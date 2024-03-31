@@ -5,12 +5,12 @@
 #include "Mesh.h"
 
 namespace soku {
-	Mesh::Mesh():
+	Mesh::Mesh() :
 		indexCount(0)
 	{
 	}
 	bool CubeMap::Initialize(Microsoft::WRL::ComPtr<ID3D11Device>& device,
-		const std::wstring & originalFilename,
+		const std::wstring& originalFilename,
 		const std::wstring& diffuseFilename,
 		const std::wstring& specularFilename)
 	{
@@ -33,12 +33,12 @@ namespace soku {
 		Utils::CreateVertexBuffer(data.m_vertices, cubeMesh->vertexBuffer, device);
 		Utils::CreateIndexBuffer(data.m_indices, cubeMesh->indexBuffer, device);
 		cubeMesh->indexCount = data.m_indices.size();
-		
+
 		Utils::CreateVSAndInputLayout(elements, vertexShader, inputLayout, device, L"Cube");
 		Utils::CreateConstantBuffer(vsConstantData, vsConstantBuffer, device);
-		
+
 		Utils::CreatePS(pixelShader, device, L"Cube");
-		
+
 		Utils::CreateCubeMapShaderResourceView(originalFilename, cubemapOrigin, device);
 		if (diffuseFilename != L"") {
 			Utils::CreateCubeMapShaderResourceView(diffuseFilename, cubemapDiffuse, device);
@@ -57,14 +57,14 @@ namespace soku {
 		context->IASetIndexBuffer(cubeMesh->indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 		context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		context->IASetInputLayout(inputLayout.Get());
-		
+
 		context->VSSetConstantBuffers(0, 1, vsConstantBuffer.GetAddressOf());
 		context->VSSetShader(vertexShader.Get(), 0, 0);
-		
+
 		context->PSSetShaderResources(0, 1, cubemapOrigin.GetAddressOf());
 		context->PSSetSamplers(0, 1, samplerState.GetAddressOf());
 		context->PSSetShader(pixelShader.Get(), 0, 0);
-		
+
 		context->DrawIndexed(cubeMesh->indexCount, 0, 0);
 	}
 	void CubeMap::UpdateConstantData(Microsoft::WRL::ComPtr<ID3D11DeviceContext>& context)
@@ -106,7 +106,7 @@ namespace soku {
 			Utils::CreateGS(NormalGS, device, L"Normal");
 			Utils::CreatePS(NormalPS, device, L"Normal");
 
-			if (data.texturePath != "") 
+			if (data.texturePath != "")
 			{
 				Utils::CreateShaderResourceView(data.texturePath, mesh->shaderResourceView, device);
 			}
@@ -134,21 +134,21 @@ namespace soku {
 		};
 		context->PSSetShaderResources(0, ARRAYSIZE(iblShaders), iblShaders);
 		context->PSSetSamplers(0, 1, samplerState.GetAddressOf());
-		
+
 		UINT stride = sizeof(Vertex);
 		UINT offset = 0;
 		for (const auto m : meshes) {
 			context->VSSetShader(vertexShader.Get(), 0, 0);
 			context->PSSetShader(pixelShader.Get(), 0, 0);
-			
+
 			context->IASetVertexBuffers(0, 1, m->vertexBuffer.GetAddressOf(), &stride, &offset);
-			context->IASetIndexBuffer(m->indexBuffer.Get(),DXGI_FORMAT_R32_UINT,0);
+			context->IASetIndexBuffer(m->indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 			context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 			context->IASetInputLayout(inputLayout.Get());
 
 			context->VSSetConstantBuffers(0, 1, vsConstantBuffer.GetAddressOf());
 			context->PSSetConstantBuffers(0, 1, psConstantBuffer.GetAddressOf());
-			
+
 			context->PSSetShaderResources(ARRAYSIZE(iblShaders), 1, m->shaderResourceView.GetAddressOf());
 			context->DrawIndexed(m->indexCount, 0, 0);
 
@@ -165,7 +165,7 @@ namespace soku {
 				context->DrawIndexed(m->indexCount, 0, 0);
 				context->GSSetShader(nullptr, 0, 0);
 			}
-			
+
 		}
 	}
 	void MeshGroup::UpdateModelWorld(const Matrix& modelWorldRow) {
@@ -177,8 +177,8 @@ namespace soku {
 		vsConstantData.model = modelWorldRow.Transpose();
 		vsConstantData.invTranspose = m_invTransposeRow.Transpose();
 	}
-	
-	
+
+
 
 
 }

@@ -1,4 +1,3 @@
-#include "pch.h"
 #include "RenderApp.h"
 
 int main()

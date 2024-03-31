@@ -1,6 +1,6 @@
 #include "Header.hlsli"
 
-cbuffer CubeVSConstant : register(b0) 
+cbuffer CubeVSConstant : register(b0)
 {
 	matrix view;
 	matrix projection;

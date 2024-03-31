@@ -30,7 +30,7 @@ namespace soku {
 		float dummy1 = 0.f;
 		Vector3 specular = Vector3(1.f);
 		float dummy2 = 0.f;
-		Vector3 fresnelR0 = Vector3(1.f,1.f,1.f);
+		Vector3 fresnelR0 = Vector3(1.f, 1.f, 1.f);
 		float dummy3 = 0.f;
 	};
 	struct BasicPSConstantData {

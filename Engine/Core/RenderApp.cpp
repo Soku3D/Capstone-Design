@@ -45,14 +45,14 @@ namespace soku
 		//	//sphereMeshGroup->UpdateConstantData(m_context);
 		//	meshGroups.push_back(sphereMeshGroup);
 		//}
-	
+
 		/*pickingMesh = std::make_shared<MeshGroup>();
 		pickingMesh->Initialize(m_device, { GeometryGenerator::MakeSphere(15, 15, 0.1f) }, L"Basic", L"Basic");
-		
+
 		lightMesh = std::make_shared<MeshGroup>();
 		lightMesh->Initialize(m_device, { GeometryGenerator::MakeSphere(15, 15, 0.1f) }, L"Basic", L"Basic");*/
 
-		
+
 		return true;
 	}
 	void RenderApp::Update(float deltaTime)
@@ -93,7 +93,7 @@ namespace soku
 
 		basicPSConstantData.eyeWorld = m_camera->GetEyePos();
 
-		for (auto& meshGroup : meshGroups) 
+		for (auto& meshGroup : meshGroups)
 		{
 			meshGroup->drawNormal = drawMeshesNormal;
 			meshGroup->vsConstantData.view = view;
@@ -114,11 +114,11 @@ namespace soku
 		if (ImGui::RadioButton("Directional Light", m_lightFlag == 1)) {
 			m_lightFlag = 1;
 		}
-		ImGui::SameLine(); 
+		ImGui::SameLine();
 		if (ImGui::RadioButton("Point Light", m_lightFlag == 2)) {
 			m_lightFlag = 2;
 		}
-		ImGui::SameLine(); 
+		ImGui::SameLine();
 		if (ImGui::RadioButton("Spot Light", m_lightFlag == 3)) {
 			m_lightFlag = 3;
 		}

@@ -26,18 +26,18 @@ namespace soku {
 	private:
 		Microsoft::WRL::ComPtr <ID3D11Buffer> vertexBuffer;
 		Microsoft::WRL::ComPtr <ID3D11Buffer> indexBuffer;
-		
+
 		Microsoft::WRL::ComPtr<ID3D11Texture2D> texture;
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> shaderResourceView;
 
 		UINT indexCount;
 	};
-	class CubeMap{
+	class CubeMap {
 	public:
 		CubeMap() {}
 		bool Initialize(Microsoft::WRL::ComPtr<ID3D11Device>& device,
 			const std::wstring& originalFilename = L"Assets/Textures/cubemaps/courtyard.dds.dds",
-			const std::wstring& diffuseFilename = L"", 
+			const std::wstring& diffuseFilename = L"",
 			const std::wstring& specularFilename = L"");
 		void Render(Microsoft::WRL::ComPtr<ID3D11DeviceContext>& context);
 	public:
@@ -64,13 +64,13 @@ namespace soku {
 	class MeshGroup {
 	public:
 		bool Initialize(Microsoft::WRL::ComPtr<ID3D11Device>& device,
-			const std::vector<MeshData<Vertex,uint32_t>>& meshData,
+			const std::vector<MeshData<Vertex, uint32_t>>& meshData,
 			const std::wstring& vsPrefix = L"",
-			const std::wstring& psPrefix = L"" );
+			const std::wstring& psPrefix = L"");
 		void UpdateConstantData(Microsoft::WRL::ComPtr<ID3D11DeviceContext>& context);
 		void UpdateModelWorld(const Matrix& modelWorldRow);
 		void Render(Microsoft::WRL::ComPtr<ID3D11DeviceContext>& context);
-	public: 
+	public:
 		Matrix m_modelWorldRow = Matrix();
 		Matrix m_invTransposeRow = Matrix();
 		BasicVSConstantData vsConstantData;
@@ -96,7 +96,7 @@ namespace soku {
 		Microsoft::WRL::ComPtr<ID3D11VertexShader> NormalVS;
 		Microsoft::WRL::ComPtr<ID3D11GeometryShader> NormalGS;
 		Microsoft::WRL::ComPtr<ID3D11PixelShader> NormalPS;
-		
+
 		Microsoft::WRL::ComPtr<ID3D11SamplerState> samplerState;
 	};
 	typedef MeshData<Vertex, uint32_t> meshData;

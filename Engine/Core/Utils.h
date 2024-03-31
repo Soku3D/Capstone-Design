@@ -1,5 +1,6 @@
 #pragma once 
 
+
 namespace soku {
 	class Utils {
 	public:
@@ -10,9 +11,6 @@ namespace soku {
 				if (error)
 				{
 					std::cout << (char*)error->GetBufferPointer();
-				}
-				else {
-					std::cout << "Failed compile shader\n";
 				}
 			}
 		}

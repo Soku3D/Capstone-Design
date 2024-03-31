@@ -57,7 +57,7 @@ namespace soku
 		AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, false);
 
 		// Create Window
-		m_hWnd = CreateWindowW(L"class", L"hi", WS_OVERLAPPEDWINDOW,
+		m_hWnd = CreateWindowW(L"class", L"wnd", WS_OVERLAPPEDWINDOW,
 			10, 10,
 			rect.right - rect.left,
 			rect.bottom - rect.top,
@@ -104,9 +104,8 @@ namespace soku
 			D3D11_SDK_VERSION,
 			device.GetAddressOf(),
 			&featureLevel,
-			context.GetAddressOf()))) 
-		{
-			std::cerr << "CreateDevice Failed";
+			context.GetAddressOf()))) {
+			MessageBox(NULL, "CreateDevice Failed", NULL, 0);
 			return false;
 		}
 
@@ -147,12 +146,12 @@ namespace soku
 				m_context.GetAddressOf()
 			);
 		if (FAILED(hr)) {
-			std::cerr << "D3D11CreateDeviceAndSwapChain Failed" << '\n';
+			std::cout << "D3D11CreateDeviceAndSwapChain Failed" << '\n';
 			return false;
 		}
 		if (!CreateRenderTargetView())
 		{
-			std::cerr << "CreateRenderTargetView Failed" << '\n';
+			std::cout << "CreateRenderTargetView Failed" << '\n';
 			return false;
 		}
 		SetViewport();
