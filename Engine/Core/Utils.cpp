@@ -5,6 +5,8 @@
 #include "stb_image_write.h"
 #include <directxtk/DDSTextureLoader.h> 
 #include "Utils.h"
+#include "CompiledShaders/CubePS.h"
+#include "CompiledShaders/CubeVS.h"
 
 namespace soku {
 	using namespace Microsoft::WRL;
@@ -12,7 +14,7 @@ namespace soku {
 		const std::wstring shaderfileName)
 	{
 #if defined(DEBUG) || defined(_DEBUG)
-		ComPtr<ID3DBlob> shader;
+		/*ComPtr<ID3DBlob> shader;
 		ComPtr<ID3DBlob> error;
 		UINT compileFlags = D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
 		std::wstring file = shaderfileName + L"VS.hlsl";
@@ -20,29 +22,29 @@ namespace soku {
 			"main", "vs_5_0", compileFlags, 0,
 			shader.GetAddressOf(), error.GetAddressOf());
 
-		CheckResult(hr, error.Get());
-		if (FAILED(device->CreateVertexShader(shader->GetBufferPointer(), shader->GetBufferSize(),
+		CheckResult(hr, error.Get());*/
+		if (FAILED(device->CreateVertexShader(g_pCubeVS, sizeof(g_pCubeVS),
 			nullptr, vs.GetAddressOf()))) {
 			std::cout << "CreateVertexShader Failed\n";
 		}
 
 		if (FAILED(device->CreateInputLayout(elements.data(), elements.size(),
-			shader->GetBufferPointer(), shader->GetBufferSize(),
+			g_pCubeVS, sizeof(g_pCubeVS),
 			inputLayout.GetAddressOf()))) {
 			std::cout << "CreateInputLayout Failed\n";
 		}
 #else
-		std::wstring file = L"Shaders/";
+		std::wstring file = L"CompiledShaders/";
 		file += shaderfileName + L"VS.cso";
 		std::ifstream input(file.c_str(), std::ios::binary);
 		std::vector<unsigned char> buffer(std::istreambuf_iterator<char>(input), {});
-		if (FAILED(device->CreateVertexShader(buffer.data(), buffer.size(),
+		if (FAILED(device->CreateVertexShader(g_pCubeVS, sizeof(g_pCubeVS),
 			nullptr, vs.GetAddressOf()))) {
 			std::cout << "CreateVertexShader Failed\n";
 		}
 
 		if (FAILED(device->CreateInputLayout(elements.data(), elements.size(),
-			buffer.data(), buffer.size(),
+			g_pCubeVS, sizeof(g_pCubeVS),
 			inputLayout.GetAddressOf()))) {
 			std::cout << "CreateInputLayout Failed\n";
 		}
@@ -67,7 +69,7 @@ namespace soku {
 		}
 
 #else
-		std::wstring file = L"Shaders/";
+		std::wstring file = L"CompiledShaders/";
 		file += shaderfileName + L"GS.cso";
 		std::ifstream input(file.c_str(), std::ios::binary);
 		std::vector<unsigned char> buffer(std::istreambuf_iterator<char>(input), {});
@@ -80,7 +82,7 @@ namespace soku {
 	void Utils::CreatePS(Microsoft::WRL::ComPtr<ID3D11PixelShader>& ps, Microsoft::WRL::ComPtr<ID3D11Device>& device, const std::wstring shaderfileName)
 	{
 #if defined(DEBUG) || defined(_DEBUG)
-		ComPtr<ID3DBlob> shader;
+		/*ComPtr<ID3DBlob> shader;
 		ComPtr<ID3DBlob> error;
 		UINT compileFlags = compileFlags = D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
 		std::wstring file = shaderfileName + L"PS.hlsl";
@@ -88,20 +90,19 @@ namespace soku {
 			"main", "ps_5_0", compileFlags, 0,
 			shader.GetAddressOf(), error.GetAddressOf());
 
-		CheckResult(hr, error.Get());
-		if (FAILED(device->CreatePixelShader(shader->GetBufferPointer(), shader->GetBufferSize(),
+		CheckResult(hr, error.Get());*/
+		if (FAILED(device->CreatePixelShader(g_pCubePS, sizeof(g_pCubePS),
 			NULL, ps.GetAddressOf()))) {
 			std::cout << "CreatePixelShader Failed\n";
 		}
 
 #else
-		std::wstring file = L"Shaders/";
+		std::wstring file = L"CompiledShaders/";
 		file += shaderfileName + L"PS.cso";
 		std::ifstream input(file.c_str(), std::ios::binary);
-		std::vector<unsigned char> buffer(std::istreambuf_iterator<char>(input), {});
-		if (FAILED(device->CreatePixelShader(buffer.data(), buffer.size(),
-			nullptr, ps.GetAddressOf()))) {
-			std::cout << "CreatePixel Failed\n";
+		if (FAILED(device->CreatePixelShader(g_pCubePS, sizeof(g_pCubePS),
+			NULL, ps.GetAddressOf()))) {
+			std::cout << "CreatePixelShader Failed\n";
 		}
 #endif
 	}
