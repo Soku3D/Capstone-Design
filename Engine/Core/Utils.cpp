@@ -5,8 +5,11 @@
 #include "stb_image_write.h"
 #include <directxtk/DDSTextureLoader.h> 
 #include "Utils.h"
-#include "CompiledShaders/CubePS.h"
-#include "CompiledShaders/CubeVS.h"
+
+#include "CompiledShaders\CubeVS.h"
+#include "CompiledShaders\CubePs.h"
+
+
 
 namespace soku {
 	using namespace Microsoft::WRL;

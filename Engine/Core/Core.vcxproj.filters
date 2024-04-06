@@ -22,7 +22,7 @@
     <ClInclude Include="GeometryGenerator.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="Mesh.h">
+    <ClInclude Include="MeshData.h">
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="ModelLoader.h">
@@ -43,6 +43,12 @@
     <ClInclude Include="Vertex.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="GraphicsCommon.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GraphicsPSO.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BaseApp.cpp">
@@ -55,9 +61,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="GeometryGenerator.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Mesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ModelLoader.cpp">
@@ -76,6 +79,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Vertex.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphicsCommon.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GraphicsPSO.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

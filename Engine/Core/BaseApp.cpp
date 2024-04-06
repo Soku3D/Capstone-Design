@@ -179,8 +179,6 @@ namespace soku
 		if (!CreateRasterizerState(m_rasterizerState)) {
 			return false;
 		}
-
-
 		return true;
 	}
 	bool BaseApp::CreateRenderTargetView() {

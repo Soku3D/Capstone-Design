@@ -20,9 +20,9 @@ namespace soku {
 			ProcessNode(pScene, pNode->mChildren[i]);
 		}
 	}
-	meshData ModelLoader::ProcessMesh(const aiScene* pScene, aiMesh* pMesh)
+	MeshData ModelLoader::ProcessMesh(const aiScene* pScene, aiMesh* pMesh)
 	{
-		meshData data;
+		MeshData data;
 		for (int i = 0; i < pMesh->mNumVertices; i++)
 		{
 			Vertex v;
