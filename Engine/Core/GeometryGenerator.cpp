@@ -3,8 +3,9 @@
 #include "GeometryGenerator.h"
 
 namespace soku {
-	meshData GeometryGenerator::MakePlane()
+	MeshData GeometryGenerator::MakeSquare()
 	{
+		MeshData meshData;
 		std::vector<uint32_t> indices;
 		std::vector<Vertex> vertices;
 		float l = 1.f;
@@ -40,59 +41,20 @@ namespace soku {
 		indices.push_back(2);
 		indices.push_back(3);
 
-		return MeshData(vertices, indices);
+		meshData.m_vertices = vertices;
+		meshData.m_indices = indices;
+
+		return meshData;
 	}
 
-	MeshData<SimpleVertex, uint32_t> GeometryGenerator::MakeCubeMapBox(float l)
+	MeshData GeometryGenerator::MakeCubeMapBox(float l)
 	{
-		std::vector<SimpleVertex> vertices;
-		std::vector<uint32_t> indices;
 		
-		Vector3 p0(-l, l, -l);
-		Vector3 p1(-l, l, l);
-		Vector3 p2(l, l, l);
-		Vector3 p3(l, l, -l);
-		Vector3 p4(-l, -l, -l);
-		Vector3 p5(-l, -l, l);
-		Vector3 p6(l, -l, l);
-		Vector3 p7(l, -l, -l);
-
-		
-		std::vector<Vector3> points{
-			p0, p1, p2, p3,
-				p5, p4, p7, p6,
-				p7, p3, p2, p6,
-				p5, p1, p0, p4,
-				p4, p0, p3, p7,
-				p6, p2, p1, p5
-		};
-		for (int i = 0; i < 6; i++)
-		{
-			SimpleVertex v0{ points[i * 4] };
-			SimpleVertex v1{ points[i * 4 + 1]};
-			SimpleVertex v2{ points[i * 4 + 2] };
-			SimpleVertex v3{ points[i * 4 + 3] };
-			vertices.push_back(v0);
-			vertices.push_back(v1);
-			vertices.push_back(v2);
-			vertices.push_back(v3);
-		}
-		for (int j = 0; j < 6; j++)
-		{
-			int i = 4 * j;
-			indices.push_back(i);
-			indices.push_back(i + 2);
-			indices.push_back(i + 1);
-
-			indices.push_back(i);
-			indices.push_back(i + 3);
-			indices.push_back(i + 2);
-		}
-		return MeshData(vertices, indices);
 	}
 	
-	meshData GeometryGenerator::MakeBox(float l, const std::string& texturePath)
+	MeshData GeometryGenerator::MakeBox(float l, const std::string& texturePath)
 	{
+		MeshData meshData;
 		std::vector<uint32_t> indices;
 		std::vector<Vertex> vertices;
 		
@@ -145,9 +107,9 @@ namespace soku {
 			indices.push_back(i + 2);
 			indices.push_back(i + 3);
 		}
-		return MeshData(vertices, indices, texturePath);
+		return meshData;
 	}
-	meshData GeometryGenerator::MakeGrid(int x, int y)
+	MeshData GeometryGenerator::MakeGrid(int x, int y)
 	{
 		std::vector<uint32_t> indices;
 		std::vector<Vertex> vertices;

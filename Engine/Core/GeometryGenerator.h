@@ -1,19 +1,19 @@
 #pragma once
-#include "Mesh.h"
+#include "MeshData.h"
 namespace soku {
 	
 	class GeometryGenerator {
 	public:
-		static meshData MakePlane();
-		static MeshData<SimpleVertex, uint32_t> MakeCubeMapBox(float l = 1.f);
-		static meshData MakeBox(float l = 1.f, const std::string& texturePath = "");
-		static meshData MakeGrid(int x = 1, int y = 1);
-		static meshData MakeCylinder(int x = 5, int y = 2, float height = 2.f, int radius = 1.f);
-		static meshData MakeSphere(int x = 5, int y = 5, float radius = 1.f, const std::string& texturePath = "");
-		static meshData MakeTetrahedron();
-		static meshData MakeIcosahedron();
-		static meshData Subdivision(const meshData& meshData, float radius = 1.f);
-		static meshData SubdivisionToSphere(const meshData& meshData, float radius = 1.f);
-		static std::vector<meshData> LoadMeshData(std::string filePath, std::string filename);
+		static MeshData MakeSquare();
+		static MeshData MakeCubeMapBox(float l = 1.f);
+		static MeshData MakeBox(float l = 1.f, const std::string& texturePath = "");
+		static MeshData MakeGrid(int x = 1, int y = 1);
+		static MeshData MakeCylinder(int x = 5, int y = 2, float height = 2.f, int radius = 1.f);
+		static MeshData MakeSphere(int x = 5, int y = 5, float radius = 1.f, const std::string& texturePath = "");
+		static MeshData MakeTetrahedron();
+		static MeshData MakeIcosahedron();
+		static MeshData Subdivision(const MeshData& meshData, float radius = 1.f);
+		static MeshData SubdivisionToSphere(const MeshData& meshData, float radius = 1.f);
+		static std::vector<MeshData> LoadMeshData(std::string filePath, std::string filename);
 	};
 }
