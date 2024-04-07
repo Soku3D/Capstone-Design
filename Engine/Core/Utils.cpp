@@ -13,102 +13,6 @@
 
 namespace soku {
 	using namespace Microsoft::WRL;
-	void Utils::CreateVSAndInputLayout(std::vector<D3D11_INPUT_ELEMENT_DESC>& elements, Microsoft::WRL::ComPtr<ID3D11VertexShader>& vs, Microsoft::WRL::ComPtr<ID3D11InputLayout>& inputLayout, Microsoft::WRL::ComPtr<ID3D11Device>& device,
-		const std::wstring shaderfileName)
-	{
-#if defined(DEBUG) || defined(_DEBUG)
-		/*ComPtr<ID3DBlob> shader;
-		ComPtr<ID3DBlob> error;
-		UINT compileFlags = D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
-		std::wstring file = shaderfileName + L"VS.hlsl";
-		HRESULT hr = D3DCompileFromFile(file.c_str(), nullptr, D3D_COMPILE_STANDARD_FILE_INCLUDE,
-			"main", "vs_5_0", compileFlags, 0,
-			shader.GetAddressOf(), error.GetAddressOf());
-
-		CheckResult(hr, error.Get());*/
-		if (FAILED(device->CreateVertexShader(g_pCubeVS, sizeof(g_pCubeVS),
-			nullptr, vs.GetAddressOf()))) {
-			std::cout << "CreateVertexShader Failed\n";
-		}
-
-		if (FAILED(device->CreateInputLayout(elements.data(), elements.size(),
-			g_pCubeVS, sizeof(g_pCubeVS),
-			inputLayout.GetAddressOf()))) {
-			std::cout << "CreateInputLayout Failed\n";
-		}
-#else
-		std::wstring file = L"CompiledShaders/";
-		file += shaderfileName + L"VS.cso";
-		std::ifstream input(file.c_str(), std::ios::binary);
-		std::vector<unsigned char> buffer(std::istreambuf_iterator<char>(input), {});
-		if (FAILED(device->CreateVertexShader(g_pCubeVS, sizeof(g_pCubeVS),
-			nullptr, vs.GetAddressOf()))) {
-			std::cout << "CreateVertexShader Failed\n";
-		}
-
-		if (FAILED(device->CreateInputLayout(elements.data(), elements.size(),
-			g_pCubeVS, sizeof(g_pCubeVS),
-			inputLayout.GetAddressOf()))) {
-			std::cout << "CreateInputLayout Failed\n";
-		}
-#endif
-	}
-
-	void Utils::CreateGS(Microsoft::WRL::ComPtr<ID3D11GeometryShader>& gs, Microsoft::WRL::ComPtr<ID3D11Device>& device, const std::wstring shaderfileName)
-	{
-#if defined(DEBUG) || defined(_DEBUG)
-		ComPtr<ID3DBlob> shader;
-		ComPtr<ID3DBlob> error;
-		UINT compileFlags = compileFlags = D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
-		std::wstring file = shaderfileName + L"GS.hlsl";
-		HRESULT hr = D3DCompileFromFile(file.c_str(), 0, D3D_COMPILE_STANDARD_FILE_INCLUDE,
-			"main", "gs_5_0", compileFlags, 0,
-			shader.GetAddressOf(), error.GetAddressOf());
-
-		CheckResult(hr, error.Get());
-		if (FAILED(device->CreateGeometryShader(shader->GetBufferPointer(), shader->GetBufferSize(),
-			NULL, gs.GetAddressOf()))) {
-			std::cout << "CreateGeometryShader Failed\n";
-		}
-
-#else
-		std::wstring file = L"CompiledShaders/";
-		file += shaderfileName + L"GS.cso";
-		std::ifstream input(file.c_str(), std::ios::binary);
-		std::vector<unsigned char> buffer(std::istreambuf_iterator<char>(input), {});
-		if (FAILED(device->CreateGeometryShader(buffer.data(), buffer.size(),
-			nullptr, gs.GetAddressOf()))) {
-			std::cout << "CreateGeometryShader Failed\n";
-		}
-#endif
-	}
-	void Utils::CreatePS(Microsoft::WRL::ComPtr<ID3D11PixelShader>& ps, Microsoft::WRL::ComPtr<ID3D11Device>& device, const std::wstring shaderfileName)
-	{
-#if defined(DEBUG) || defined(_DEBUG)
-		/*ComPtr<ID3DBlob> shader;
-		ComPtr<ID3DBlob> error;
-		UINT compileFlags = compileFlags = D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
-		std::wstring file = shaderfileName + L"PS.hlsl";
-		HRESULT hr = D3DCompileFromFile(file.c_str(), 0, D3D_COMPILE_STANDARD_FILE_INCLUDE,
-			"main", "ps_5_0", compileFlags, 0,
-			shader.GetAddressOf(), error.GetAddressOf());
-
-		CheckResult(hr, error.Get());*/
-		if (FAILED(device->CreatePixelShader(g_pCubePS, sizeof(g_pCubePS),
-			NULL, ps.GetAddressOf()))) {
-			std::cout << "CreatePixelShader Failed\n";
-		}
-
-#else
-		std::wstring file = L"CompiledShaders/";
-		file += shaderfileName + L"PS.cso";
-		std::ifstream input(file.c_str(), std::ios::binary);
-		if (FAILED(device->CreatePixelShader(g_pCubePS, sizeof(g_pCubePS),
-			NULL, ps.GetAddressOf()))) {
-			std::cout << "CreatePixelShader Failed\n";
-		}
-#endif
-	}
 	std::vector<uint8_t> Utils::CreateTextureImage(const std::string& filePath, int& width, int& height) {
 		int channels;
 		unsigned char* img = stbi_load(filePath.c_str(), &width, &height, &channels, 0);
@@ -184,7 +88,6 @@ namespace soku {
 		if (FAILED(hr)) {
 			std::cout << "CreateTexture2D FAILED\n";
 		}
-	
 	}
 	void Utils::CreateShaderResourceView(const std::string& filePath,
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>& shaderResourceView, Microsoft::WRL::ComPtr<ID3D11Device>& device)

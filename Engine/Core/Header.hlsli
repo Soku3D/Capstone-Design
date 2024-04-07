@@ -1,10 +1,17 @@
-struct BasicVSInput
+
+cbuffer GlobalConsts : register(b1)
+{
+    Matrix viewProj;
+    float3 eyePos;
+    float dummy;
+}
+struct DefaultVSInput
 {
     float3 position : POSITION;
-    float2 texcoord : TEXCOORD;
     float3 normal : Normal;
+    float2 texcoord : TEXCOORD;
 };
-struct BasicPSInput
+struct DefaultPSInput
 {
     float4 posProj : SV_Position;
     float2 texcoord : Texcoord;

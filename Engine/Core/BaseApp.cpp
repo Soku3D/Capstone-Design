@@ -1,5 +1,4 @@
 #include "pch.h"
-#include "Utils.h"
 #include "BaseApp.h"
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -39,6 +38,24 @@ namespace soku
 			return false;
 		}
 		return true;
+	}
+	void BaseApp::CreateConsts()
+	{
+		Utils::CreateConstantBuffer(m_globalConstsCPU, m_globalConstsGPU, m_device);
+	}
+	void BaseApp::UpdateGlobalConsts(const Vector3& eyeWorld, const Matrix& viewRow, const Matrix& projRow)
+	{
+		m_globalConstsCPU.eyePos = eyeWorld;
+		m_globalConstsCPU.viewProj = viewRow * projRow;
+		m_globalConstsCPU.viewProj = m_globalConstsCPU.viewProj.Transpose();
+
+		Utils::UpdateConstantBuffer(m_globalConstsCPU, m_globalConstsGPU, m_context);
+	}
+	void BaseApp::SetGlobalConsts()
+	{
+		m_context->VSSetConstantBuffers(1, 1, m_globalConstsGPU.GetAddressOf());
+		m_context->PSSetConstantBuffers(1, 1, m_globalConstsGPU.GetAddressOf());
+		m_context->GSSetConstantBuffers(1, 1, m_globalConstsGPU.GetAddressOf());
 	}
 	bool BaseApp::InitWindow()
 	{
@@ -82,8 +99,6 @@ namespace soku
 	bool BaseApp::InitDirect3D()
 	{
 		using namespace Microsoft::WRL;
-		ComPtr<ID3D11Device> device;
-		ComPtr<ID3D11DeviceContext> context;
 
 		UINT createDeviceFlag = 0;
 		D3D_FEATURE_LEVEL featureLevels[] = {
@@ -94,26 +109,6 @@ namespace soku
 #if defined(DEBUG) || (_DEBUG)
 		createDeviceFlag |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
-		if (FAILED(D3D11CreateDevice(
-			nullptr,
-			D3D_DRIVER_TYPE_HARDWARE,
-			nullptr,
-			createDeviceFlag,
-			featureLevels,
-			ARRAYSIZE(featureLevels),
-			D3D11_SDK_VERSION,
-			device.GetAddressOf(),
-			&featureLevel,
-			context.GetAddressOf()))) {
-			MessageBox(NULL, "CreateDevice Failed", NULL, 0);
-			return false;
-		}
-
-		device->CheckMultisampleQualityLevels(
-			swapChainFormat,
-			m_sampleCount,
-			&m_sampleQulity);
-
 		DXGI_SWAP_CHAIN_DESC scDesc;
 		ZeroMemory(&scDesc, sizeof(scDesc));
 		scDesc.BufferDesc.Width = m_width;
@@ -121,8 +116,8 @@ namespace soku
 		scDesc.BufferDesc.Format = swapChainFormat;
 		scDesc.BufferDesc.RefreshRate.Numerator = 60;
 		scDesc.BufferDesc.RefreshRate.Denominator = 1;
-		scDesc.SampleDesc.Count = (m_sampleQulity > 0) ? m_sampleCount : 1;
-		scDesc.SampleDesc.Quality = (m_sampleQulity > 0) ? m_sampleQulity - 1 : 0;
+		scDesc.SampleDesc.Count = 1;
+		scDesc.SampleDesc.Quality = 0;
 		scDesc.BufferCount = 2;
 		scDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 		scDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
@@ -149,88 +144,14 @@ namespace soku
 			std::cout << "D3D11CreateDeviceAndSwapChain Failed" << '\n';
 			return false;
 		}
-		if (!CreateRenderTargetView())
-		{
-			std::cout << "CreateRenderTargetView Failed" << '\n';
-			return false;
-		}
+		Graphics::InitCommonStates(m_device);
+
+		CreateBuffers();
 		SetViewport();
-		if (!CreateDepthBuffer()) {
-			return false;
-		}
 
-		D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
-		ZeroMemory(&depthStencilDesc, sizeof(D3D11_DEPTH_STENCIL_DESC));
-		depthStencilDesc.DepthEnable = true;
-		depthStencilDesc.DepthWriteMask =
-			D3D11_DEPTH_WRITE_MASK::D3D11_DEPTH_WRITE_MASK_ALL;
-		depthStencilDesc.DepthFunc =
-			D3D11_COMPARISON_FUNC::D3D11_COMPARISON_LESS_EQUAL;
-
-		if (FAILED(m_device->CreateDepthStencilState(
-			&depthStencilDesc, m_depthStencilState.GetAddressOf()))) {
-			std::cout << "CreateDepthStencilState() failed." << std::endl;
-		}
-
-		if (!CreateRasterizerState(m_rasterizerState_wireMode, D3D11_FILL_MODE::D3D11_FILL_WIREFRAME,
-			D3D11_CULL_NONE)) {
-			return false;
-		}
-		if (!CreateRasterizerState(m_rasterizerState)) {
-			return false;
-		}
+	
+		CreateConsts();
 		return true;
-	}
-	bool BaseApp::CreateRenderTargetView() {
-		Microsoft::WRL::ComPtr<ID3D11Texture2D> backBuffer;
-		m_swapChain->GetBuffer(0, IID_PPV_ARGS(backBuffer.GetAddressOf()));
-		if (backBuffer)
-		{
-			if (FAILED(m_device->CreateRenderTargetView(backBuffer.Get(), nullptr, 
-				m_renderTargetView.GetAddressOf())))
-			{
-				std::cout << "CreateRenderTargetView(backbuffer) FAILED\n";
-				return false;
-			}
-			D3D11_TEXTURE2D_DESC desc;
-			backBuffer->GetDesc(&desc);
-			if (FAILED(m_device->CreateTexture2D(&desc, 0, m_indexTexture.GetAddressOf()))) {
-				std::cout << "CreateTexture2D(indexTexture) FAILED\n";
-				return false;
-			}
-			if (FAILED(m_device->CreateRenderTargetView(m_indexTexture.Get(), nullptr,
-				m_indexRtv.GetAddressOf())))
-			{
-				std::cout << "CreateRenderTargetView(indexRtv) FAILED\n";
-				return false;
-			}
-			backBuffer->GetDesc(&desc);
-			desc.SampleDesc = { 1,0 };
-			desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-			desc.MiscFlags = 0;
-			if (FAILED(m_device->CreateTexture2D(&desc, 0, m_tempTexture.GetAddressOf()))) {
-				std::cout << "CreateTexture2D(m_tempTexture) FAILED\n";
-				return false;
-			}
-			if (FAILED(m_device->CreateTexture2D(&desc, 0, m_indexTempTexture.GetAddressOf()))) {
-				std::cout << "CreateTexture2D(m_indexTempTexture) FAILED\n";
-				return false;
-			}
-			
-			desc.Width = 1;
-			desc.Height = 1;
-			desc.SampleDesc = { 1,0 };
-			desc.Usage = D3D11_USAGE_STAGING;
-			desc.BindFlags = 0;
-			desc.MiscFlags = 0;
-			desc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
-			if (FAILED(m_device->CreateTexture2D(&desc, 0, m_indexStagingTexture.GetAddressOf()))) {
-				std::cout << "CreateTexture2D(m_indexStagingTexture) FAILED\n";
-				return false;
-			}
-			return true;
-		}
-		return false;
 	}
 	void BaseApp::SetViewport() {
 		m_viewport =
@@ -250,43 +171,51 @@ namespace soku
 		depthDesc.Height = m_height;
 		depthDesc.MipLevels = depthDesc.ArraySize = 1;
 		depthDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
-		depthDesc.SampleDesc.Count = (m_sampleQulity > 0) ? m_sampleCount : 1;
-		depthDesc.SampleDesc.Quality = (m_sampleQulity > 0) ? m_sampleQulity - 1 : 0;
+		depthDesc.SampleDesc.Count = 1;
+		depthDesc.SampleDesc.Quality = 0;
 		depthDesc.Usage = D3D11_USAGE_DEFAULT;
 		depthDesc.BindFlags = D3D11_BIND_FLAG::D3D11_BIND_DEPTH_STENCIL;
+
 		HRESULT hr = m_device->CreateTexture2D(&depthDesc, nullptr, depthBuffer.GetAddressOf());
 
 		if (FAILED(hr)) {
 			std::cout << "CreateDepthBuffer Failed" << '\n';
 			return false;
 		}
-		hr = m_device->CreateDepthStencilView(depthBuffer.Get(), 0, m_depthStencilView.GetAddressOf());
+		hr = m_device->CreateDepthStencilView(depthBuffer.Get(), 0, m_DSV.GetAddressOf());
 		if (FAILED(hr)) {
 			std::cout << "CreateDepthStencilView Failed" << '\n';
 			return false;
 		}
 		return true;
 	}
-	bool BaseApp::CreateRasterizerState(Microsoft::WRL::ComPtr <ID3D11RasterizerState>& rasterizerState,
-		D3D11_FILL_MODE fillMode, D3D11_CULL_MODE cullMode) {
-		D3D11_RASTERIZER_DESC rsDesc;
-		ZeroMemory(&rsDesc, sizeof(rsDesc));
-		rsDesc.CullMode = cullMode;
-		rsDesc.FillMode = fillMode;
-		rsDesc.FrontCounterClockwise = false;
-		rsDesc.DepthClipEnable = true;
+	void BaseApp::CreateBuffers()
+	{
+		Microsoft::WRL::ComPtr<ID3D11Texture2D> backBuffer;
+		m_swapChain->GetBuffer(0, IID_PPV_ARGS(backBuffer.GetAddressOf()));
 
-		HRESULT hr =
-			m_device->CreateRasterizerState(&rsDesc, rasterizerState.ReleaseAndGetAddressOf());
-		if (FAILED(hr)) {
-			std::cout << "CreateRasterizerState Failed\n";
-			return false;
-		}
-		//m_context->RSSetState(rasterizerState.Get());
+		ThrowIfFailed(
+			m_device->CreateRenderTargetView(backBuffer.Get(), nullptr, m_backBufferRTV.GetAddressOf()));
 
-		return true;
+		D3D11_TEXTURE2D_DESC texDesc;
+		backBuffer->GetDesc(&texDesc);
+
+		m_device->CheckMultisampleQualityLevels(
+			DXGI_FORMAT_R16G16B16A16_FLOAT, 4, &m_sampleQulity);
+		texDesc.Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
+		texDesc.Usage = D3D11_USAGE_DEFAULT;
+		texDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+		m_device->CreateTexture2D(&texDesc, NULL, m_resolvedBuffer.GetAddressOf());
+		m_device->CreateShaderResourceView(m_resolvedBuffer.Get(), NULL, m_resolvedSRV.GetAddressOf());
+		m_device->CreateRenderTargetView(m_resolvedBuffer.Get(), NULL, m_resolvedRTV.GetAddressOf());
+
+		texDesc.SampleDesc.Count = (m_sampleQulity > 0) ? 4 : 1;
+		texDesc.SampleDesc.Quality = (m_sampleQulity > 0) ? m_sampleQulity-1 : 0;
+		m_device->CreateTexture2D(&texDesc, NULL, m_floatBuffer.GetAddressOf());
+		m_device->CreateRenderTargetView(m_floatBuffer.Get(), NULL, m_floatRTV.GetAddressOf());
+
+		CreateDepthBuffer();
 	}
-
 	bool BaseApp::InitGUI()
 	{
 		ImGui::CreateContext();
@@ -344,44 +273,7 @@ namespace soku
 	}
 	void BaseApp::CapturePNG()
 	{
-		Microsoft::WRL::ComPtr<ID3D11Texture2D> backbuffer;
-		m_swapChain->GetBuffer(0, IID_PPV_ARGS(backbuffer.GetAddressOf()));
-		m_context->ResolveSubresource(m_tempTexture.Get(), 0, backbuffer.Get(), 0, DXGI_FORMAT_R8G8B8A8_UNORM);
-
-		D3D11_TEXTURE2D_DESC desc;
-		m_tempTexture->GetDesc(&desc);
-		desc.BindFlags = 0;
-		desc.MiscFlags = 0;
-		desc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
-		desc.Usage = D3D11_USAGE_STAGING;
-
-		Microsoft::WRL::ComPtr<ID3D11Texture2D> stagingTexture;
-		if (FAILED(m_device->CreateTexture2D(&desc, nullptr,
-			stagingTexture.GetAddressOf()))) {
-			std::cout << "CreateTexture2D Failed()" << std::endl;
-		}
-		D3D11_BOX stagingbox{
-		0,0,
-		0,
-		m_width, m_height
-		,1
-		};
-		m_context->CopySubresourceRegion(stagingTexture.Get(), 0, 0, 0, 0,
-			m_tempTexture.Get(), 0, &stagingbox);
-
-		std::vector<unsigned char> img(desc.Width * desc.Height * 4);
-
-		D3D11_MAPPED_SUBRESOURCE ms;
-		m_context->Map(stagingTexture.Get(), 0, D3D11_MAP_READ, 0, &ms);
-		uint8_t* pData = (uint8_t*)ms.pData;
-		for (int h = 0; h < desc.Height; h++)
-		{
-			memcpy(&img[h * desc.Width * 4], &pData[h * ms.RowPitch],
-				desc.Width * sizeof(uint8_t) * 4);
-		}
-		m_context->Unmap(stagingTexture.Get(), 0);
-
-		Utils::SavePNG(img, desc.Width, desc.Height);
+		//Utils::SavePNG(img, desc.Width, desc.Height);
 	}
 	LRESULT BaseApp::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
@@ -397,14 +289,13 @@ namespace soku
 				m_height = int(HIWORD(lParam));
 				m_guiWidth = 0;
 
-				m_renderTargetView.Reset();
+				m_backBufferRTV.Reset();
 				m_swapChain->ResizeBuffers(0, // 현재 개수 유지
 					(UINT)LOWORD(lParam), // 해상도 변경
 					(UINT)HIWORD(lParam),
 					DXGI_FORMAT_UNKNOWN, // 현재 포맷 유지
 					0);
-				CreateRenderTargetView();
-				CreateDepthBuffer();
+				CreateBuffers();
 				SetViewport();
 
 				// 화면 해상도가 바뀌면 카메라의 aspect ratio도 변경
@@ -416,14 +307,14 @@ namespace soku
 			return 0;
 		case WM_KEYDOWN:
 			keyDownState[wParam] = true;
-			if (wParam == 'V' && !m_FPSMode)
+			/*if (wParam == 'V' && !m_FPSMode)
 				m_FPSMode = true;
 			else if (wParam == 'V' && m_FPSMode)
 				m_FPSMode = false;
 			if (wParam == 'G' && !m_grapmode)
 				m_grapmode = true;
 			else if (wParam == 'G' && m_grapmode)
-				m_grapmode = false;
+				m_grapmode = false;*/
 			break;
 		case WM_KEYUP:
 			keyDownState[wParam] = false;
@@ -438,18 +329,18 @@ namespace soku
 			UINT rawSize = sizeof(raw);
 
 			const UINT resultData = GetRawInputData(reinterpret_cast<HRAWINPUT>(lParam), RID_INPUT, &raw, &rawSize, sizeof(RAWINPUTHEADER));
-			if (raw.header.dwType == RIM_TYPEMOUSE && m_FPSMode) {
-				int deltaX = raw.data.mouse.lLastX;
-				int deltaY = raw.data.mouse.lLastY;
-				//std::cout << deltaX << " " << deltaY << '\n';
-				OnMouseMove(deltaX, deltaY);
-			}
+			//if (raw.header.dwType == RIM_TYPEMOUSE && m_FPSMode) {
+			int deltaX = raw.data.mouse.lLastX;
+			int deltaY = raw.data.mouse.lLastY;
+			//std::cout << deltaX << " " << deltaY << '\n';
+			OnMouseMove(deltaX, deltaY);
+			//}
 			DirectX::Mouse::ProcessMessage(msg, wParam, lParam);
 			break;
 		}
 		case WM_LBUTTONDOWN:
-			if (!mouse->GetState().leftButton)
-				m_dragStartFlag = true; 
+			/*if (!mouse->GetState().leftButton)
+				m_dragStartFlag = true; */
 		case WM_LBUTTONUP:
 		case WM_ACTIVATE:
 		case WM_ACTIVATEAPP:
@@ -464,7 +355,7 @@ namespace soku
 		case WM_MOUSEHOVER:
 			DirectX::Mouse::ProcessMessage(msg, wParam, lParam);
 			break;
-		
+
 		}
 		return ::DefWindowProc(hWnd, msg, wParam, lParam);
 	}

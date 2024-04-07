@@ -1,22 +1,35 @@
 #pragma once
 #include "Timer.h"
 #include "Camera.h"
+#include "GraphicsCommon.h"
+#include "Constants.h"
+#include "GraphicsPSO.h"
+#include "Utils.h"
 namespace soku {
 	class BaseApp{
 	public:
 		BaseApp(int width, int height);
+		virtual ~BaseApp() {}
+
 		virtual bool Initialize();
-		bool InitWindow();
-		bool InitDirect3D();
-		bool InitGUI();
 		
 		int Run();
 		LRESULT wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-		float GetAspectRatio() const {
-			return float(m_width) / (float)m_height;
-		}
-		
+		float GetAspectRatio() const {	return float(m_width) / (float)m_height;}
+
+		//void InitCubemaps(std::wstring basePath, std::wstring envFilename,
+		//	std::wstring specularFilename, std::wstring irradianceFilename,
+		//	std::wstring brdfFilename);
+		void CreateConsts();
+		void UpdateGlobalConsts(const Vector3& eyeWorld, const Matrix& viewRow, const Matrix& projRow);
+		void SetGlobalConsts();
 	protected:
+		bool InitWindow();
+		bool InitDirect3D();
+		bool InitGUI();
+		void SetViewport();
+		bool CreateDepthBuffer();
+		void CreateBuffers();
 
 		virtual void Render(float deltaTime) = 0;
 		virtual void Update(float deltaTime) = 0;
@@ -33,47 +46,36 @@ namespace soku {
 		HWND m_hWnd;
 		D3D11_VIEWPORT m_viewport;
 	protected:
-		void SetViewport();
-		bool CreateRenderTargetView();
-		bool CreateDepthBuffer();
-		bool CreateRasterizerState(
-			Microsoft::WRL::ComPtr <ID3D11RasterizerState>& rasterizerState,
-			D3D11_FILL_MODE fillMode = D3D11_FILL_SOLID,
-			D3D11_CULL_MODE cullMode = D3D11_CULL_BACK);
-	protected:
 		Microsoft::WRL::ComPtr<ID3D11Device> m_device;
 		Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_context;
 		Microsoft::WRL::ComPtr<IDXGISwapChain> m_swapChain;
-		Microsoft::WRL::ComPtr<ID3D11Texture2D> m_backBuffer;
+		Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_backBufferRTV;
+		Microsoft::WRL::ComPtr<ID3D11DepthStencilView> m_DSV;
 
-		Microsoft::WRL::ComPtr <ID3D11RenderTargetView> m_renderTargetView;
-		Microsoft::WRL::ComPtr <ID3D11RenderTargetView> m_indexRtv;
-		Microsoft::WRL::ComPtr<ID3D11Texture2D> m_indexTexture;
-		Microsoft::WRL::ComPtr<ID3D11Texture2D> m_indexTempTexture;
-		Microsoft::WRL::ComPtr<ID3D11Texture2D> m_indexStagingTexture;
-
-		
-
-		Microsoft::WRL::ComPtr <ID3D11DepthStencilView> m_depthStencilView;
-		Microsoft::WRL::ComPtr <ID3D11Texture2D> m_depthStencilBuffer;
-		Microsoft::WRL::ComPtr <ID3D11DepthStencilState> m_depthStencilState;
-		
-		Microsoft::WRL::ComPtr <ID3D11RasterizerState> m_rasterizerState;
-		Microsoft::WRL::ComPtr <ID3D11RasterizerState> m_rasterizerState_wireMode;
-
+		Microsoft::WRL::ComPtr<ID3D11Texture2D> m_floatBuffer;
+		Microsoft::WRL::ComPtr<ID3D11Texture2D> m_resolvedBuffer;
+		Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_floatRTV;
+		Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_resolvedRTV;
+		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_resolvedSRV;
 	protected:
 		Timer m_timer;
 		std::unique_ptr<DirectX::Mouse> mouse;
 		std::shared_ptr<Camera> m_camera;
-		void OnMouseMove(int delX, int delY);
 		bool keyDownState[256];
-		bool m_dragStartFlag = false;
 		bool m_captureFlag = false;
+		
 		void CapturePNG();
-		Microsoft::WRL::ComPtr<ID3D11Texture2D> m_tempTexture;
-		DirectX::SimpleMath::Quaternion q;
-		bool m_leftButton;
-		bool m_grapmode = false;
-		bool m_FPSMode = true;
+		void OnMouseMove(int delX, int delY);
+	public:
+		GlobalConstants m_globalConstsCPU;
+		GlobalConstants m_reflectGlobalConstsCPU;
+	private:
+		Microsoft::WRL::ComPtr<ID3D11Buffer> m_globalConstsGPU;
+		Microsoft::WRL::ComPtr<ID3D11Buffer> m_reflectGlobalConstsGPU;
+
+		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_envSRV;
+		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_irradianceSRV;
+		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_specularSRV;
+		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_brdfSRV;
 	};
 }

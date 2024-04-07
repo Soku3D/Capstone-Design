@@ -12,8 +12,8 @@ namespace soku {
 		static MeshData MakeSphere(int x = 5, int y = 5, float radius = 1.f, const std::string& texturePath = "");
 		static MeshData MakeTetrahedron();
 		static MeshData MakeIcosahedron();
-		static MeshData Subdivision(const MeshData& meshData, float radius = 1.f);
-		static MeshData SubdivisionToSphere(const MeshData& meshData, float radius = 1.f);
+		//static MeshData Subdivision(const MeshData& meshData, float radius = 1.f);
+		//static MeshData SubdivisionToSphere(const MeshData& meshData, float radius = 1.f);
 		static std::vector<MeshData> LoadMeshData(std::string filePath, std::string filename);
 	};
 }

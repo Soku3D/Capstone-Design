@@ -2,6 +2,11 @@
 
 
 namespace soku {
+	inline void ThrowIfFailed(HRESULT hr) {
+		if (FAILED(hr)) {
+			throw std::exception();
+		}
+	}
 	class Utils {
 	public:
 		static void CheckResult(HRESULT& hr, ID3DBlob* error)
@@ -14,24 +19,7 @@ namespace soku {
 				}
 			}
 		}
-		static void CreateVSAndInputLayout(
-			std::vector<D3D11_INPUT_ELEMENT_DESC>& elements,
-			Microsoft::WRL::ComPtr<ID3D11VertexShader>& vs,
-			Microsoft::WRL::ComPtr<ID3D11InputLayout>& inputLayout,
-			Microsoft::WRL::ComPtr<ID3D11Device>& device,
-			const std::wstring shaderfileName = L""
-		);
-		static void CreateGS(
-			Microsoft::WRL::ComPtr<ID3D11GeometryShader>& gs,
-			Microsoft::WRL::ComPtr<ID3D11Device>& device,
-			const std::wstring shaderfileName = L""
-		);
-		static void CreatePS(
-			Microsoft::WRL::ComPtr<ID3D11PixelShader>& ps,
-			Microsoft::WRL::ComPtr<ID3D11Device>& device,
-			const std::wstring shaderfileName = L""
-		);
-		
+			
 		static std::vector<uint8_t> CreateTextureImage(const std::string& filePath, int& width, int& height);
 		static void SavePNG(const std::vector<uint8_t>& image, const int& x, const int& y);
 		template <typename VERTEX>
@@ -105,7 +93,6 @@ namespace soku {
 			memcpy(ms.pData, &constantData, sizeof(CONSTANT));
 			context->Unmap(constantBuffer.Get(), NULL);
 		}
-		
 		static void UpdateTextureBuffer(const std::vector<uint8_t>& imageData,
 			Microsoft::WRL::ComPtr<ID3D11Buffer>& constantBuffer,
 			Microsoft::WRL::ComPtr<ID3D11DeviceContext>& context)

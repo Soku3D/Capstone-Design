@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "GeometryGenerator.h"
-
 #include "RenderApp.h"
 
 namespace soku
@@ -16,13 +15,11 @@ namespace soku
 		{
 			return false;
 		}
-		{
-			cubeMap = std::make_shared <CubeMap>();
-			cubeMap->Initialize(m_device,
-				L"Assets/Textures/cubemaps/courtyard.dds",
-				L"Assets/Textures/cubemaps/courtyard_diffuse.dds",
-				L"Assets/Textures/cubemaps/courtyard_specural.dds");
-		}
+		auto boxData = GeometryGenerator::MakeBox();
+		auto grid = std::make_shared<Model>();
+		grid->Initialize({boxData}, m_device);
+		models.push_back(grid);
+
 		return true;
 	}
 	void RenderApp::Update(float deltaTime)
@@ -40,68 +37,37 @@ namespace soku
 			m_camera->MoveForward(-deltaTime);
 		}
 		Matrix model = Matrix();
-		Matrix view = m_camera->GetViewRow().Transpose();
-		Matrix projection = m_camera->GetProjRow().Transpose();
+		Matrix viewRow = m_camera->GetViewRow();
+		Matrix projRow = m_camera->GetProjRow();
+		Vector3 eyeWorld = m_camera->GetEyePos();
 
-		cubeMap->psConstantData = basicPSConstantData;
-		cubeMap->vsConstantData.view = m_camera->GetCubeViewRow().Transpose();
-		cubeMap->vsConstantData.projection = projection;
-		cubeMap->UpdateConstantData(m_context);
-
-		for (int i = 1; i <= 3; i++)
-		{
-			if (m_lightFlag != i) {
-				basicPSConstantData.lights[i - 1].lightStrength = Vector3(0.f);
-			}
-			else {
-				basicPSConstantData.lights[i - 1] = guiLight;
-			}
+		BaseApp::UpdateGlobalConsts(eyeWorld, viewRow, projRow);
+		for (const auto& model : models) {
+			model->m_meshConstantsCPU.world = Matrix::CreateTranslation(Vector3(0.f, 0.f, 3.f));
+			model->m_meshConstantsCPU.world = model->m_meshConstantsCPU.world.Transpose();
+			Utils::UpdateConstantBuffer(model->m_meshConstantsCPU, model->m_meshConstantsGPU,m_context);
 		}
-		basicPSConstantData.material.ambient = Vector3(guiAmbient);
-		basicPSConstantData.material.diffuse = Vector3(guiDiffuse);
-		basicPSConstantData.material.specular = Vector3(guiSpecular);
-
-		basicPSConstantData.eyeWorld = m_camera->GetEyePos();
-
-		for (auto& meshGroup : meshGroups)
-		{
-			meshGroup->drawNormal = drawMeshesNormal;
-			meshGroup->vsConstantData.view = view;
-			meshGroup->vsConstantData.projection = projection;
-			basicPSConstantData.useTexture = meshGroup->psConstantData.useTexture;
-			meshGroup->psConstantData = basicPSConstantData;
-			meshGroup->UpdateConstantData(m_context);
-		}
-		
 	}
 	void RenderApp::UpdateGUI(float deltaTime)
 	{
-		ImGui::Checkbox("Draw NormalLines", &drawMeshesNormal);
-		ImGui::Checkbox("Use Texture", &basicPSConstantData.useTexture);
-		if (ImGui::RadioButton("Directional Light", m_lightFlag == 1)) {
-			m_lightFlag = 1;
-		}
 		
 	}
 	void RenderApp::Render(float deltaTime)
 	{
-		float clearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+		FLOAT color[4]{ 0.f,0.f,0.f,1.f };
+		m_context->OMSetRenderTargets(1, m_backBufferRTV.GetAddressOf(), m_DSV.Get());
+		m_context->ClearRenderTargetView(m_backBufferRTV.Get(), color);
+		m_context->ClearDepthStencilView(m_DSV.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL,
+			1.f, 0);
 
-		m_context->ClearRenderTargetView(m_renderTargetView.Get(), clearColor);
+		BaseApp::SetGlobalConsts();
 
-		m_context->ClearDepthStencilView(m_depthStencilView.Get(),
-			D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL,
-			1.0f, 0);
-		// Multiple render targets
-		ID3D11RenderTargetView* rtvs[]{
-			m_renderTargetView.Get(),
-			m_indexRtv.Get()
-		};
-		m_context->OMSetRenderTargets(ARRAYSIZE(rtvs), rtvs, m_depthStencilView.Get());
-		m_context->OMSetDepthStencilState(m_depthStencilState.Get(), 0);
+		Graphics::defaultSolidPSO.SetPipelineState(m_context);
+		
+		for (const auto& model : models) {
+			model->Render(m_context);
+		}
+		
 
-		m_context->RSSetState(m_rasterizerState.Get());
-
-		cubeMap->Render(m_context);
 	}
 }

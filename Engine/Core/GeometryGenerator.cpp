@@ -13,10 +13,7 @@ namespace soku {
 		Vector3 p1(-l, l, 0.f);
 		Vector3 p2(l, l, 0.f);
 		Vector3 p3(l, -l, 0.f);
-
-
 		Vector3 n(0, 0, -l);
-
 
 		std::vector<Vector3> points{
 			p0, p1, p2, p3,
@@ -46,15 +43,13 @@ namespace soku {
 
 		return meshData;
 	}
-
 	MeshData GeometryGenerator::MakeCubeMapBox(float l)
 	{
-		
+		MeshData data;
+		return data;
 	}
-	
 	MeshData GeometryGenerator::MakeBox(float l, const std::string& texturePath)
 	{
-		MeshData meshData;
 		std::vector<uint32_t> indices;
 		std::vector<Vertex> vertices;
 		
@@ -107,10 +102,11 @@ namespace soku {
 			indices.push_back(i + 2);
 			indices.push_back(i + 3);
 		}
-		return meshData;
+		return MeshData(vertices, indices);
 	}
 	MeshData GeometryGenerator::MakeGrid(int x, int y)
 	{
+		MeshData meshData;
 		std::vector<uint32_t> indices;
 		std::vector<Vertex> vertices;
 		float l = 1.f;
@@ -151,9 +147,11 @@ namespace soku {
 				indices.push_back(idx3);
 			}
 		}
-		return MeshData(vertices, indices);
+		meshData.m_vertices = vertices;
+		meshData.m_indices = indices;
+		return meshData;
 	}
-	meshData GeometryGenerator::MakeCylinder(int x, int y, float height, int radius)
+	MeshData GeometryGenerator::MakeCylinder(int x, int y, float height, int radius)
 	{
 		std::vector<uint32_t> indices;
 		std::vector<Vertex> vertices;
@@ -199,7 +197,7 @@ namespace soku {
 		}
 		return MeshData(vertices, indices);
 	}
-	meshData GeometryGenerator::MakeSphere(int x, int y, float radius, const std::string& texturePath)
+	MeshData GeometryGenerator::MakeSphere(int x, int y, float radius, const std::string& texturePath)
 	{
 		std::vector<uint32_t> indices;
 		std::vector<Vertex> vertices;
@@ -245,7 +243,7 @@ namespace soku {
 		}
 		return MeshData(vertices, indices, texturePath);
 	}
-	meshData GeometryGenerator::MakeTetrahedron()
+	MeshData GeometryGenerator::MakeTetrahedron()
 	{
 		std::vector<uint32_t> indices;
 		std::vector<Vertex> vertices;
@@ -287,7 +285,7 @@ namespace soku {
 
 		return MeshData(vertices, indices);
 	}
-	meshData GeometryGenerator::MakeIcosahedron()
+	MeshData GeometryGenerator::MakeIcosahedron()
 	{
 		std::vector<uint32_t> indices;
 		std::vector<Vertex> vertices;
@@ -295,117 +293,117 @@ namespace soku {
 
 		return MeshData(vertices, indices);
 	}
-	meshData GeometryGenerator::Subdivision(const meshData& meshData, float radius)
-	{
-		std::vector<uint32_t> indices;
-		std::vector<Vertex> vertices;
+	//MeshData GeometryGenerator::Subdivision(const meshData& meshData, float radius)
+	//{
+	//	std::vector<uint32_t> indices;
+	//	std::vector<Vertex> vertices;
 
-		int triangleCount = meshData.m_indices.size() / 3;
-		for (int i = 0; i < triangleCount; i++)
-		{
-			Vertex v0 = meshData.m_vertices[meshData.m_indices[i * 3]];
-			Vertex v1 = meshData.m_vertices[meshData.m_indices[i * 3 + 1]];
-			Vertex v2 = meshData.m_vertices[meshData.m_indices[i * 3 + 2]];
+	//	int triangleCount = meshData.m_indices.size() / 3;
+	//	for (int i = 0; i < triangleCount; i++)
+	//	{
+	//		Vertex v0 = meshData.m_vertices[meshData.m_indices[i * 3]];
+	//		Vertex v1 = meshData.m_vertices[meshData.m_indices[i * 3 + 1]];
+	//		Vertex v2 = meshData.m_vertices[meshData.m_indices[i * 3 + 2]];
 
-			Vertex v3{ v0.position * 0.5f + v1.position * 0.5f,v0.uv * 0.5f + v1.uv * 0.5f, Vector3(0.f) };
-			Vertex v4{ v1.position * 0.5f + v2.position * 0.5f,v1.uv * 0.5f + v2.uv * 0.5f, Vector3(0.f) };
-			Vertex v5{ v0.position * 0.5f + v2.position * 0.5f,v0.uv * 0.5f + v2.uv * 0.5f, Vector3(0.f) };
+	//		Vertex v3{ v0.position * 0.5f + v1.position * 0.5f,v0.uv * 0.5f + v1.uv * 0.5f, Vector3(0.f) };
+	//		Vertex v4{ v1.position * 0.5f + v2.position * 0.5f,v1.uv * 0.5f + v2.uv * 0.5f, Vector3(0.f) };
+	//		Vertex v5{ v0.position * 0.5f + v2.position * 0.5f,v0.uv * 0.5f + v2.uv * 0.5f, Vector3(0.f) };
 
-			vertices.push_back(v0);
-			vertices.push_back(v1);
-			vertices.push_back(v2);
-			vertices.push_back(v3);
-			vertices.push_back(v4);
-			vertices.push_back(v5);
+	//		vertices.push_back(v0);
+	//		vertices.push_back(v1);
+	//		vertices.push_back(v2);
+	//		vertices.push_back(v3);
+	//		vertices.push_back(v4);
+	//		vertices.push_back(v5);
 
-			int idx = 6 * i;
-			indices.push_back(idx);
-			indices.push_back(idx + 3);
-			indices.push_back(idx + 5);
-			indices.push_back(idx + 3);
-			indices.push_back(idx + 4);
-			indices.push_back(idx + 5);
-			indices.push_back(idx + 5);
-			indices.push_back(idx + 4);
-			indices.push_back(idx + 2);
-			indices.push_back(idx + 3);
-			indices.push_back(idx + 1);
-			indices.push_back(idx + 4);
-		}
-		for (auto& v : vertices) {
-			float l = v.position.Length();
-			v.position *= (radius / l);
-			v.normal = v.position;
-			v.normal.Normalize();
-		}
-		return MeshData(vertices, indices);
-	}
-	meshData GeometryGenerator::SubdivisionToSphere(const meshData& meshData, float radius)
-	{
-		std::vector<uint32_t> indices;
-		std::vector<Vertex> vertices;
+	//		int idx = 6 * i;
+	//		indices.push_back(idx);
+	//		indices.push_back(idx + 3);
+	//		indices.push_back(idx + 5);
+	//		indices.push_back(idx + 3);
+	//		indices.push_back(idx + 4);
+	//		indices.push_back(idx + 5);
+	//		indices.push_back(idx + 5);
+	//		indices.push_back(idx + 4);
+	//		indices.push_back(idx + 2);
+	//		indices.push_back(idx + 3);
+	//		indices.push_back(idx + 1);
+	//		indices.push_back(idx + 4);
+	//	}
+	//	for (auto& v : vertices) {
+	//		float l = v.position.Length();
+	//		v.position *= (radius / l);
+	//		v.normal = v.position;
+	//		v.normal.Normalize();
+	//	}
+	//	return MeshData(vertices, indices);
+	//}
+	//meshData GeometryGenerator::SubdivisionToSphere(const meshData& meshData, float radius)
+	//{
+	//	std::vector<uint32_t> indices;
+	//	std::vector<Vertex> vertices;
 
-		auto TranslateToSphere = [&](Vertex& v) {
-			v.normal = v.position;
-			v.normal.Normalize();
-			v.position = v.normal * radius;
+	//	auto TranslateToSphere = [&](Vertex& v) {
+	//		v.normal = v.position;
+	//		v.normal.Normalize();
+	//		v.position = v.normal * radius;
 
-			/*float yTheta = acosf(v.position.y / radius);
-			float xTheta = atan2(v.position.x,v.position.z);
-			xTheta += DirectX::XM_PI;
-			yTheta /= DirectX::XM_PI;
-			xTheta /= DirectX::XM_2PI;
+	//		/*float yTheta = acosf(v.position.y / radius);
+	//		float xTheta = atan2(v.position.x,v.position.z);
+	//		xTheta += DirectX::XM_PI;
+	//		yTheta /= DirectX::XM_PI;
+	//		xTheta /= DirectX::XM_2PI;
 
-			v.uv = Vector2(xTheta, yTheta);*/
+	//		v.uv = Vector2(xTheta, yTheta);*/
 
-			};
-		int triangleCount = meshData.m_indices.size() / 3;
-		for (int i = 0; i < triangleCount; i++)
-		{
-			Vertex v0 = meshData.m_vertices[meshData.m_indices[i * 3]];
-			TranslateToSphere(v0);
-			Vertex v1 = meshData.m_vertices[meshData.m_indices[i * 3 + 1]];
-			TranslateToSphere(v1);
-			Vertex v2 = meshData.m_vertices[meshData.m_indices[i * 3 + 2]];
-			TranslateToSphere(v2);
+	//		};
+	//	int triangleCount = meshData.m_indices.size() / 3;
+	//	for (int i = 0; i < triangleCount; i++)
+	//	{
+	//		Vertex v0 = meshData.m_vertices[meshData.m_indices[i * 3]];
+	//		TranslateToSphere(v0);
+	//		Vertex v1 = meshData.m_vertices[meshData.m_indices[i * 3 + 1]];
+	//		TranslateToSphere(v1);
+	//		Vertex v2 = meshData.m_vertices[meshData.m_indices[i * 3 + 2]];
+	//		TranslateToSphere(v2);
 
-			Vertex v3{ v0.position * 0.5f + v1.position * 0.5f,v0.uv * 0.5f + v1.uv * 0.5f, Vector3(0.f) };
-			Vertex v4{ v1.position * 0.5f + v2.position * 0.5f,v1.uv * 0.5f + v2.uv * 0.5f, Vector3(0.f) };
-			Vertex v5{ v0.position * 0.5f + v2.position * 0.5f,v0.uv * 0.5f + v2.uv * 0.5f, Vector3(0.f) };
-			TranslateToSphere(v3);
-			TranslateToSphere(v4);
-			TranslateToSphere(v5);
+	//		Vertex v3{ v0.position * 0.5f + v1.position * 0.5f,v0.uv * 0.5f + v1.uv * 0.5f, Vector3(0.f) };
+	//		Vertex v4{ v1.position * 0.5f + v2.position * 0.5f,v1.uv * 0.5f + v2.uv * 0.5f, Vector3(0.f) };
+	//		Vertex v5{ v0.position * 0.5f + v2.position * 0.5f,v0.uv * 0.5f + v2.uv * 0.5f, Vector3(0.f) };
+	//		TranslateToSphere(v3);
+	//		TranslateToSphere(v4);
+	//		TranslateToSphere(v5);
 
-			vertices.push_back(v0);
-			vertices.push_back(v1);
-			vertices.push_back(v2);
-			vertices.push_back(v3);
-			vertices.push_back(v4);
-			vertices.push_back(v5);
+	//		vertices.push_back(v0);
+	//		vertices.push_back(v1);
+	//		vertices.push_back(v2);
+	//		vertices.push_back(v3);
+	//		vertices.push_back(v4);
+	//		vertices.push_back(v5);
 
-			int idx = 6 * i;
-			indices.push_back(idx);
-			indices.push_back(idx + 3);
-			indices.push_back(idx + 5);
-			indices.push_back(idx + 3);
-			indices.push_back(idx + 4);
-			indices.push_back(idx + 5);
-			indices.push_back(idx + 5);
-			indices.push_back(idx + 4);
-			indices.push_back(idx + 2);
-			indices.push_back(idx + 3);
-			indices.push_back(idx + 1);
-			indices.push_back(idx + 4);
-		}
-		return MeshData(vertices, indices);
-	}
-	std::vector<meshData> GeometryGenerator::LoadMeshData(std::string filePath, std::string filename)
+	//		int idx = 6 * i;
+	//		indices.push_back(idx);
+	//		indices.push_back(idx + 3);
+	//		indices.push_back(idx + 5);
+	//		indices.push_back(idx + 3);
+	//		indices.push_back(idx + 4);
+	//		indices.push_back(idx + 5);
+	//		indices.push_back(idx + 5);
+	//		indices.push_back(idx + 4);
+	//		indices.push_back(idx + 2);
+	//		indices.push_back(idx + 3);
+	//		indices.push_back(idx + 1);
+	//		indices.push_back(idx + 4);
+	//	}
+	//	return MeshData(vertices, indices);
+	//}
+	std::vector<MeshData> GeometryGenerator::LoadMeshData(std::string filePath, std::string filename)
 	{
 		using namespace DirectX;
 
 		ModelLoader modelLoader;
 		modelLoader.Load(filePath, filename);
-		std::vector<meshData>& meshes = modelLoader.m_meshData;
+		std::vector<MeshData>& meshes = modelLoader.m_meshData;
 
 		// Normalize vertices
 		Vector3 vmin(1000, 1000, 1000);

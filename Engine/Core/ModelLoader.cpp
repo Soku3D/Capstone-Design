@@ -51,7 +51,7 @@ namespace soku {
 					std::string(std::filesystem::path(filepath.C_Str())
 						.filename()
 						.string());
-				data.texturePath = fullPath;
+				data.albedoTextureFilename = fullPath;
 			}
 		}
 		return data;
