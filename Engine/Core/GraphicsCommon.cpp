@@ -5,6 +5,8 @@
 #include "CompiledShaders/DefaultPS.h"
 #include "CompiledShaders/DefaultVS.h"
 #include "CompiledShaders/CombinePS.h"
+#include "CompiledShaders/CombineVS.h"
+
 
 
 
@@ -18,6 +20,8 @@ Microsoft::WRL::ComPtr<ID3D11RasterizerState> solidRS;
 Microsoft::WRL::ComPtr<ID3D11DepthStencilState> drawDSS;
 
 Microsoft::WRL::ComPtr<ID3D11InputLayout> basicIL;
+Microsoft::WRL::ComPtr<ID3D11InputLayout> combineIL;
+
 
 GraphicsPSO defaultSolidPSO;
 GraphicsPSO combinePSO;
@@ -63,20 +67,23 @@ void InitCommonStates(Microsoft::WRL::ComPtr<ID3D11Device> &device) {
          D3D11_INPUT_PER_VERTEX_DATA, 0},
         {"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12,
          D3D11_INPUT_PER_VERTEX_DATA, 0},
-        {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 36,
+        {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24,
          D3D11_INPUT_PER_VERTEX_DATA, 0}};
     std::vector<D3D11_INPUT_ELEMENT_DESC> IEs = {
         {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0,
          D3D11_INPUT_PER_VERTEX_DATA, 0},
         {"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12,
          D3D11_INPUT_PER_VERTEX_DATA, 0},
-        {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 36,
+        {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 24,
          D3D11_INPUT_PER_VERTEX_DATA, 0},
-        {"TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 24,
+        {"TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 32,
          D3D11_INPUT_PER_VERTEX_DATA, 0},
     };
     device->CreateInputLayout(basicIEs.data(), basicIEs.size(), g_pDefaultVS,
                               sizeof(g_pDefaultVS), basicIL.GetAddressOf());
+
+   /* device->CreateInputLayout(basicIEs.data(), basicIEs.size(), g_pCombineVS,
+                              sizeof(g_pCombineVS), combineIL.GetAddressOf());*/
 
     defaultSolidPSO.SetVertexShader(g_pDefaultVS, sizeof(g_pDefaultVS), device);
     defaultSolidPSO.SetPixelShader(g_pDefaultPS, sizeof(g_pDefaultPS), device);
@@ -87,6 +94,8 @@ void InitCommonStates(Microsoft::WRL::ComPtr<ID3D11Device> &device) {
     defaultSolidPSO.SetInputLayout(basicIL);
 
     combinePSO = defaultSolidPSO;
+    //combinePSO.SetInputLayout(combineIL);
+    combinePSO.SetVertexShader(g_pCombineVS, sizeof(g_pCombineVS), device);
     combinePSO.SetPixelShader(g_pCombinePS, sizeof(g_pCombinePS), device);
 }
 

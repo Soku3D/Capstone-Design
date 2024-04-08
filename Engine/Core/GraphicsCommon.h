@@ -13,6 +13,8 @@ extern Microsoft::WRL::ComPtr<ID3D11RasterizerState> solidRS;
 extern Microsoft::WRL::ComPtr<ID3D11DepthStencilState> drawDSS;
 
 extern Microsoft::WRL::ComPtr<ID3D11InputLayout> basicIL;
+extern Microsoft::WRL::ComPtr<ID3D11InputLayout> combineIL;
+
 
 extern GraphicsPSO defaultSolidPSO;
 extern GraphicsPSO combinePSO;

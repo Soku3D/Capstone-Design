@@ -8,13 +8,13 @@ cbuffer GlobalConsts : register(b1)
 struct DefaultVSInput
 {
     float3 position : POSITION;
-    float3 normal : Normal;
+    float3 normal : NORMAL;
     float2 texcoord : TEXCOORD;
 };
 struct DefaultPSInput
 {
     float4 posProj : SV_Position;
-    float2 texcoord : Texcoord;
+    float2 texcoord : TEXCOORD;
 };
 struct CubeVSInput
 {

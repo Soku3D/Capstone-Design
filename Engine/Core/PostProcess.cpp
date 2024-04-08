@@ -11,13 +11,16 @@ void PostProcess::Initialize(
     const std::vector<Microsoft::WRL::ComPtr<ID3D11RenderTargetView>> &targets,
     const int &width,
     const int &height) {
+
     combineFilter.Initialize(width, height);
     combineFilter.SetRenderTargetViews(targets);
     combineFilter.SetShaderResourceViews(resources);
     auto screen = GeometryGenerator::MakeSquare();
-    model = std::make_shared<Model>();
-    model->Initialize({screen}, device);
-
+    m_meshes = std::make_shared<Mesh>();
+    Utils::CreateVertexBuffer(screen.m_vertices, m_meshes->m_vertexBuffer,
+                              device);
+    Utils::CreateIndexBuffer(screen.m_indices, m_meshes->m_indexBuffer, device);
+    m_meshes->m_indexCount = screen.m_indices.size();    
 }
 void PostProcess::CreateBuffer(
     const int &width, const int &height,
@@ -45,8 +48,16 @@ void PostProcess::CreateBuffer(
                                                  outputSRV.GetAddressOf()));
 }
 void PostProcess::Render(Microsoft::WRL::ComPtr<ID3D11DeviceContext> &context) {
-    Graphics::combinePSO.SetPipelineState(context);
+    
+    UINT stride = sizeof(Vertex);
+    UINT offset = 0;
     combineFilter.Render(context);
-    model->Render(context);
+
+    context->IASetVertexBuffers(0, 1, m_meshes->m_vertexBuffer.GetAddressOf(),
+                                &stride, &offset);
+    context->IASetIndexBuffer(m_meshes->m_indexBuffer.Get(),
+                              DXGI_FORMAT_R32_UINT, 0);
+
+    context->DrawIndexed(m_meshes->m_indexCount, 0, 0);
 }
 } // namespace soku

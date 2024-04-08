@@ -1,6 +1,6 @@
 #pragma once
 #include "ImageFilter.h"
-#include "Model.h"
+#include "Mesh.h"
 namespace soku {
 class PostProcess {
   public:
@@ -25,7 +25,7 @@ class PostProcess {
 
   private:
     int m_indexCount;
-    std::shared_ptr<Model> model;
+    std::shared_ptr<Mesh> m_meshes;
   private:
     std::vector<Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>> SRVs;
     std::vector<Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>> RTVs;

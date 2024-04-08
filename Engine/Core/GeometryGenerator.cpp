@@ -22,10 +22,10 @@ MeshData GeometryGenerator::MakeSquare() {
         p3,
     };
     for (int i = 0; i < 1; i++) {
-        Vertex v0{points[i], Vector2(0.f, 1.f), n};
-        Vertex v1{points[i + 1], Vector2(0.f, 0.f), n};
-        Vertex v2{points[i + 2], Vector2(1.f, 0.f), n};
-        Vertex v3{points[i + 3], Vector2(1.f, 1.f), n};
+        Vertex v0{points[i], n, Vector2(0.f, 1.f)};
+        Vertex v1{points[i + 1], n, Vector2(0.f, 0.f)};
+        Vertex v2{points[i + 2], n, Vector2(1.f, 0.f)};
+        Vertex v3{points[i + 3], n, Vector2(1.f, 1.f)};
         vertices.push_back(v0);
         vertices.push_back(v1);
         vertices.push_back(v2);
@@ -73,10 +73,10 @@ MeshData GeometryGenerator::MakeBox(float l, const std::string &texturePath) {
     std::vector<Vector3> points{p0, p1, p2, p3, p5, p4, p7, p6, p7, p3, p2, p6,
                                 p5, p1, p0, p4, p4, p0, p3, p7, p6, p2, p1, p5};
     for (int i = 0; i < 6; i++) {
-        Vertex v0{points[i * 4], Vector2(0.f, 1.f), norms[i]};
-        Vertex v1{points[i * 4 + 1], Vector2(0.f, 0.f), norms[i]};
-        Vertex v2{points[i * 4 + 2], Vector2(1.f, 0.f), norms[i]};
-        Vertex v3{points[i * 4 + 3], Vector2(1.f, 1.f), norms[i]};
+        Vertex v0{points[i * 4], norms[i], Vector2(0.f, 1.f)};
+        Vertex v1{points[i * 4 + 1], norms[i], Vector2(0.f, 0.f)};
+        Vertex v2{points[i * 4 + 2], norms[i], Vector2(1.f, 0.f)};
+        Vertex v3{points[i * 4 + 3], norms[i], Vector2(1.f, 1.f)};
         vertices.push_back(v0);
         vertices.push_back(v1);
         vertices.push_back(v2);
@@ -111,7 +111,9 @@ MeshData GeometryGenerator::MakeGrid(int x, int y) {
             Vector3 p = point + Vector3(width * dx, height * dy, 0.f);
             Vector2 uv = uvPoint + Vector2(width * uvDx, height * uvDy);
             Vector3 normal(0, 0, -1);
-            Vertex v0{p, uv, normal};
+            Vertex v0{
+                p,  normal, uv
+            };
             vertices.push_back(v0);
         }
     }
@@ -156,7 +158,7 @@ MeshData GeometryGenerator::MakeCylinder(int x, int y, float height,
             Vector2 uv = uvPoint + Vector2(width * uvDx, height * uvDy);
             Vector3 normal(p.x, 0, p.z);
             normal.Normalize();
-            Vertex v0{p, uv, normal};
+            Vertex v0{p, normal, uv};
             vertices.push_back(v0);
         }
     }
@@ -201,7 +203,7 @@ MeshData GeometryGenerator::MakeSphere(int x, int y, float radius,
             Vector2 uv = uvPoint + Vector2(width * uvDx, height * uvDy);
             Vector3 normal(p.x, p.y, p.z);
             normal.Normalize();
-            Vertex v0{p, uv, normal};
+            Vertex v0{p, normal, uv};
             vertices.push_back(v0);
         }
     }

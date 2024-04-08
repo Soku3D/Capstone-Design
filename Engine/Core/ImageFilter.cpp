@@ -13,12 +13,13 @@ void ImageFilter::Initialize(
     m_viewport = {0.f, 0.f, (FLOAT)width, (FLOAT)height, 0.f, 1.f};
 }
 void ImageFilter::Render(Microsoft::WRL::ComPtr<ID3D11DeviceContext> &context) {
+    context->RSSetViewports(1, &m_viewport);
     context->OMSetRenderTargets(m_rtvs.size(), m_rtvs.data(), NULL);
         
     //context->PSSetShader(m_pixelShader.Get(), NULL, 0);
     context->PSSetShaderResources(0, m_srvs.size(), m_srvs.data());
 
-    context->RSSetViewports(1, &m_viewport);
+    
 }
 
 void ImageFilter::SetRenderTargetViews(
