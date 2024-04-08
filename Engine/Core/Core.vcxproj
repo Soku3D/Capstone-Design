@@ -25,11 +25,13 @@
     <ClInclude Include="GeometryGenerator.h" />
     <ClInclude Include="GraphicsCommon.h" />
     <ClInclude Include="GraphicsPSO.h" />
+    <ClInclude Include="ImageFilter.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="MeshData.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="ModelLoader.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="PostProcess.h" />
     <ClInclude Include="RenderApp.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="Utils.h" />
@@ -42,11 +44,13 @@
     <ClCompile Include="GeometryGenerator.cpp" />
     <ClCompile Include="GraphicsCommon.cpp" />
     <ClCompile Include="GraphicsPSO.cpp" />
+    <ClCompile Include="ImageFilter.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="MeshData.cpp" />
     <ClCompile Include="Model.cpp" />
     <ClCompile Include="ModelLoader.cpp" />
     <ClCompile Include="pch.cpp" />
+    <ClCompile Include="PostProcess.cpp" />
     <ClCompile Include="RenderApp.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="Utils.cpp" />
@@ -56,6 +60,12 @@
     <None Include="Header.hlsli" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="CombinePS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
     <FxCompile Include="CubePS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>

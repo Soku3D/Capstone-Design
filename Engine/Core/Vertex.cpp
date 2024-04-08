@@ -1,5 +1,3 @@
 #include "pch.h"
 
-namespace soku {
-
-}
+namespace soku {}
