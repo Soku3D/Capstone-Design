@@ -81,7 +81,7 @@ class Utils {
         HRESULT hr =
             device->CreateBuffer(&bufferDesc, &subData, buffer.GetAddressOf());
         if (FAILED(hr)) {
-            std::cout << "CreateBuffer Failed\n";
+            std::cout << "Create ConstantBuffer  Failed\n";
         }
     }
     template <typename CONSTANT>
@@ -113,10 +113,11 @@ class Utils {
         const std::string &filePath,
         Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> &shaderResourceView,
         Microsoft::WRL::ComPtr<ID3D11Device> &device);
-    static void CreateCubeMapShaderResourceView(
+    static void CreateDDSTexture(
         const std::wstring &filePath,
         Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> &shaderResourceView,
-        Microsoft::WRL::ComPtr<ID3D11Device> &device);
+        Microsoft::WRL::ComPtr<ID3D11Device> &device,
+        bool isCubeMap);
     static void CreateShaderResourceView(
         const std::string &filePath,
         Microsoft::WRL::ComPtr<ID3D11Texture2D> &texture,

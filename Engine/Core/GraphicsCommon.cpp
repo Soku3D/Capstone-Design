@@ -1,11 +1,12 @@
 #include "pch.h"
 #include "GraphicsCommon.h"
-#include "CompiledShaders/CubePS.h"
-#include "CompiledShaders/CubeVS.h"
-#include "CompiledShaders/DefaultPS.h"
+
+#include "CompiledShaders/SkyboxVS.h"
+#include "CompiledShaders/SkyboxPS.h"
 #include "CompiledShaders/DefaultVS.h"
-#include "CompiledShaders/CombinePS.h"
+#include "CompiledShaders/DefaultPS.h"
 #include "CompiledShaders/CombineVS.h"
+#include "CompiledShaders/CombinePS.h"
 #include "CompiledShaders/UpSamplingPS.h"
 #include "CompiledShaders/DownSamplingPS.h"
 
@@ -18,6 +19,7 @@ Microsoft::WRL::ComPtr<ID3D11SamplerState> linearWrapSS;
 Microsoft::WRL::ComPtr<ID3D11SamplerState> linearClampSS;
 
 Microsoft::WRL::ComPtr<ID3D11RasterizerState> solidRS;
+Microsoft::WRL::ComPtr<ID3D11RasterizerState> cubeRS;
 
 Microsoft::WRL::ComPtr<ID3D11DepthStencilState> drawDSS;
 
@@ -25,6 +27,7 @@ Microsoft::WRL::ComPtr<ID3D11InputLayout> basicIL;
 Microsoft::WRL::ComPtr<ID3D11InputLayout> combineIL;
 
 GraphicsPSO defaultSolidPSO;
+GraphicsPSO skyboxPSO;
 GraphicsPSO combinePSO;
 GraphicsPSO upSamplingPSO;
 GraphicsPSO downSamplingPSO;
@@ -57,6 +60,9 @@ void InitCommonStates(Microsoft::WRL::ComPtr<ID3D11Device> &device) {
     rasterDesc.DepthClipEnable = true;
     rasterDesc.MultisampleEnable = true;
     device->CreateRasterizerState(&rasterDesc, solidRS.GetAddressOf());
+    rasterDesc.CullMode = D3D11_CULL_NONE;
+    rasterDesc.FrontCounterClockwise = true;
+    device->CreateRasterizerState(&rasterDesc, cubeRS.GetAddressOf());
 
     D3D11_DEPTH_STENCIL_DESC dsDesc;
     ZeroMemory(&dsDesc, sizeof(dsDesc));
@@ -94,6 +100,11 @@ void InitCommonStates(Microsoft::WRL::ComPtr<ID3D11Device> &device) {
     defaultSolidPSO.SetRasterizerState(solidRS);
     defaultSolidPSO.SetDepthStencilState(drawDSS);
     defaultSolidPSO.SetInputLayout(basicIL);
+
+    skyboxPSO = defaultSolidPSO;
+    skyboxPSO.SetVertexShader(g_pSkyboxVS, sizeof(g_pSkyboxVS), device);
+    skyboxPSO.SetPixelShader(g_pSkyboxPS, sizeof(g_pSkyboxPS), device);
+    skyboxPSO.SetRasterizerState(cubeRS);
 
     combinePSO = defaultSolidPSO;
     

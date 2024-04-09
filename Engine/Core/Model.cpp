@@ -28,7 +28,7 @@ void Model::Render(Microsoft::WRL::ComPtr<ID3D11DeviceContext> &context) {
                                     &stride, &offsets);
         context->IASetIndexBuffer(mesh->m_indexBuffer.Get(),
                                   DXGI_FORMAT_R32_UINT, 0);
-        context->PSSetShaderResources(0, 1, mesh->m_albedoSRV.GetAddressOf());
+        //context->PSSetShaderResources(0, 1, mesh->m_albedoSRV.GetAddressOf());
 
         context->DrawIndexed(mesh->m_indexCount, 0, 0);
     }

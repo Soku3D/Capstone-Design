@@ -11,8 +11,7 @@ void PostProcess::Initialize(
     const std::vector<Microsoft::WRL::ComPtr<ID3D11RenderTargetView>> &targets,
     const int &width,
     const int &height) {
-
-   
+      
     
     // Create Filter Mesh
     auto screen = GeometryGenerator::MakeSquare();
@@ -22,17 +21,18 @@ void PostProcess::Initialize(
     Utils::CreateIndexBuffer(screen.m_indices, m_meshes->m_indexBuffer, device);
     m_meshes->m_indexCount = screen.m_indices.size();    
     
+    // Create Filters
     for (int i = 0; i < 5; i++) {
         int scailIdx = pow(2, i);
-        ImageFilter downFilter(width / scailIdx, height / scailIdx);
+        ImageFilter downFilter(width / scailIdx, height / scailIdx, device);
         downFilters.push_back(downFilter);
     }
     for (int i = 4; i >= 0; i--) {
         int scailIdx = pow(2, i);
-        ImageFilter upFilter(width / scailIdx, height / scailIdx);
+        ImageFilter upFilter(width / scailIdx, height / scailIdx, device);
         upFilters.push_back(upFilter);
     }
-    combineFilter.Initialize(width, height);
+    combineFilter.Initialize(width, height, device);
     combineFilter.SetRenderTargetViews(targets);
     combineFilter.SetShaderResourceViews(resources);
 }
@@ -70,7 +70,7 @@ void PostProcess::Render(Microsoft::WRL::ComPtr<ID3D11DeviceContext> &context) {
     context->IASetIndexBuffer(m_meshes->m_indexBuffer.Get(),
                               DXGI_FORMAT_R32_UINT, 0);
 
-    Graphics::downSamplingPSO.SetPipelineState(context);
+   /* Graphics::downSamplingPSO.SetPipelineState(context);
     for (int i = 0; i < downFilters.size(); i++) {
         downFilters[i].Render(context);
         context->DrawIndexed(m_meshes->m_indexCount, 0, 0);
@@ -78,8 +78,8 @@ void PostProcess::Render(Microsoft::WRL::ComPtr<ID3D11DeviceContext> &context) {
     for (int i = 0; i < upFilters.size(); i++) {
         upFilters[i].Render(context);
         context->DrawIndexed(m_meshes->m_indexCount, 0, 0);
-    }
-    Graphics::combinePSO.SetPipelineState(context);
+    }*/
+    
     combineFilter.Render(context);
     context->DrawIndexed(m_meshes->m_indexCount, 0, 0);
 }

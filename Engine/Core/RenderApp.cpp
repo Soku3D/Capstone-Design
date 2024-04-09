@@ -10,10 +10,16 @@ bool RenderApp::Initialize() {
     if (!BaseApp::Initialize()) {
         return false;
     }
-    auto boxData = GeometryGenerator::MakeBox();
+    BaseApp::InitCubemaps(L"Assets/Textures/Skybox/Sample/", L"Sample");
+
+    auto box = GeometryGenerator::MakeBox(40.f);
+    skybox = std::make_shared<Model>();
+    skybox->Initialize({box}, m_device);
+
+   /* auto boxData = GeometryGenerator::MakeBox();
     auto grid = std::make_shared<Model>();
     grid->Initialize({boxData}, m_device);
-    models.push_back(grid);
+    models.push_back(grid);*/
 
     return true;
 }
@@ -55,6 +61,7 @@ void RenderApp::Render(float deltaTime) {
         m_DSV.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.f, 0);
 
     BaseApp::SetGlobalConsts();
+    m_context->PSSetShaderResources(10, 1, m_envSRV.GetAddressOf());
 
     Graphics::defaultSolidPSO.SetPipelineState(m_context);
 
@@ -62,9 +69,13 @@ void RenderApp::Render(float deltaTime) {
         model->Render(m_context);
     }
 
+    Graphics::skyboxPSO.SetPipelineState(m_context);
+    skybox->Render(m_context);
+
     m_context->ResolveSubresource(m_resolvedBuffer.Get(), 0,
                                   m_floatBuffer.Get(), 0,
                                   DXGI_FORMAT_R16G16B16A16_FLOAT);
+    Graphics::combinePSO.SetPipelineState(m_context);
 
     m_postProcess.Render(m_context);
 }

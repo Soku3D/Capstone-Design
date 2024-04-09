@@ -5,6 +5,11 @@ cbuffer GlobalConsts : register(b1)
     float3 eyePos;
     float dummy;
 }
+
+//TextureCube IrradianceIBL : register(t11);
+//TextureCube SpecularIBL : register(t12);
+//Texture2D brdf : register(t13);
+
 struct DefaultVSInput
 {
     float3 position : POSITION;
@@ -16,14 +21,10 @@ struct DefaultPSInput
     float4 posProj : SV_Position;
     float2 texcoord : TEXCOORD;
 };
-struct CubeVSInput
+struct SkyboxPSInput
 {
-    float3 pos : POSITION;
-};
-struct CubePSInput
-{
-    float4 position : SV_Position;
-    float3 modelPos : Position;
+    float4 posProj : SV_Position;
+    float3 WorldPos : Position;
 };
 struct Light
 {

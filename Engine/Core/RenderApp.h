@@ -10,13 +10,13 @@ class RenderApp : public BaseApp {
   public:
     RenderApp(const int width, const int height);
     virtual bool Initialize() override;
-
+    
   private:
     virtual void Render(float deltaTime) override;
     virtual void Update(float deltaTime) override;
     virtual void UpdateGUI(float deltaTime) override;
   private:
     std::vector<std::shared_ptr<Model>> models;
-
+    std::shared_ptr<Model> skybox;
 };
 } // namespace soku

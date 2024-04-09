@@ -3,9 +3,9 @@
 #include "Constants.h"
 #include "GraphicsCommon.h"
 #include "GraphicsPSO.h"
+#include "PostProcess.h"
 #include "Timer.h"
 #include "Utils.h"
-#include "PostProcess.h"
 
 namespace soku {
 class BaseApp {
@@ -19,9 +19,8 @@ class BaseApp {
     LRESULT wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
     float GetAspectRatio() const { return float(m_width) / (float)m_height; }
 
-    // void InitCubemaps(std::wstring basePath, std::wstring envFilename,
-    //	std::wstring specularFilename, std::wstring irradianceFilename,
-    //	std::wstring brdfFilename);
+    void InitCubemaps(const std::wstring &basePath,
+                      const std::wstring &filename);
     void CreateConsts();
     void UpdateGlobalConsts(const Vector3 &eyeWorld, const Matrix &viewRow,
                             const Matrix &projRow);
@@ -83,7 +82,8 @@ class BaseApp {
 
   protected:
     PostProcess m_postProcess;
-  private:
+
+  protected:
     Microsoft::WRL::ComPtr<ID3D11Buffer> m_globalConstsGPU;
     Microsoft::WRL::ComPtr<ID3D11Buffer> m_reflectGlobalConstsGPU;
 

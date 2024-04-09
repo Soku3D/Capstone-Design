@@ -31,6 +31,15 @@ bool BaseApp::Initialize() {
     }
     return true;
 }
+void BaseApp::InitCubemaps(const std::wstring &basePath,
+                           const std::wstring &filename) {
+    std::wstring brdfPath = basePath + filename + L"Brdf.dds";
+    std::wstring diffusePath = basePath + filename + L"DiffuseHDR.dds";
+    std::wstring envPath = basePath + filename + L"EnvHDR.dds";
+    std::wstring specularPath = basePath + filename + L"SpecularHDR.dds";
+
+    Utils::CreateDDSTexture(envPath, m_envSRV, m_device, true);
+}
 void BaseApp::CreateConsts() {
     Utils::CreateConstantBuffer(m_globalConstsCPU, m_globalConstsGPU, m_device);
 }

@@ -121,10 +121,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="CubeVS.hlsl">
+    <FxCompile Include="SkyboxVS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="CubePS.hlsl">
+    <FxCompile Include="SkyboxPS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
     <FxCompile Include="DefaultVS.hlsl">

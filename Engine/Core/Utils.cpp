@@ -6,8 +6,8 @@
 #include "stb_image_write.h"
 #include <directxtk/DDSTextureLoader.h>
 
-#include "CompiledShaders\CubePs.h"
-#include "CompiledShaders\CubeVS.h"
+#include "CompiledShaders/CubePs.h"
+#include "CompiledShaders/CubeVS.h"
 
 namespace soku {
 using namespace Microsoft::WRL;
@@ -99,21 +99,23 @@ void Utils::CreateShaderResourceView(
         std::cout << "CreateShaderResourceView FAILED\n";
     }
 }
-void Utils::CreateCubeMapShaderResourceView(
+
+void Utils::CreateDDSTexture(
     const std::wstring &filePath,
-    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> &shaderResourceView,
-    Microsoft::WRL::ComPtr<ID3D11Device> &device) {
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> &SRV,
+    Microsoft::WRL::ComPtr<ID3D11Device> &device, bool isCubeMap) {
+    
     Microsoft::WRL::ComPtr<ID3D11Texture2D> texture;
-    //
-    HRESULT hr = DirectX::CreateDDSTextureFromFileEx(
-        device.Get(), filePath.c_str(), 0, D3D11_USAGE_DEFAULT,
-        D3D11_BIND_SHADER_RESOURCE, 0, D3D11_RESOURCE_MISC_TEXTURECUBE,
-        DirectX::DX11::DDS_LOADER_FLAGS(false),
-        (ID3D11Resource **)texture.GetAddressOf(),
-        shaderResourceView.GetAddressOf(), nullptr);
-    if (FAILED(hr)) {
-        std::cout << "CreateShaderResourceView FAILED\n";
+    UINT miscFlags = 0;
+    if (isCubeMap) {
+        miscFlags |= D3D11_RESOURCE_MISC_TEXTURECUBE;
     }
+
+     ThrowIfFailed(DirectX::CreateDDSTextureFromFileEx(
+        device.Get(), filePath.c_str(), 0, D3D11_USAGE_DEFAULT,
+        D3D11_BIND_SHADER_RESOURCE, 0, miscFlags, DirectX::DDS_LOADER_FLAGS(false),
+        (ID3D11Resource **)texture.GetAddressOf(),
+        SRV.GetAddressOf(), NULL));
 }
 void Utils::CreateShaderResourceView(
     const std::string &filePath,
