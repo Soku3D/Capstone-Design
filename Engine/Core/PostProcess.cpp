@@ -12,15 +12,29 @@ void PostProcess::Initialize(
     const int &width,
     const int &height) {
 
-    combineFilter.Initialize(width, height);
-    combineFilter.SetRenderTargetViews(targets);
-    combineFilter.SetShaderResourceViews(resources);
+   
+    
+    // Create Filter Mesh
     auto screen = GeometryGenerator::MakeSquare();
     m_meshes = std::make_shared<Mesh>();
     Utils::CreateVertexBuffer(screen.m_vertices, m_meshes->m_vertexBuffer,
                               device);
     Utils::CreateIndexBuffer(screen.m_indices, m_meshes->m_indexBuffer, device);
     m_meshes->m_indexCount = screen.m_indices.size();    
+    
+    for (int i = 0; i < 5; i++) {
+        int scailIdx = pow(2, i);
+        ImageFilter downFilter(width / scailIdx, height / scailIdx);
+        downFilters.push_back(downFilter);
+    }
+    for (int i = 4; i >= 0; i--) {
+        int scailIdx = pow(2, i);
+        ImageFilter upFilter(width / scailIdx, height / scailIdx);
+        upFilters.push_back(upFilter);
+    }
+    combineFilter.Initialize(width, height);
+    combineFilter.SetRenderTargetViews(targets);
+    combineFilter.SetShaderResourceViews(resources);
 }
 void PostProcess::CreateBuffer(
     const int &width, const int &height,
@@ -51,13 +65,22 @@ void PostProcess::Render(Microsoft::WRL::ComPtr<ID3D11DeviceContext> &context) {
     
     UINT stride = sizeof(Vertex);
     UINT offset = 0;
-    combineFilter.Render(context);
-
     context->IASetVertexBuffers(0, 1, m_meshes->m_vertexBuffer.GetAddressOf(),
                                 &stride, &offset);
     context->IASetIndexBuffer(m_meshes->m_indexBuffer.Get(),
                               DXGI_FORMAT_R32_UINT, 0);
 
+    Graphics::downSamplingPSO.SetPipelineState(context);
+    for (int i = 0; i < downFilters.size(); i++) {
+        downFilters[i].Render(context);
+        context->DrawIndexed(m_meshes->m_indexCount, 0, 0);
+    }
+    for (int i = 0; i < upFilters.size(); i++) {
+        upFilters[i].Render(context);
+        context->DrawIndexed(m_meshes->m_indexCount, 0, 0);
+    }
+    Graphics::combinePSO.SetPipelineState(context);
+    combineFilter.Render(context);
     context->DrawIndexed(m_meshes->m_indexCount, 0, 0);
 }
 } // namespace soku

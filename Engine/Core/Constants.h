@@ -10,4 +10,9 @@ struct MeshConstants {
     Matrix world;
     Matrix worldIT;
 };
+struct SamplingPSConstants {
+    float dx;
+    float dy;
+    Vector2 dummy;
+};
 } // namespace soku

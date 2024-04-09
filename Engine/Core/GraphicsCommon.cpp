@@ -6,6 +6,8 @@
 #include "CompiledShaders/DefaultVS.h"
 #include "CompiledShaders/CombinePS.h"
 #include "CompiledShaders/CombineVS.h"
+#include "CompiledShaders/UpSamplingPS.h"
+#include "CompiledShaders/DownSamplingPS.h"
 
 
 
@@ -22,9 +24,11 @@ Microsoft::WRL::ComPtr<ID3D11DepthStencilState> drawDSS;
 Microsoft::WRL::ComPtr<ID3D11InputLayout> basicIL;
 Microsoft::WRL::ComPtr<ID3D11InputLayout> combineIL;
 
-
 GraphicsPSO defaultSolidPSO;
 GraphicsPSO combinePSO;
+GraphicsPSO upSamplingPSO;
+GraphicsPSO downSamplingPSO;
+
 void InitCommonStates(Microsoft::WRL::ComPtr<ID3D11Device> &device) {
     // Create SamplerState
     D3D11_SAMPLER_DESC samplerDesc;
@@ -82,9 +86,7 @@ void InitCommonStates(Microsoft::WRL::ComPtr<ID3D11Device> &device) {
     device->CreateInputLayout(basicIEs.data(), basicIEs.size(), g_pDefaultVS,
                               sizeof(g_pDefaultVS), basicIL.GetAddressOf());
 
-   /* device->CreateInputLayout(basicIEs.data(), basicIEs.size(), g_pCombineVS,
-                              sizeof(g_pCombineVS), combineIL.GetAddressOf());*/
-
+  
     defaultSolidPSO.SetVertexShader(g_pDefaultVS, sizeof(g_pDefaultVS), device);
     defaultSolidPSO.SetPixelShader(g_pDefaultPS, sizeof(g_pDefaultPS), device);
     defaultSolidPSO.SetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -94,10 +96,20 @@ void InitCommonStates(Microsoft::WRL::ComPtr<ID3D11Device> &device) {
     defaultSolidPSO.SetInputLayout(basicIL);
 
     combinePSO = defaultSolidPSO;
-    //combinePSO.SetInputLayout(combineIL);
+    
     combinePSO.SetVertexShader(g_pCombineVS, sizeof(g_pCombineVS), device);
     combinePSO.SetPixelShader(g_pCombinePS, sizeof(g_pCombinePS), device);
+
+    upSamplingPSO = combinePSO;
+    upSamplingPSO.SetPixelShader(g_pUpSamplingPS, sizeof(g_pUpSamplingPS),
+                                 device);
+    
+    downSamplingPSO = combinePSO;
+    downSamplingPSO.SetPixelShader(g_pDownSamplingPS, sizeof(g_pDownSamplingPS),
+                                 device);
+
 }
+
 
 /*void InitSamplers(Microsoft::WRL::ComPtr<ID3D11Device>& device)
 {

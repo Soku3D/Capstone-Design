@@ -18,6 +18,8 @@ extern Microsoft::WRL::ComPtr<ID3D11InputLayout> combineIL;
 
 extern GraphicsPSO defaultSolidPSO;
 extern GraphicsPSO combinePSO;
+extern GraphicsPSO upSamplingPSO;
+extern GraphicsPSO downSamplingPSO;
 
 } // namespace Graphics
 } // namespace soku

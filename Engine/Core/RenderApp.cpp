@@ -65,7 +65,6 @@ void RenderApp::Render(float deltaTime) {
     m_context->ResolveSubresource(m_resolvedBuffer.Get(), 0,
                                   m_floatBuffer.Get(), 0,
                                   DXGI_FORMAT_R16G16B16A16_FLOAT);
-    Graphics::combinePSO.SetPipelineState(m_context);
 
     m_postProcess.Render(m_context);
 }

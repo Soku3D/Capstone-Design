@@ -1,6 +1,7 @@
 #pragma once
 #include "ImageFilter.h"
 #include "Mesh.h"
+
 namespace soku {
 class PostProcess {
   public:
