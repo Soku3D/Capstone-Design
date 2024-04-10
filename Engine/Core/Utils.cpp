@@ -11,27 +11,43 @@
 
 namespace soku {
 using namespace Microsoft::WRL;
-std::vector<uint8_t> Utils::CreateTextureImage(const std::string &filePath,
+std::vector<uint8_t> Utils::CreateTextureImage(const std::wstring &filePath,
                                                int &width, int &height) {
+    std::string path;
     int channels;
-    unsigned char *img =
-        stbi_load(filePath.c_str(), &width, &height, &channels, 0);
-    std::vector<uint8_t> image(width * height * 4);
-    if (channels == 3) {
-        for (int i = 0; i < height; i++) {
-            for (int j = 0; j < width; j++) {
-                int idx = j + width * i;
-                image[idx * 4] = img[idx * 3];
-                image[idx * 4 + 1] = img[idx * 3 + 1];
-                image[idx * 4 + 2] = img[idx * 3 + 2];
-                image[idx * 4 + 3] = 255;
+    path.assign(filePath.begin(), filePath.end());
+    
+    intptr_t handle;
+    struct _finddata_t fd;
+    if ((handle = _findfirst(path.c_str(), &fd)) == -1L) {
+        std::cout << path << " file in directory!" << std::endl;
+        return {};
+    }
+    else {
+         unsigned char *img =
+            stbi_load(path.c_str(), &width, &height, &channels, 0);
+        std::vector<uint8_t> image(width * height * 4);
+        if (channels == 3) {
+            for (int i = 0; i < height; i++) {
+                for (int j = 0; j < width; j++) {
+                    int idx = j + width * i;
+                    image[idx * 4] = img[idx * 3];
+                    image[idx * 4 + 1] = img[idx * 3 + 1];
+                    image[idx * 4 + 2] = img[idx * 3 + 2];
+                    image[idx * 4 + 3] = 255;
+                }
+            }
+        } else {
+            for (size_t i = 0; i < width * height; i++) {
+                for (size_t c = 0; c < 4; c++) {
+                    image[4 * i + c] = img[i * channels + c];
+                }
             }
         }
-    } else {
-        memcpy(image.data(), img, image.size());
-    }
-    delete[] img;
-    return image;
+        std::cout << path << " " << width << " " << height << " " << std::endl;
+        delete[] img;
+        return image;
+    }  
 }
 void Utils::SavePNG(const std::vector<uint8_t> &image, const int &x,
                     const int &y) {
@@ -57,134 +73,90 @@ void Utils::SavePNG(const std::vector<uint8_t> &image, const int &x,
 
     stbi_write_png(currtime.c_str(), x, y, 4, image.data(), x * 4);
 }
-void Utils::CreateTextureBuffer(
-    const std::string &filePath,
-    Microsoft::WRL::ComPtr<ID3D11Texture2D> &texture,
-    Microsoft::WRL::ComPtr<ID3D11Device> &device) {
-    int width, height;
-    std::vector<uint8_t> image = CreateTextureImage(filePath, width, height);
-
-    D3D11_TEXTURE2D_DESC textureDesc;
-    ZeroMemory(&textureDesc, sizeof(textureDesc));
-    textureDesc.Width = width;
-    textureDesc.Height = height;
-    textureDesc.MipLevels = 1;
-    textureDesc.ArraySize = 1;
-    textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-    textureDesc.SampleDesc.Count = 1;
-    textureDesc.Usage = D3D11_USAGE_IMMUTABLE;
-    textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-    textureDesc.CPUAccessFlags = 0;
-
-    D3D11_SUBRESOURCE_DATA subData;
-    ZeroMemory(&subData, sizeof(subData));
-    subData.pSysMem = image.data();
-    subData.SysMemPitch = width * 4;
-
-    HRESULT hr = device->CreateTexture2D(&textureDesc, &subData,
-                                         texture.ReleaseAndGetAddressOf());
-    if (FAILED(hr)) {
-        std::cout << "CreateTexture2D FAILED\n";
-    }
-}
-void Utils::CreateShaderResourceView(
-    const std::string &filePath,
-    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> &shaderResourceView,
-    Microsoft::WRL::ComPtr<ID3D11Device> &device) {
-    Microsoft::WRL::ComPtr<ID3D11Texture2D> texture;
-    CreateTextureBuffer(filePath, texture, device);
-    HRESULT hr = device->CreateShaderResourceView(
-        texture.Get(), nullptr, shaderResourceView.ReleaseAndGetAddressOf());
-    if (FAILED(hr)) {
-        std::cout << "CreateShaderResourceView FAILED\n";
-    }
-}
 
 void Utils::CreateDDSTexture(
     const std::wstring &filePath,
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> &SRV,
     Microsoft::WRL::ComPtr<ID3D11Device> &device, bool isCubeMap) {
-    
+
     Microsoft::WRL::ComPtr<ID3D11Texture2D> texture;
     UINT miscFlags = 0;
     if (isCubeMap) {
         miscFlags |= D3D11_RESOURCE_MISC_TEXTURECUBE;
     }
 
-     ThrowIfFailed(DirectX::CreateDDSTextureFromFileEx(
+    ThrowIfFailed(DirectX::CreateDDSTextureFromFileEx(
         device.Get(), filePath.c_str(), 0, D3D11_USAGE_DEFAULT,
-        D3D11_BIND_SHADER_RESOURCE, 0, miscFlags, DirectX::DDS_LOADER_FLAGS(false),
-        (ID3D11Resource **)texture.GetAddressOf(),
-        SRV.GetAddressOf(), NULL));
+        D3D11_BIND_SHADER_RESOURCE, 0, miscFlags,
+        DirectX::DDS_LOADER_FLAGS(false),
+        (ID3D11Resource **)texture.GetAddressOf(), SRV.GetAddressOf(), NULL));
 }
-void Utils::CreateShaderResourceView(
-    const std::string &filePath,
-    Microsoft::WRL::ComPtr<ID3D11Texture2D> &texture,
-    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> &shaderResourceView,
-    Microsoft::WRL::ComPtr<ID3D11Device> &device) {
-    CreateTextureBuffer(filePath, texture, device);
-    HRESULT hr = device->CreateShaderResourceView(
-        texture.Get(), nullptr, shaderResourceView.ReleaseAndGetAddressOf());
-    if (FAILED(hr)) {
-        std::cout << "CreateShaderResourceView FAILED\n";
-    }
+
+void Utils::CreateTexture(const std::wstring &filePath,
+                          Microsoft::WRL::ComPtr<ID3D11Texture2D> &tex,
+                          Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> &srv,
+                          Microsoft::WRL::ComPtr<ID3D11Device> &device,
+                          Microsoft::WRL::ComPtr<ID3D11DeviceContext> &context,
+                          bool useSRGB) {
+    using Microsoft::WRL::ComPtr;
+    DXGI_FORMAT format =
+        useSRGB ? DXGI_FORMAT_R8G8B8A8_UNORM_SRGB : DXGI_FORMAT_R8G8B8A8_UNORM;
+
+    ComPtr<ID3D11Texture2D> stagingTex;
+    int width, height;
+    const std::vector<uint8_t> image =
+        CreateTextureImage(filePath, width, height);
+    if (image.empty())
+        return;
+    CreateStagingTexture(width, height, image, format, stagingTex, device,context);
+
+    D3D11_TEXTURE2D_DESC texDesc;
+    stagingTex->GetDesc(&texDesc);
+    texDesc.MipLevels = 0;
+    texDesc.Usage = D3D11_USAGE_DEFAULT;
+    texDesc.CPUAccessFlags = 0;
+    texDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+    texDesc.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
+    
+    device->CreateTexture2D(&texDesc, NULL, tex.GetAddressOf());
+    context->CopySubresourceRegion(tex.Get(), 0, 0, 0, 0, stagingTex.Get(), 0,
+                                   NULL);
+    device->CreateShaderResourceView(tex.Get(), NULL, srv.GetAddressOf());
+    context->GenerateMips(srv.Get());
 }
-void Utils::CreateTextureArray(
-    const std::vector<std::string> &filePaths,
-    Microsoft::WRL::ComPtr<ID3D11Texture2D> textureArray,
-    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> &shaderResourceView,
-    Microsoft::WRL::ComPtr<ID3D11Device> &device) {
-    int width = 0, height = 0, channels = 4;
-    std::vector<uint8_t> pixels;
-    for (const auto &path : filePaths) {
-        std::vector<uint8_t> img =
-            Utils::CreateTextureImage(path, width, height);
-        pixels.insert(pixels.end(), img.begin(), img.end());
+
+void Utils::CreateStagingTexture(
+    const int &width, const int &height, const std::vector<uint8_t> &image,
+    const DXGI_FORMAT &format,
+    Microsoft::WRL::ComPtr<ID3D11Texture2D> &stagingTex,
+    Microsoft::WRL::ComPtr<ID3D11Device> &device,
+    Microsoft::WRL::ComPtr<ID3D11DeviceContext> &context,
+    const int &mipLevels, const int &arraySize) {
+
+    D3D11_TEXTURE2D_DESC texDesc;
+    ZeroMemory(&texDesc, sizeof(texDesc));
+    texDesc.Width = width;
+    texDesc.Height = height;
+    texDesc.Format = format;
+    texDesc.MipLevels = mipLevels;
+    texDesc.ArraySize = arraySize;
+    texDesc.SampleDesc.Count = 1;
+    texDesc.Usage = D3D11_USAGE_STAGING;
+    texDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ | D3D11_CPU_ACCESS_WRITE;
+
+    ThrowIfFailed(
+        device->CreateTexture2D(&texDesc, NULL, stagingTex.GetAddressOf()));
+    
+    D3D11_MAPPED_SUBRESOURCE ms;
+    context->Map(stagingTex.Get(), 0, D3D11_MAP_WRITE, 0, &ms);
+    uint8_t *pData = (uint8_t *)ms.pData;
+    for (int h = 0; h < height; h++) {
+        memcpy(&pData[h * ms.RowPitch], &image[h * 4 * width], 4 * width);
     }
-    D3D11_TEXTURE2D_DESC textureDesc;
-    ZeroMemory(&textureDesc, sizeof(textureDesc));
-    textureDesc.Width = (UINT)width;
-    textureDesc.Height = (UINT)height;
-    textureDesc.MipLevels = 1;
-    textureDesc.ArraySize = (UINT)filePaths.size();
-    textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-    textureDesc.SampleDesc.Count = 1;
-    textureDesc.Usage = D3D11_USAGE_IMMUTABLE;
-    textureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-    textureDesc.CPUAccessFlags = 0;
+    context->Unmap(stagingTex.Get(), 0);    
+}
 
-    std::vector<D3D11_SUBRESOURCE_DATA> subDataArray(textureDesc.ArraySize);
-    for (int i = 0; i < subDataArray.size(); i++) {
-        int offset = width * height * 4 * i * sizeof(uint8_t);
-        D3D11_SUBRESOURCE_DATA subData;
-        ZeroMemory(&subData, sizeof(subData));
-        subData.pSysMem = pixels.data() + offset;
-        subData.SysMemPitch = width * 4;
-        subData.SysMemSlicePitch = width * height * 4;
-        subDataArray[i] = subData;
-    }
+void Utils::CreateTextureArray(){
 
-    HRESULT hr = device->CreateTexture2D(&textureDesc, subDataArray.data(),
-                                         textureArray.GetAddressOf());
-    if (FAILED(hr)) {
-        std::cout << "CreateTexture2DArray FAILED\n";
-    }
-
-    D3D11_SHADER_RESOURCE_VIEW_DESC viewDesc;
-    ZeroMemory(&viewDesc, sizeof(viewDesc));
-    viewDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-    viewDesc.ViewDimension =
-        D3D11_SRV_DIMENSION::D3D11_SRV_DIMENSION_TEXTURE2DARRAY;
-    viewDesc.Texture2DArray.ArraySize = textureDesc.ArraySize;
-    viewDesc.Texture2DArray.MipLevels = textureDesc.MipLevels;
-    viewDesc.Texture2DArray.MostDetailedMip = 0;
-    viewDesc.Texture2DArray.FirstArraySlice = 0;
-
-    hr = device->CreateShaderResourceView(textureArray.Get(), &viewDesc,
-                                          shaderResourceView.GetAddressOf());
-
-    if (FAILED(hr)) {
-        std::cout << "CreateShaderResourceView Array FAILED\n";
-    }
 }
 } // namespace soku

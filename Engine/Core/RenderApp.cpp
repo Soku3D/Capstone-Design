@@ -12,11 +12,15 @@ bool RenderApp::Initialize() {
     }
     BaseApp::InitCubemaps(L"Assets/Textures/Skybox/Sample/", L"Sample");
 
+    auto sphere = GeometryGenerator::MakeSphere(100,100);
+    sphere.SetTexturePath(L"greyRock");
     auto box = GeometryGenerator::MakeBox(40.f);
-    skybox = std::make_shared<Model>();
-    skybox->Initialize({box}, m_device);
 
-   /* auto boxData = GeometryGenerator::MakeBox();
+    skybox = std::make_shared<Model>(m_device, m_context, std::vector{box});
+    auto sphereModel =
+        std::make_shared<Model>(m_device, m_context, std::vector{sphere});
+    models.push_back(sphereModel);
+    /* auto boxData = GeometryGenerator::MakeBox();
     auto grid = std::make_shared<Model>();
     grid->Initialize({boxData}, m_device);
     models.push_back(grid);*/
@@ -41,20 +45,22 @@ void RenderApp::Update(float deltaTime) {
     Matrix projRow = m_camera->GetProjRow();
     Vector3 eyeWorld = m_camera->GetEyePos();
 
-    BaseApp::UpdateGlobalConsts(eyeWorld, viewRow, projRow);
+    BaseApp::UpdateGlobalConsts(eyeWorld, viewRow, projRow, textureLOD);
     for (const auto &model : models) {
         model->m_meshConstantsCPU.world =
-            Matrix::CreateTranslation(Vector3(0.f, 0.f, 3.f));
+            Matrix::CreateTranslation(Vector3(0.f, 0.f, 1.5f));
         model->m_meshConstantsCPU.world =
             model->m_meshConstantsCPU.world.Transpose();
         Utils::UpdateConstantBuffer(model->m_meshConstantsCPU,
                                     model->m_meshConstantsGPU, m_context);
     }
 }
-void RenderApp::UpdateGUI(float deltaTime) {}
+void RenderApp::UpdateGUI(float deltaTime) {
+    ImGui::SliderFloat("TextureLOD", &textureLOD, 0.f, 10.f);
+}
 
 void RenderApp::Render(float deltaTime) {
-    FLOAT color[4]{0.f, 0.f, 0.f, 1.f};
+    FLOAT color[4]{80.f / 255.f, 80.f / 255.f, 80.f / 255.f, 1.f};
     m_context->OMSetRenderTargets(1, m_floatRTV.GetAddressOf(), m_DSV.Get());
     m_context->ClearRenderTargetView(m_floatRTV.Get(), color);
     m_context->ClearDepthStencilView(
@@ -69,8 +75,8 @@ void RenderApp::Render(float deltaTime) {
         model->Render(m_context);
     }
 
-    Graphics::skyboxPSO.SetPipelineState(m_context);
-    skybox->Render(m_context);
+    /*Graphics::skyboxPSO.SetPipelineState(m_context);
+    skybox->Render(m_context);*/
 
     m_context->ResolveSubresource(m_resolvedBuffer.Get(), 0,
                                   m_floatBuffer.Get(), 0,

@@ -50,7 +50,9 @@ MeshData ModelLoader::ProcessMesh(const aiScene *pScene, aiMesh *pMesh) {
                 std::string(std::filesystem::path(filepath.C_Str())
                                 .filename()
                                 .string());
-            data.albedoTextureFilename = fullPath;
+            std::wstring path;
+            path.assign(fullPath.begin(), fullPath.end());
+            data.albedoPath = path;
         }
     }
     return data;

@@ -23,7 +23,7 @@ class BaseApp {
                       const std::wstring &filename);
     void CreateConsts();
     void UpdateGlobalConsts(const Vector3 &eyeWorld, const Matrix &viewRow,
-                            const Matrix &projRow);
+                            const Matrix &projRow, const float& lod = 0.f);
     void SetGlobalConsts();
 
   protected:

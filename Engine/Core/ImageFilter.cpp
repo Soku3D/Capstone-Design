@@ -11,7 +11,7 @@ void ImageFilter::Initialize(const int &width, const int &height,
     m_viewport = {0.f, 0.f, (FLOAT)width, (FLOAT)height, 0.f, 1.f};
     samplingConstantCPU.dx = 1.f / width;
     samplingConstantCPU.dy = 1.f / height;
-    
+    samplingConstantCPU.gamma = 2.2f;
     Utils::CreateConstantBuffer(samplingConstantCPU, samplingConstantGPU,
                                 device);
 }

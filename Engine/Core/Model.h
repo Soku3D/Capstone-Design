@@ -6,8 +6,23 @@ namespace soku {
 class Model {
   public:
     Model();
-    void Initialize(const std::vector<MeshData> &data,
-                    Microsoft::WRL::ComPtr<ID3D11Device> &device);
+    Model(Microsoft::WRL::ComPtr<ID3D11Device> &device,
+          Microsoft::WRL::ComPtr<ID3D11DeviceContext> &context,
+          const std::vector<MeshData> &data, const std::string &filename = "",
+          const std::string &fileExtension = "",
+          const std::string &basePath = "");
+
+    void Initialize(Microsoft::WRL::ComPtr<ID3D11Device> &device,
+                    Microsoft::WRL::ComPtr<ID3D11DeviceContext> &context,
+                    const std::vector<MeshData> &data,
+                    const std::string &filename,
+                    const std::string &fileExtension,
+                    const std::string &basePath);
+
+    void Initialize(Microsoft::WRL::ComPtr<ID3D11Device> &device,
+                    Microsoft::WRL::ComPtr<ID3D11DeviceContext> &context,
+                    const std::vector<MeshData> &data);
+
     void Render(Microsoft::WRL::ComPtr<ID3D11DeviceContext> &context);
 
   public:

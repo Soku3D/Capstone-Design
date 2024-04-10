@@ -4,7 +4,7 @@ namespace soku {
 struct GlobalConstants {
     Matrix viewProj;
     Vector3 eyePos;
-    float dummy1;
+    float lod;
 };
 struct MeshConstants {
     Matrix world;
@@ -13,6 +13,7 @@ struct MeshConstants {
 struct SamplingPSConstants {
     float dx;
     float dy;
-    Vector2 dummy;
+    float expose;
+    float gamma;
 };
 } // namespace soku

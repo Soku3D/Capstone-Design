@@ -44,11 +44,11 @@ void BaseApp::CreateConsts() {
     Utils::CreateConstantBuffer(m_globalConstsCPU, m_globalConstsGPU, m_device);
 }
 void BaseApp::UpdateGlobalConsts(const Vector3 &eyeWorld, const Matrix &viewRow,
-                                 const Matrix &projRow) {
+                                 const Matrix &projRow, const float & lod) {
     m_globalConstsCPU.eyePos = eyeWorld;
     m_globalConstsCPU.viewProj = viewRow * projRow;
     m_globalConstsCPU.viewProj = m_globalConstsCPU.viewProj.Transpose();
-
+    m_globalConstsCPU.lod = lod;
     Utils::UpdateConstantBuffer(m_globalConstsCPU, m_globalConstsGPU,
                                 m_context);
 }

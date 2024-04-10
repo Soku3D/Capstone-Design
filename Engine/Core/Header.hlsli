@@ -3,9 +3,9 @@ cbuffer GlobalConsts : register(b1)
 {
     Matrix viewProj;
     float3 eyePos;
-    float dummy;
+    float lod;
 }
-
+TextureCube envIBL : register(t10);
 //TextureCube IrradianceIBL : register(t11);
 //TextureCube SpecularIBL : register(t12);
 //Texture2D brdf : register(t13);

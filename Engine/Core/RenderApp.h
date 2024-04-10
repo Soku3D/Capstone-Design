@@ -18,5 +18,6 @@ class RenderApp : public BaseApp {
   private:
     std::vector<std::shared_ptr<Model>> models;
     std::shared_ptr<Model> skybox;
+    float textureLOD;
 };
 } // namespace soku

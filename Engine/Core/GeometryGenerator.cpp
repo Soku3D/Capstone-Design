@@ -223,7 +223,7 @@ MeshData GeometryGenerator::MakeSphere(int x, int y, float radius,
             indices.push_back(idx3);
         }
     }
-    return MeshData(vertices, indices, texturePath);
+    return MeshData(vertices, indices);
 }
 MeshData GeometryGenerator::MakeTetrahedron() {
     std::vector<uint32_t> indices;

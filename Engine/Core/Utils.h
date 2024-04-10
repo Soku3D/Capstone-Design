@@ -16,7 +16,7 @@ class Utils {
         }
     }
 
-    static std::vector<uint8_t> CreateTextureImage(const std::string &filePath,
+    static std::vector<uint8_t> CreateTextureImage(const std::wstring &filePath,
                                                    int &width, int &height);
     static void SavePNG(const std::vector<uint8_t> &image, const int &x,
                         const int &y);
@@ -105,28 +105,23 @@ class Utils {
         memcpy(ms.pData, imageData.data(), sizeof(imageData));
         context->Unmap(constantBuffer.Get(), NULL);
     }
-    static void
-    CreateTextureBuffer(const std::string &filePath,
-                        Microsoft::WRL::ComPtr<ID3D11Texture2D> &texture,
-                        Microsoft::WRL::ComPtr<ID3D11Device> &device);
-    static void CreateShaderResourceView(
-        const std::string &filePath,
-        Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> &shaderResourceView,
-        Microsoft::WRL::ComPtr<ID3D11Device> &device);
     static void CreateDDSTexture(
         const std::wstring &filePath,
         Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> &shaderResourceView,
+        Microsoft::WRL::ComPtr<ID3D11Device> &device, bool isCubeMap);
+    static void CreateTexture(
+        const std::wstring &filePath, Microsoft::WRL::ComPtr<ID3D11Texture2D> &tex,
+        Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> &srv,
         Microsoft::WRL::ComPtr<ID3D11Device> &device,
-        bool isCubeMap);
-    static void CreateShaderResourceView(
-        const std::string &filePath,
-        Microsoft::WRL::ComPtr<ID3D11Texture2D> &texture,
-        Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> &shaderResourceView,
-        Microsoft::WRL::ComPtr<ID3D11Device> &device);
-    static void CreateTextureArray(
-        const std::vector<std::string> &filePaths,
-        Microsoft::WRL::ComPtr<ID3D11Texture2D> textureArray,
-        Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> &shaderResourceView,
-        Microsoft::WRL::ComPtr<ID3D11Device> &device);
+        Microsoft::WRL::ComPtr<ID3D11DeviceContext> &context, bool useSRGB);
+    static void
+    CreateStagingTexture(const int &width, const int &height,
+                         const std::vector<uint8_t> &image,
+                         const DXGI_FORMAT &format,
+                         Microsoft::WRL::ComPtr<ID3D11Texture2D> &stagingTex,
+                         Microsoft::WRL::ComPtr<ID3D11Device> &device,
+                         Microsoft::WRL::ComPtr<ID3D11DeviceContext> &context,
+                         const int &mipLevels = 1, const int &arraySize = 1);
+    static void CreateTextureArray();
 };
 } // namespace soku
