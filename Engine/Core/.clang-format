@@ -4,4 +4,5 @@ TabWidth:        4 # 기본값 8
 IndentWidth:     4 # 기본값 2
 UseTab:          Never # 기본값 Never
 AccessModifierOffset: -2 # 기본값 -2
+SortIncludes: false
 ColumnLimit: 80

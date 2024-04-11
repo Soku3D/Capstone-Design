@@ -10,7 +10,8 @@ void PostProcess::Initialize(
     const std::vector<Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>>  &resources,
     const std::vector<Microsoft::WRL::ComPtr<ID3D11RenderTargetView>> &targets,
     const int &width,
-    const int &height) {
+    const int &height,
+    const int & bloomLevel) {
       
     
     // Create Filter Mesh
@@ -20,21 +21,38 @@ void PostProcess::Initialize(
                               device);
     Utils::CreateIndexBuffer(screen.m_indices, m_meshes->m_indexBuffer, device);
     m_meshes->m_indexCount = screen.m_indices.size();    
-    
+    SRVs.resize(bloomLevel + 1);
+    RTVs.resize(bloomLevel + 1);
+
     // Create Filters
-    for (int i = 0; i < 5; i++) {
-        int scailIdx = pow(2, i);
-        ImageFilter downFilter(width / scailIdx, height / scailIdx, device);
+    for (int i = 0; i < bloomLevel+1; i++) {
+        int scale = pow(2, i);
+        CreateBuffer(width / scale, height / scale, SRVs[i], RTVs[i],
+                     device);
+    }
+    CreateBuffer(width , height , SRVs[0], RTVs[0], device);
+    for (int i = 0; i < bloomLevel; i++) {
+        int scale = pow(2, i+1);
+        ImageFilter downFilter(width / scale, height / scale,
+                               device);
+        downFilter.SetRenderTargetViews({RTVs[i+1]});
+        if (i == 0) {
+            downFilter.SetShaderResourceViews(resources);
+        } else {
+            downFilter.SetShaderResourceViews({SRVs[i]});     
+        }
         downFilters.push_back(downFilter);
     }
-    for (int i = 4; i >= 0; i--) {
-        int scailIdx = pow(2, i);
-        ImageFilter upFilter(width / scailIdx, height / scailIdx, device);
+    for (int i = bloomLevel-1; i >= 0; i--) {
+        int scale = pow(2, i);
+        ImageFilter upFilter(width / scale, height / scale, device);
+        upFilter.SetShaderResourceViews({SRVs[i + 1]});
+        upFilter.SetRenderTargetViews({RTVs[i]});
         upFilters.push_back(upFilter);
     }
     combineFilter.Initialize(width, height, device);
+    combineFilter.SetShaderResourceViews({resources[0], SRVs[0]});
     combineFilter.SetRenderTargetViews(targets);
-    combineFilter.SetShaderResourceViews(resources);
 }
 void PostProcess::CreateBuffer(
     const int &width, const int &height,
@@ -70,17 +88,24 @@ void PostProcess::Render(Microsoft::WRL::ComPtr<ID3D11DeviceContext> &context) {
     context->IASetIndexBuffer(m_meshes->m_indexBuffer.Get(),
                               DXGI_FORMAT_R32_UINT, 0);
 
-   /* Graphics::downSamplingPSO.SetPipelineState(context);
+   Graphics::downSamplingPSO.SetPipelineState(context);
     for (int i = 0; i < downFilters.size(); i++) {
         downFilters[i].Render(context);
         context->DrawIndexed(m_meshes->m_indexCount, 0, 0);
     }
+    Graphics::upSamplingPSO.SetPipelineState(context);
     for (int i = 0; i < upFilters.size(); i++) {
         upFilters[i].Render(context);
         context->DrawIndexed(m_meshes->m_indexCount, 0, 0);
-    }*/
-    
+    }
+    Graphics::combinePSO.SetPipelineState(context);
     combineFilter.Render(context);
     context->DrawIndexed(m_meshes->m_indexCount, 0, 0);
+}
+void PostProcess::Update(const SamplingPSConstants &constant,
+                         Microsoft::WRL::ComPtr<ID3D11DeviceContext> &context) {
+    combineFilter.samplingConstantCPU.bloomStrength = constant.bloomStrength;
+    Utils::UpdateConstantBuffer(combineFilter.samplingConstantCPU,
+                                combineFilter.samplingConstantGPU, context);
 }
 } // namespace soku

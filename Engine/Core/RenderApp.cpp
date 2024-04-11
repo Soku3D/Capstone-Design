@@ -12,7 +12,7 @@ bool RenderApp::Initialize() {
     }
     BaseApp::InitCubemaps(L"Assets/Textures/Skybox/Sample/", L"Sample");
 
-    auto sphere = GeometryGenerator::MakeSphere(100,100);
+    auto sphere = GeometryGenerator::MakeSphere(100, 100);
     sphere.SetTexturePath(L"greyRock");
     auto box = GeometryGenerator::MakeBox(40.f);
 
@@ -49,14 +49,22 @@ void RenderApp::Update(float deltaTime) {
     for (const auto &model : models) {
         model->m_meshConstantsCPU.world =
             Matrix::CreateTranslation(Vector3(0.f, 0.f, 1.5f));
+        model->m_meshConstantsCPU.worldIT =
+            model->m_meshConstantsCPU.world.Invert().Transpose();
         model->m_meshConstantsCPU.world =
             model->m_meshConstantsCPU.world.Transpose();
+        model->m_meshConstantsCPU.worldIT =
+            model->m_meshConstantsCPU.worldIT.Transpose();
+        model->m_meshConstantsCPU.heightScale = heightScale;
         Utils::UpdateConstantBuffer(model->m_meshConstantsCPU,
                                     model->m_meshConstantsGPU, m_context);
     }
+    m_postProcess.Update(SPSconstant, m_context);
 }
 void RenderApp::UpdateGUI(float deltaTime) {
     ImGui::SliderFloat("TextureLOD", &textureLOD, 0.f, 10.f);
+    ImGui::SliderFloat("HeightScale", &heightScale, 0.f, 1.f);
+    ImGui::SliderFloat("bloomStrength", &SPSconstant.bloomStrength, 0.f, 1.f);
 }
 
 void RenderApp::Render(float deltaTime) {
@@ -75,13 +83,13 @@ void RenderApp::Render(float deltaTime) {
         model->Render(m_context);
     }
 
-    /*Graphics::skyboxPSO.SetPipelineState(m_context);
-    skybox->Render(m_context);*/
+    Graphics::skyboxPSO.SetPipelineState(m_context);
+    skybox->Render(m_context);
 
     m_context->ResolveSubresource(m_resolvedBuffer.Get(), 0,
                                   m_floatBuffer.Get(), 0,
                                   DXGI_FORMAT_R16G16B16A16_FLOAT);
-    Graphics::combinePSO.SetPipelineState(m_context);
+    
 
     m_postProcess.Render(m_context);
 }

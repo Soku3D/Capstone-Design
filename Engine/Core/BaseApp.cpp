@@ -46,6 +46,8 @@ void BaseApp::CreateConsts() {
 void BaseApp::UpdateGlobalConsts(const Vector3 &eyeWorld, const Matrix &viewRow,
                                  const Matrix &projRow, const float & lod) {
     m_globalConstsCPU.eyePos = eyeWorld;
+    m_globalConstsCPU.view = viewRow.Transpose();
+    m_globalConstsCPU.proj = projRow.Transpose();
     m_globalConstsCPU.viewProj = viewRow * projRow;
     m_globalConstsCPU.viewProj = m_globalConstsCPU.viewProj.Transpose();
     m_globalConstsCPU.lod = lod;

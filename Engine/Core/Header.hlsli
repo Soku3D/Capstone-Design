@@ -2,6 +2,8 @@
 cbuffer GlobalConsts : register(b1)
 {
     Matrix viewProj;
+    Matrix view;
+    Matrix proj;
     float3 eyePos;
     float lod;
 }
@@ -19,6 +21,7 @@ struct DefaultVSInput
 struct DefaultPSInput
 {
     float4 posProj : SV_Position;
+    float3 normal : NORMAL;
     float2 texcoord : TEXCOORD;
 };
 struct SkyboxPSInput
