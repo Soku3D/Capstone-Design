@@ -42,22 +42,36 @@ void BaseApp::InitCubemaps(const std::wstring &basePath,
 }
 void BaseApp::CreateConsts() {
     Utils::CreateConstantBuffer(m_globalConstsCPU, m_globalConstsGPU, m_device);
+    Utils::CreateConstantBuffer(m_reflectGlobalConstsCPU,
+                                m_reflectGlobalConstsGPU, m_device);
 }
 void BaseApp::UpdateGlobalConsts(const Vector3 &eyeWorld, const Matrix &viewRow,
-                                 const Matrix &projRow, const float & lod) {
+                                 const Matrix &projRow, const float &lod,
+                                 const Matrix &refl) {
     m_globalConstsCPU.eyePos = eyeWorld;
     m_globalConstsCPU.view = viewRow.Transpose();
     m_globalConstsCPU.proj = projRow.Transpose();
     m_globalConstsCPU.viewProj = viewRow * projRow;
     m_globalConstsCPU.viewProj = m_globalConstsCPU.viewProj.Transpose();
     m_globalConstsCPU.lod = lod;
+
+    m_reflectGlobalConstsCPU = m_globalConstsCPU;
+    m_reflectGlobalConstsCPU.view = refl * projRow;
+    m_reflectGlobalConstsCPU.view = m_reflectGlobalConstsCPU.view.Transpose();
+    m_reflectGlobalConstsCPU.viewProj = (refl * projRow * projRow);
+    m_reflectGlobalConstsCPU.viewProj =
+        m_reflectGlobalConstsCPU.viewProj.Transpose();
+
+    Utils::UpdateConstantBuffer(m_reflectGlobalConstsCPU,
+                                m_reflectGlobalConstsGPU, m_context);
     Utils::UpdateConstantBuffer(m_globalConstsCPU, m_globalConstsGPU,
                                 m_context);
 }
-void BaseApp::SetGlobalConsts() {
-    m_context->VSSetConstantBuffers(1, 1, m_globalConstsGPU.GetAddressOf());
-    m_context->PSSetConstantBuffers(1, 1, m_globalConstsGPU.GetAddressOf());
-    m_context->GSSetConstantBuffers(1, 1, m_globalConstsGPU.GetAddressOf());
+void BaseApp::SetGlobalConsts(
+    Microsoft::WRL::ComPtr<ID3D11Buffer> &globalConstsGPU) {
+    m_context->VSSetConstantBuffers(1, 1, globalConstsGPU.GetAddressOf());
+    m_context->PSSetConstantBuffers(1, 1, globalConstsGPU.GetAddressOf());
+    m_context->GSSetConstantBuffers(1, 1, globalConstsGPU.GetAddressOf());
 }
 bool BaseApp::InitWindow() {
     // Create WindowClass
@@ -65,7 +79,7 @@ bool BaseApp::InitWindow() {
         sizeof(wc), CS_CLASSDC, MainProc, 0, 0,        GetModuleHandle(NULL),
         0,          0,          0,        0, L"class", 0};
     RegisterClassExW(&wc);
-    RECT rect = {0, 0, m_width, m_height};
+    RECT rect = {(LONG)0, (LONG)0, (LONG)m_width, (LONG)m_height};
     AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, false);
 
     // Create Window

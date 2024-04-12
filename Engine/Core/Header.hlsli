@@ -1,11 +1,19 @@
 
 cbuffer GlobalConsts : register(b1)
 {
-    Matrix viewProj;
-    Matrix view;
-    Matrix proj;
+    matrix viewProj;
+    matrix view;
+    matrix proj;
     float3 eyePos;
     float lod;
+}
+cbuffer ReflectedGlobalConsts : register(b2)
+{
+    matrix r_viewProj;
+    matrix r_view;
+    matrix r_proj;
+    float3 r_eyePos;
+    float r_lod;
 }
 TextureCube envIBL : register(t10);
 //TextureCube IrradianceIBL : register(t11);

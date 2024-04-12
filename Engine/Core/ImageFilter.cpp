@@ -19,9 +19,9 @@ void ImageFilter::Initialize(const int &width, const int &height,
 void ImageFilter::Render(Microsoft::WRL::ComPtr<ID3D11DeviceContext> &context) {
     
     context->RSSetViewports(1, &m_viewport);
-    context->OMSetRenderTargets(m_rtvs.size(), m_rtvs.data(), NULL);
+    context->OMSetRenderTargets((UINT)m_rtvs.size(), m_rtvs.data(), NULL);
     context->PSSetConstantBuffers(0, 1, samplingConstantGPU.GetAddressOf());
-    context->PSSetShaderResources(0, m_srvs.size(), m_srvs.data());
+    context->PSSetShaderResources((UINT)0, (UINT)m_srvs.size(), m_srvs.data());
 }
 void ImageFilter::SetRenderTargetViews(
     const std::vector<Microsoft::WRL::ComPtr<ID3D11RenderTargetView>> &rtvs) {

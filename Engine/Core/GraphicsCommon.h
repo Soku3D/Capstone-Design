@@ -9,19 +9,24 @@ extern Microsoft::WRL::ComPtr<ID3D11SamplerState> linearWrapSS;
 extern Microsoft::WRL::ComPtr<ID3D11SamplerState> linearClampSS;
 
 extern Microsoft::WRL::ComPtr<ID3D11RasterizerState> solidRS;
-extern Microsoft::WRL::ComPtr<ID3D11RasterizerState> cubeRS;
+extern Microsoft::WRL::ComPtr<ID3D11RasterizerState> skyboxRS;
 
 extern Microsoft::WRL::ComPtr<ID3D11DepthStencilState> drawDSS;
+extern Microsoft::WRL::ComPtr<ID3D11DepthStencilState> maskingDSS;
+extern Microsoft::WRL::ComPtr<ID3D11DepthStencilState> maskedDrawDSS;
 
 extern Microsoft::WRL::ComPtr<ID3D11InputLayout> basicIL;
 extern Microsoft::WRL::ComPtr<ID3D11InputLayout> combineIL;
 
+extern Microsoft::WRL::ComPtr<ID3D11BlendState> basicBS;
 
 extern GraphicsPSO defaultSolidPSO;
 extern GraphicsPSO skyboxPSO;
 extern GraphicsPSO combinePSO;
 extern GraphicsPSO upSamplingPSO;
 extern GraphicsPSO downSamplingPSO;
-
+extern GraphicsPSO mirrorMaskingPSO;
+extern GraphicsPSO mirrorPSO;
+extern GraphicsPSO blendPSO;
 } // namespace Graphics
 } // namespace soku

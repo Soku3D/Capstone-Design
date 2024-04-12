@@ -23,10 +23,12 @@ class BaseApp {
                       const std::wstring &filename);
     void CreateConsts();
     void UpdateGlobalConsts(const Vector3 &eyeWorld, const Matrix &viewRow,
-                            const Matrix &projRow, const float& lod = 0.f);
-    void SetGlobalConsts();
+                            const Matrix &projRow, const float &lod = 0.f,
+                            const Matrix &refl = Matrix());
+    void SetGlobalConsts(Microsoft::WRL::ComPtr<ID3D11Buffer> &globalConstsGPU);
 
   protected:
+
     bool InitWindow();
     bool InitDirect3D();
     bool InitGUI();

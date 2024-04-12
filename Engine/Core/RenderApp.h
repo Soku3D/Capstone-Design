@@ -18,11 +18,13 @@ class RenderApp : public BaseApp {
   private:
     std::vector<std::shared_ptr<Model>> models;
     std::shared_ptr<Model> skybox;
+    std::shared_ptr<Model> mirror;
     //GlobalCosntants
     float textureLOD;
     //MeshConstants
     float heightScale;
     
     SamplingPSConstants SPSconstant;
+    Matrix mirrorMat;
 };
 } // namespace soku

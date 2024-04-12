@@ -9,7 +9,7 @@ class GeometryGenerator {
     static MeshData MakeBox(float l = 1.f, const std::string &texturePath = "");
     static MeshData MakeGrid(int x = 1, int y = 1);
     static MeshData MakeCylinder(int x = 5, int y = 2, float height = 2.f,
-                                 int radius = 1.f);
+                                 float radius = 1.f);
     static MeshData MakeSphere(int x = 5, int y = 5, float radius = 1.f,
                                const std::string &texturePath = "");
     static MeshData MakeTetrahedron();

@@ -138,7 +138,7 @@ MeshData GeometryGenerator::MakeGrid(int x, int y) {
     return meshData;
 }
 MeshData GeometryGenerator::MakeCylinder(int x, int y, float height,
-                                         int radius) {
+                                         float radius) {
     std::vector<uint32_t> indices;
     std::vector<Vertex> vertices;
 

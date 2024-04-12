@@ -27,7 +27,7 @@ class Utils {
                        Microsoft::WRL::ComPtr<ID3D11Device> &device) {
         D3D11_BUFFER_DESC bufferDesc;
         ZeroMemory(&bufferDesc, sizeof(bufferDesc));
-        bufferDesc.ByteWidth = vertices.size() * sizeof(VERTEX);
+        bufferDesc.ByteWidth = (UINT)(vertices.size() * sizeof(VERTEX));
         bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
         bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
         bufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
@@ -47,7 +47,7 @@ class Utils {
                       Microsoft::WRL::ComPtr<ID3D11Device> &device) {
         D3D11_BUFFER_DESC bufferDesc;
         ZeroMemory(&bufferDesc, sizeof(bufferDesc));
-        bufferDesc.ByteWidth = indices.size() * sizeof(INDEX);
+        bufferDesc.ByteWidth = (UINT)(indices.size() * sizeof(INDEX));
         bufferDesc.Usage = D3D11_USAGE_DYNAMIC;
         bufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
         bufferDesc.BindFlags = D3D11_BIND_FLAG::D3D11_BIND_INDEX_BUFFER;
@@ -123,5 +123,7 @@ class Utils {
                          Microsoft::WRL::ComPtr<ID3D11DeviceContext> &context,
                          const int &mipLevels = 1, const int &arraySize = 1);
     static void CreateTextureArray();
+    static Matrix CreateReflectedMatrix(const Vector3 &normal,
+                                        const Vector3 &point);
 };
 } // namespace soku

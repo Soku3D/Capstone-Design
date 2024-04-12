@@ -31,7 +31,7 @@ void Model::Initialize(Microsoft::WRL::ComPtr<ID3D11Device> &device,
                                   device);
         Utils::CreateIndexBuffer(mesh.m_indices, newMesh->m_indexBuffer,
                                  device);
-        newMesh->m_indexCount = mesh.m_indices.size();
+        newMesh->m_indexCount = (UINT)mesh.m_indices.size();
 
        
         if (!mesh.albedoPath.empty()) {
@@ -67,7 +67,7 @@ void Model::Render(Microsoft::WRL::ComPtr<ID3D11DeviceContext> &context) {
             mesh->m_albedoSRV.Get(), mesh->m_aoSRV.Get(),
             mesh->m_normalSRV.Get()};
         context->VSSetShaderResources(0, 1, mesh->m_heightSRV.GetAddressOf());
-        context->PSSetShaderResources(0, srvs.size(), srvs.data());
+        context->PSSetShaderResources(0, (UINT)srvs.size(), srvs.data());
 
         context->DrawIndexed(mesh->m_indexCount, 0, 0);
     }

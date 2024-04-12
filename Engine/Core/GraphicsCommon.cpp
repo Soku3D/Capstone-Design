@@ -12,26 +12,32 @@
 
 
 
-
 namespace soku {
 namespace Graphics {
 Microsoft::WRL::ComPtr<ID3D11SamplerState> linearWrapSS;
 Microsoft::WRL::ComPtr<ID3D11SamplerState> linearClampSS;
 
 Microsoft::WRL::ComPtr<ID3D11RasterizerState> solidRS;
-Microsoft::WRL::ComPtr<ID3D11RasterizerState> cubeRS;
+Microsoft::WRL::ComPtr<ID3D11RasterizerState> skyboxRS;
 
 Microsoft::WRL::ComPtr<ID3D11DepthStencilState> drawDSS;
+Microsoft::WRL::ComPtr<ID3D11DepthStencilState> maskingDSS;
+Microsoft::WRL::ComPtr<ID3D11DepthStencilState> maskedDrawDSS;
+
 
 Microsoft::WRL::ComPtr<ID3D11InputLayout> basicIL;
 Microsoft::WRL::ComPtr<ID3D11InputLayout> combineIL;
+
+Microsoft::WRL::ComPtr<ID3D11BlendState> basicBS;
 
 GraphicsPSO defaultSolidPSO;
 GraphicsPSO skyboxPSO;
 GraphicsPSO combinePSO;
 GraphicsPSO upSamplingPSO;
 GraphicsPSO downSamplingPSO;
-
+GraphicsPSO mirrorMaskingPSO;
+GraphicsPSO mirrorPSO;
+GraphicsPSO blendPSO;
 void InitCommonStates(Microsoft::WRL::ComPtr<ID3D11Device> &device) {
     // Create SamplerState
     D3D11_SAMPLER_DESC samplerDesc;
@@ -62,7 +68,7 @@ void InitCommonStates(Microsoft::WRL::ComPtr<ID3D11Device> &device) {
     device->CreateRasterizerState(&rasterDesc, solidRS.GetAddressOf());
     rasterDesc.CullMode = D3D11_CULL_NONE;
     rasterDesc.FrontCounterClockwise = true;
-    device->CreateRasterizerState(&rasterDesc, cubeRS.GetAddressOf());
+    device->CreateRasterizerState(&rasterDesc, skyboxRS.GetAddressOf());
 
     D3D11_DEPTH_STENCIL_DESC dsDesc;
     ZeroMemory(&dsDesc, sizeof(dsDesc));
@@ -71,6 +77,19 @@ void InitCommonStates(Microsoft::WRL::ComPtr<ID3D11Device> &device) {
     dsDesc.DepthFunc = D3D11_COMPARISON_LESS;
     dsDesc.StencilEnable = false;
     device->CreateDepthStencilState(&dsDesc, drawDSS.GetAddressOf());
+
+    dsDesc.StencilEnable = true;
+    dsDesc.StencilReadMask = D3D11_DEFAULT_STENCIL_READ_MASK;
+    dsDesc.StencilWriteMask = D3D11_DEFAULT_STENCIL_WRITE_MASK;
+    dsDesc.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
+    dsDesc.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP;
+    dsDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_REPLACE;
+    dsDesc.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
+    device->CreateDepthStencilState(&dsDesc, maskingDSS.GetAddressOf());
+
+    dsDesc.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
+    dsDesc.FrontFace.StencilFunc = D3D11_COMPARISON_EQUAL;
+    device->CreateDepthStencilState(&dsDesc, maskingDSS.GetAddressOf());
 
     std::vector<D3D11_INPUT_ELEMENT_DESC> basicIEs = {
         {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0,
@@ -89,10 +108,24 @@ void InitCommonStates(Microsoft::WRL::ComPtr<ID3D11Device> &device) {
         {"TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 32,
          D3D11_INPUT_PER_VERTEX_DATA, 0},
     };
-    device->CreateInputLayout(basicIEs.data(), basicIEs.size(), g_pDefaultVS,
+    device->CreateInputLayout(basicIEs.data(), (UINT)basicIEs.size(), g_pDefaultVS,
                               sizeof(g_pDefaultVS), basicIL.GetAddressOf());
 
-  
+    D3D11_BLEND_DESC blendDesc;
+    ZeroMemory(&blendDesc, sizeof(blendDesc));
+    blendDesc.RenderTarget[0].BlendEnable = true;
+
+    blendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+    blendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_BLEND_FACTOR;
+    blendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_INV_BLEND_FACTOR;
+    
+    blendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+    blendDesc.RenderTarget[0].DestBlendAlpha =
+        D3D11_BLEND::D3D11_BLEND_ONE;
+    blendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND::D3D11_BLEND_ONE;
+    blendDesc.RenderTarget[0].RenderTargetWriteMask =
+        device->CreateBlendState(&blendDesc, basicBS.GetAddressOf());
+
     defaultSolidPSO.SetVertexShader(g_pDefaultVS, sizeof(g_pDefaultVS), device);
     defaultSolidPSO.SetPixelShader(g_pDefaultPS, sizeof(g_pDefaultPS), device);
     defaultSolidPSO.SetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -101,13 +134,17 @@ void InitCommonStates(Microsoft::WRL::ComPtr<ID3D11Device> &device) {
     defaultSolidPSO.SetDepthStencilState(drawDSS);
     defaultSolidPSO.SetInputLayout(basicIL);
 
+    mirrorMaskingPSO = defaultSolidPSO;
+    mirrorMaskingPSO.SetDepthStencilState(maskingDSS);
+    mirrorPSO = defaultSolidPSO;
+    mirrorPSO.SetDepthStencilState(maskedDrawDSS);
     skyboxPSO = defaultSolidPSO;
     skyboxPSO.SetVertexShader(g_pSkyboxVS, sizeof(g_pSkyboxVS), device);
     skyboxPSO.SetPixelShader(g_pSkyboxPS, sizeof(g_pSkyboxPS), device);
-    skyboxPSO.SetRasterizerState(cubeRS);
+    skyboxPSO.SetRasterizerState(skyboxRS);
 
     combinePSO = defaultSolidPSO;
-    
+    combinePSO.SetSamplerState(linearClampSS);
     combinePSO.SetVertexShader(g_pCombineVS, sizeof(g_pCombineVS), device);
     combinePSO.SetPixelShader(g_pCombinePS, sizeof(g_pCombinePS), device);
 
@@ -118,6 +155,9 @@ void InitCommonStates(Microsoft::WRL::ComPtr<ID3D11Device> &device) {
     downSamplingPSO = combinePSO;
     downSamplingPSO.SetPixelShader(g_pDownSamplingPS, sizeof(g_pDownSamplingPS),
                                  device);
+
+    blendPSO = defaultSolidPSO;
+    blendPSO.SetBlendState(basicBS);
 
 }
 

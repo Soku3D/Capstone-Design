@@ -39,6 +39,7 @@ class GraphicsPSO {
         device->CreatePixelShader(Binary, Size, nullptr,
                                   m_PSODesc.m_pixelShader.GetAddressOf());
     }
+    void SetBlendState(Microsoft::WRL::ComPtr<ID3D11BlendState> &blendState);
 
   private:
     D3D11_GRAPHICS_PIPELINE_STATE_DESC m_PSODesc;

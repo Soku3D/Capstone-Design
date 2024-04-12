@@ -20,19 +20,19 @@ void PostProcess::Initialize(
     Utils::CreateVertexBuffer(screen.m_vertices, m_meshes->m_vertexBuffer,
                               device);
     Utils::CreateIndexBuffer(screen.m_indices, m_meshes->m_indexBuffer, device);
-    m_meshes->m_indexCount = screen.m_indices.size();    
+    m_meshes->m_indexCount = (UINT)screen.m_indices.size();    
     SRVs.resize(bloomLevel + 1);
     RTVs.resize(bloomLevel + 1);
 
     // Create Filters
     for (int i = 0; i < bloomLevel+1; i++) {
-        int scale = pow(2, i);
+        int scale = (int)pow(2, i);
         CreateBuffer(width / scale, height / scale, SRVs[i], RTVs[i],
                      device);
     }
     CreateBuffer(width , height , SRVs[0], RTVs[0], device);
     for (int i = 0; i < bloomLevel; i++) {
-        int scale = pow(2, i+1);
+        int scale = (int)pow(2, i + 1);
         ImageFilter downFilter(width / scale, height / scale,
                                device);
         downFilter.SetRenderTargetViews({RTVs[i+1]});
@@ -44,7 +44,7 @@ void PostProcess::Initialize(
         downFilters.push_back(downFilter);
     }
     for (int i = bloomLevel-1; i >= 0; i--) {
-        int scale = pow(2, i);
+        int scale = (int)pow(2, i);
         ImageFilter upFilter(width / scale, height / scale, device);
         upFilter.SetShaderResourceViews({SRVs[i + 1]});
         upFilter.SetRenderTargetViews({RTVs[i]});

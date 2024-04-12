@@ -7,6 +7,6 @@ DefaultPSInput main(DefaultVSInput input)
     output.posProj = float4(input.position, 1.f);
     
     output.texcoord = input.texcoord;
-
+    output.normal = input.normal;
     return output;
 }

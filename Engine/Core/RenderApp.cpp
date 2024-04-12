@@ -11,20 +11,26 @@ bool RenderApp::Initialize() {
         return false;
     }
     BaseApp::InitCubemaps(L"Assets/Textures/Skybox/Sample/", L"Sample");
-
+    
+    // Generate Model Meshes
     auto sphere = GeometryGenerator::MakeSphere(100, 100);
     sphere.SetTexturePath(L"greyRock");
+    
     auto box = GeometryGenerator::MakeBox(40.f);
-
     skybox = std::make_shared<Model>(m_device, m_context, std::vector{box});
     auto sphereModel =
         std::make_shared<Model>(m_device, m_context, std::vector{sphere});
+    
     models.push_back(sphereModel);
+    
+    auto square = GeometryGenerator::MakeSquare();
+    mirror = std::make_shared<Model>(m_device, m_context, std::vector{square});
+   
     /* auto boxData = GeometryGenerator::MakeBox();
     auto grid = std::make_shared<Model>();
     grid->Initialize({boxData}, m_device);
     models.push_back(grid);*/
-
+    
     return true;
 }
 void RenderApp::Update(float deltaTime) {
@@ -45,7 +51,20 @@ void RenderApp::Update(float deltaTime) {
     Matrix projRow = m_camera->GetProjRow();
     Vector3 eyeWorld = m_camera->GetEyePos();
 
-    BaseApp::UpdateGlobalConsts(eyeWorld, viewRow, projRow, textureLOD);
+    // Update mirror Meshconstants
+    Vector3 mirrorTranslation(0.f, 0.f, 2.f);
+    mirror->m_meshConstantsCPU.world =
+        Matrix::CreateTranslation(mirrorTranslation);
+    mirror->m_meshConstantsCPU.worldIT =
+        mirror->m_meshConstantsCPU.world.Invert();
+     mirror->m_meshConstantsCPU.world =
+         mirror->m_meshConstantsCPU.world.Transpose();
+    Utils::UpdateConstantBuffer(mirror->m_meshConstantsCPU,
+                                mirror->m_meshConstantsGPU, m_context);
+    mirrorMat = Utils::CreateReflectedMatrix(Vector3(0.f, 0.f, -1.f),
+                                              mirrorTranslation);
+    BaseApp::UpdateGlobalConsts(eyeWorld, viewRow, projRow, textureLOD,
+                                mirrorMat);
     for (const auto &model : models) {
         model->m_meshConstantsCPU.world =
             Matrix::CreateTranslation(Vector3(0.f, 0.f, 1.5f));
@@ -59,6 +78,7 @@ void RenderApp::Update(float deltaTime) {
         Utils::UpdateConstantBuffer(model->m_meshConstantsCPU,
                                     model->m_meshConstantsGPU, m_context);
     }
+    // Update Bloom Strength
     m_postProcess.Update(SPSconstant, m_context);
 }
 void RenderApp::UpdateGUI(float deltaTime) {
@@ -74,7 +94,7 @@ void RenderApp::Render(float deltaTime) {
     m_context->ClearDepthStencilView(
         m_DSV.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.f, 0);
 
-    BaseApp::SetGlobalConsts();
+    BaseApp::SetGlobalConsts(m_globalConstsGPU);
     m_context->PSSetShaderResources(10, 1, m_envSRV.GetAddressOf());
 
     Graphics::defaultSolidPSO.SetPipelineState(m_context);
@@ -85,6 +105,24 @@ void RenderApp::Render(float deltaTime) {
 
     Graphics::skyboxPSO.SetPipelineState(m_context);
     skybox->Render(m_context);
+
+    // Mirror
+    // Stencil Buffer Masking
+    Graphics::mirrorMaskingPSO.SetPipelineState(m_context);
+    mirror->Render(m_context);
+    
+    // Draw mirror if pass Stencil
+    m_context->ClearDepthStencilView(m_DSV.Get(), D3D11_CLEAR_DEPTH, 1.f, 0);
+    BaseApp::SetGlobalConsts(m_reflectGlobalConstsGPU);
+    Graphics::mirrorPSO.SetPipelineState(m_context);
+    for (const auto &model : models) {
+        model->Render(m_context);
+    }
+    skybox->Render(m_context);
+    
+    // blending
+
+    Graphics::blendPSO.SetPipelineState(m_context);
 
     m_context->ResolveSubresource(m_resolvedBuffer.Get(), 0,
                                   m_floatBuffer.Get(), 0,

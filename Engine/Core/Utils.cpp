@@ -6,9 +6,6 @@
 #include "stb_image_write.h"
 #include <directxtk/DDSTextureLoader.h>
 
-#include "CompiledShaders/CubePs.h"
-#include "CompiledShaders/CubeVS.h"
-
 namespace soku {
 using namespace Microsoft::WRL;
 std::vector<uint8_t> Utils::CreateTextureImage(const std::wstring &filePath,
@@ -16,15 +13,14 @@ std::vector<uint8_t> Utils::CreateTextureImage(const std::wstring &filePath,
     std::string path;
     int channels;
     path.assign(filePath.begin(), filePath.end());
-    
+
     intptr_t handle;
     struct _finddata_t fd;
     if ((handle = _findfirst(path.c_str(), &fd)) == -1L) {
         std::cout << path << " file in directory!" << std::endl;
         return {};
-    }
-    else {
-         unsigned char *img =
+    } else {
+        unsigned char *img =
             stbi_load(path.c_str(), &width, &height, &channels, 0);
         std::vector<uint8_t> image(width * height * 4);
         if (channels == 3) {
@@ -47,7 +43,7 @@ std::vector<uint8_t> Utils::CreateTextureImage(const std::wstring &filePath,
         std::cout << path << " " << width << " " << height << " " << std::endl;
         delete[] img;
         return image;
-    }  
+    }
 }
 void Utils::SavePNG(const std::vector<uint8_t> &image, const int &x,
                     const int &y) {
@@ -108,7 +104,8 @@ void Utils::CreateTexture(const std::wstring &filePath,
         CreateTextureImage(filePath, width, height);
     if (image.empty())
         return;
-    CreateStagingTexture(width, height, image, format, stagingTex, device,context);
+    CreateStagingTexture(width, height, image, format, stagingTex, device,
+                         context);
 
     D3D11_TEXTURE2D_DESC texDesc;
     stagingTex->GetDesc(&texDesc);
@@ -117,7 +114,7 @@ void Utils::CreateTexture(const std::wstring &filePath,
     texDesc.CPUAccessFlags = 0;
     texDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
     texDesc.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
-    
+
     device->CreateTexture2D(&texDesc, NULL, tex.GetAddressOf());
     context->CopySubresourceRegion(tex.Get(), 0, 0, 0, 0, stagingTex.Get(), 0,
                                    NULL);
@@ -130,8 +127,8 @@ void Utils::CreateStagingTexture(
     const DXGI_FORMAT &format,
     Microsoft::WRL::ComPtr<ID3D11Texture2D> &stagingTex,
     Microsoft::WRL::ComPtr<ID3D11Device> &device,
-    Microsoft::WRL::ComPtr<ID3D11DeviceContext> &context,
-    const int &mipLevels, const int &arraySize) {
+    Microsoft::WRL::ComPtr<ID3D11DeviceContext> &context, const int &mipLevels,
+    const int &arraySize) {
 
     D3D11_TEXTURE2D_DESC texDesc;
     ZeroMemory(&texDesc, sizeof(texDesc));
@@ -146,17 +143,23 @@ void Utils::CreateStagingTexture(
 
     ThrowIfFailed(
         device->CreateTexture2D(&texDesc, NULL, stagingTex.GetAddressOf()));
-    
+
     D3D11_MAPPED_SUBRESOURCE ms;
     context->Map(stagingTex.Get(), 0, D3D11_MAP_WRITE, 0, &ms);
     uint8_t *pData = (uint8_t *)ms.pData;
     for (int h = 0; h < height; h++) {
         memcpy(&pData[h * ms.RowPitch], &image[h * 4 * width], 4 * width);
     }
-    context->Unmap(stagingTex.Get(), 0);    
+    context->Unmap(stagingTex.Get(), 0);
 }
 
-void Utils::CreateTextureArray(){
-
+void Utils::CreateTextureArray() {}
+Matrix Utils::CreateReflectedMatrix(const Vector3 &n, const Vector3 &p) {
+    float d = -n.Dot(p);
+    Matrix mat(1.f - 2.f * n.x * n.x, -2.f * n.y * n.x, -2.f * n.z * n.x, 0.f,
+               -2.f * n.x * n.y, 1.f - 2.f * n.y * n.y, -2.f * n.z * n.y, 0.f,
+               -2.f * n.x * n.z, -2.f * n.y * n.z, 1.f - 2.f * n.z * n.z, 0.f,
+               -2.f * n.x * d, -2.f * n.y * d, -2.f * n.z * d, 1.f);
+    return mat;
 }
 } // namespace soku

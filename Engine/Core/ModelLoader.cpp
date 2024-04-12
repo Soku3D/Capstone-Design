@@ -12,17 +12,17 @@ void ModelLoader::Load(const std::string &filePath,
     ProcessNode(pScene, pScene->mRootNode);
 }
 void ModelLoader::ProcessNode(const aiScene *pScene, aiNode *pNode) {
-    for (int i = 0; i < pNode->mNumMeshes; i++) {
+    for (unsigned int i = 0; i < pNode->mNumMeshes; i++) {
         m_meshData.push_back(
             ProcessMesh(pScene, pScene->mMeshes[pNode->mMeshes[i]]));
     }
-    for (int i = 0; i < pNode->mNumChildren; i++) {
+    for (unsigned int i = 0; i < pNode->mNumChildren; i++) {
         ProcessNode(pScene, pNode->mChildren[i]);
     }
 }
 MeshData ModelLoader::ProcessMesh(const aiScene *pScene, aiMesh *pMesh) {
     MeshData data;
-    for (int i = 0; i < pMesh->mNumVertices; i++) {
+    for (unsigned int i = 0; i < pMesh->mNumVertices; i++) {
         Vertex v;
         v.position = Vector3(pMesh->mVertices[i].x, pMesh->mVertices[i].y,
                              pMesh->mVertices[i].z);
@@ -34,8 +34,8 @@ MeshData ModelLoader::ProcessMesh(const aiScene *pScene, aiMesh *pMesh) {
         }
         data.m_vertices.push_back(v);
     }
-    for (int i = 0; i < pMesh->mNumFaces; i++) {
-        for (int j = 0; j < pMesh->mFaces[i].mNumIndices; j++) {
+    for (unsigned int i = 0; i < pMesh->mNumFaces; i++) {
+        for (unsigned int j = 0; j < pMesh->mFaces[i].mNumIndices; j++) {
             data.m_indices.push_back(pMesh->mFaces[i].mIndices[j]);
         }
     }
