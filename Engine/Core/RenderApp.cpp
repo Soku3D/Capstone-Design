@@ -50,7 +50,7 @@ void RenderApp::Update(float deltaTime) {
     Vector3 eyeWorld = m_camera->GetEyePos();
 
     // Update mirror Meshconstants
-    Vector3 mirrorTranslation(0.f, 1.f, 3.f);
+    Vector3 mirrorTranslation(0.f, 1.f, 1.3f);
     mirror->m_meshConstantsCPU.world =
         Matrix::CreateTranslation(mirrorTranslation);
     mirror->m_meshConstantsCPU.worldIT =
