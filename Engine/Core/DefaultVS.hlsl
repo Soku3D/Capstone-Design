@@ -21,6 +21,7 @@ DefaultPSInput main(DefaultVSInput input)
     float height = heightTex.SampleLevel(g_sampler, input.texcoord,0.f).r;
     height = height * 2.f - 1.f;
     pos += float4(height * output.normal * heightScale, 0.f);
+    output.posWorld = pos;
 	pos = mul(pos, viewProj);
 
 	output.posProj = pos;

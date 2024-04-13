@@ -56,9 +56,9 @@ void BaseApp::UpdateGlobalConsts(const Vector3 &eyeWorld, const Matrix &viewRow,
     m_globalConstsCPU.lod = lod;
 
     m_reflectGlobalConstsCPU = m_globalConstsCPU;
-    m_reflectGlobalConstsCPU.view = refl * projRow;
+    m_reflectGlobalConstsCPU.view = refl * viewRow;
     m_reflectGlobalConstsCPU.view = m_reflectGlobalConstsCPU.view.Transpose();
-    m_reflectGlobalConstsCPU.viewProj = (refl * projRow * projRow);
+    m_reflectGlobalConstsCPU.viewProj = (refl * viewRow * projRow);
     m_reflectGlobalConstsCPU.viewProj =
         m_reflectGlobalConstsCPU.viewProj.Transpose();
 

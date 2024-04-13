@@ -4,11 +4,11 @@
 
 
 namespace soku {
-MeshData GeometryGenerator::MakeSquare() {
+MeshData GeometryGenerator::MakeSquare(const float &l) {
     MeshData meshData;
     std::vector<uint32_t> indices;
     std::vector<Vertex> vertices;
-    float l = 1.f;
+
     Vector3 p0(-l, -l, 0.f);
     Vector3 p1(-l, l, 0.f);
     Vector3 p2(l, l, 0.f);

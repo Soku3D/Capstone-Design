@@ -14,6 +14,12 @@ struct MeshConstants {
     float heightScale;
     Vector3 dummy;
 };
+struct MaterialConstants {
+    int useAlbedo;
+    int useNormal;
+    int useAO;
+    int useRoughness;
+};
 struct SamplingPSConstants {
     float dx;
     float dy;

@@ -30,16 +30,10 @@ class GraphicsPSO {
     void SetPrimitiveTopology(const D3D11_PRIMITIVE_TOPOLOGY &m_topology);
 
     void SetVertexShader(const void *Binary, size_t Size,
-                         Microsoft::WRL::ComPtr<ID3D11Device> &device) {
-        device->CreateVertexShader(Binary, Size, nullptr,
-                                   m_PSODesc.m_vertexShader.GetAddressOf());
-    }
+                         Microsoft::WRL::ComPtr<ID3D11Device> &device);
     void SetPixelShader(const void *Binary, size_t Size,
-                        Microsoft::WRL::ComPtr<ID3D11Device> &device) {
-        device->CreatePixelShader(Binary, Size, nullptr,
-                                  m_PSODesc.m_pixelShader.GetAddressOf());
-    }
-    void SetBlendState(Microsoft::WRL::ComPtr<ID3D11BlendState> &blendState);
+                        Microsoft::WRL::ComPtr<ID3D11Device> &device);
+   
 
   private:
     D3D11_GRAPHICS_PIPELINE_STATE_DESC m_PSODesc;

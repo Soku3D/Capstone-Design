@@ -28,6 +28,10 @@ class Model {
   public:
     std::vector<std::shared_ptr<Mesh>> m_meshes;
     MeshConstants m_meshConstantsCPU;
+    MaterialConstants m_materialConstantsCPU;
+
+  public:
     Microsoft::WRL::ComPtr<ID3D11Buffer> m_meshConstantsGPU;
+    Microsoft::WRL::ComPtr<ID3D11Buffer> m_materialConstantsGPU;
 };
 } // namespace soku

@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "GraphicsPSO.h"
-
+#include "Utils.h"
 
 namespace soku {
 void GraphicsPSO::operator=(const GraphicsPSO &pso) {
@@ -18,7 +18,7 @@ void GraphicsPSO::SetPipelineState(
     context->GSSetShader(m_PSODesc.m_geometryShader.Get(), NULL, 0);
 
     context->RSSetState(m_PSODesc.m_rasterizerState.Get());
-    
+    context->OMSetDepthStencilState(m_PSODesc.m_depthStencilState.Get(), 1.f);
     context->VSSetSamplers(0, 1, m_PSODesc.m_samplerState.GetAddressOf());
     context->PSSetSamplers(0, 1, m_PSODesc.m_samplerState.GetAddressOf());
 }
@@ -45,5 +45,15 @@ void GraphicsPSO::SetBlendState(
 void GraphicsPSO::SetPrimitiveTopology(
     const D3D11_PRIMITIVE_TOPOLOGY &topology) {
     m_PSODesc.m_topology = topology;
+}
+void GraphicsPSO::SetVertexShader(const void *Binary, size_t Size,
+                                  Microsoft::WRL::ComPtr<ID3D11Device> &device){
+    ThrowIfFailed(device->CreateVertexShader(
+        Binary, Size, nullptr, m_PSODesc.m_vertexShader.GetAddressOf()));
+}
+void GraphicsPSO::SetPixelShader(const void *Binary, size_t Size,
+                                 Microsoft::WRL::ComPtr<ID3D11Device> &device) {
+    ThrowIfFailed(device->CreatePixelShader(
+        Binary, Size, nullptr, m_PSODesc.m_pixelShader.GetAddressOf()));
 }
 } // namespace soku

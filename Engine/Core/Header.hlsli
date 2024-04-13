@@ -28,7 +28,9 @@ struct DefaultVSInput
 };
 struct DefaultPSInput
 {
+    
     float4 posProj : SV_Position;
+    float3 posWorld : POSITION;
     float3 normal : NORMAL;
     float2 texcoord : TEXCOORD;
 };

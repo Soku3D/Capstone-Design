@@ -5,11 +5,7 @@ SkyboxPSInput main(DefaultVSInput input)
     SkyboxPSInput output;
     output.WorldPos = input.position;
 
-    float4 pos = float4(input.position, 0.0f);
-    pos = mul(pos, view);
-    pos.w = 1.f;
-    pos = mul(pos, proj);
-    output.posProj = pos;
-
+    float3 pos = mul(float4(input.position, 0.f), view).rgb;
+    output.posProj = mul(float4(pos, 1.f), proj);
     return output;
 }

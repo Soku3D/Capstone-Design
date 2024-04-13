@@ -10,6 +10,8 @@ extern Microsoft::WRL::ComPtr<ID3D11SamplerState> linearClampSS;
 
 extern Microsoft::WRL::ComPtr<ID3D11RasterizerState> solidRS;
 extern Microsoft::WRL::ComPtr<ID3D11RasterizerState> skyboxRS;
+extern Microsoft::WRL::ComPtr<ID3D11RasterizerState> reflectedRS;
+extern Microsoft::WRL::ComPtr<ID3D11RasterizerState> reflectedSkyboxRS;
 
 extern Microsoft::WRL::ComPtr<ID3D11DepthStencilState> drawDSS;
 extern Microsoft::WRL::ComPtr<ID3D11DepthStencilState> maskingDSS;
@@ -21,7 +23,9 @@ extern Microsoft::WRL::ComPtr<ID3D11InputLayout> combineIL;
 extern Microsoft::WRL::ComPtr<ID3D11BlendState> basicBS;
 
 extern GraphicsPSO defaultSolidPSO;
+extern GraphicsPSO reflectedSolidPSO;
 extern GraphicsPSO skyboxPSO;
+extern GraphicsPSO reflectedSkyboxPSO;
 extern GraphicsPSO combinePSO;
 extern GraphicsPSO upSamplingPSO;
 extern GraphicsPSO downSamplingPSO;
