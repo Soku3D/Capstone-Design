@@ -29,7 +29,7 @@ extern GraphicsPSO reflectedSkyboxPSO;
 extern GraphicsPSO combinePSO;
 extern GraphicsPSO upSamplingPSO;
 extern GraphicsPSO downSamplingPSO;
-extern GraphicsPSO mirrorMaskingPSO;
+extern GraphicsPSO stencliMaskPSO;
 extern GraphicsPSO mirrorPSO;
 extern GraphicsPSO blendPSO;
 } // namespace Graphics

@@ -36,7 +36,7 @@ GraphicsPSO reflectedSkyboxPSO;
 GraphicsPSO combinePSO;
 GraphicsPSO upSamplingPSO;
 GraphicsPSO downSamplingPSO;
-GraphicsPSO mirrorMaskingPSO;
+GraphicsPSO stencliMaskPSO;
 GraphicsPSO mirrorPSO;
 GraphicsPSO blendPSO;
 void InitCommonStates(Microsoft::WRL::ComPtr<ID3D11Device> &device) {
@@ -153,8 +153,8 @@ void InitCommonStates(Microsoft::WRL::ComPtr<ID3D11Device> &device) {
     reflectedSolidPSO.SetRasterizerState(reflectedRS);
     reflectedSolidPSO.SetDepthStencilState(maskedDrawDSS);
 
-    mirrorMaskingPSO = defaultSolidPSO;
-    mirrorMaskingPSO.SetDepthStencilState(maskingDSS);
+    stencliMaskPSO = defaultSolidPSO;
+    stencliMaskPSO.SetDepthStencilState(maskingDSS);
 
     mirrorPSO = defaultSolidPSO;
     mirrorPSO.SetDepthStencilState(maskedDrawDSS);

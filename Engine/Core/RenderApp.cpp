@@ -104,14 +104,13 @@ void RenderApp::Render(float deltaTime) {
 
     // Mirror
     // Stencil Buffer Masking
-    Graphics::mirrorMaskingPSO.SetPipelineState(m_context);
+    Graphics::stencliMaskPSO.SetPipelineState(m_context);
     mirror->Render(m_context);
     
     //// Draw mirror if pass Stencil
-    m_context->ClearDepthStencilView(m_DSV.Get(), D3D11_CLEAR_DEPTH, 1.f, 0);
-    // Draw Reflected World
-    BaseApp::SetGlobalConsts(m_reflectGlobalConstsGPU);
     Graphics::reflectedSolidPSO.SetPipelineState(m_context);
+    m_context->ClearDepthStencilView(m_DSV.Get(), D3D11_CLEAR_DEPTH, 1.f, 0);
+    BaseApp::SetGlobalConsts(m_reflectGlobalConstsGPU);
     for (const auto &model : models) {
         model->Render(m_context);
     }
