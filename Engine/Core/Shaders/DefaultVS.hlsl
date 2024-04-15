@@ -8,6 +8,7 @@ cbuffer MeshConsts : register(b0) {
 }
 Texture2D heightTex : register(t0);
 SamplerState g_sampler : register(s0);
+
 DefaultPSInput main(DefaultVSInput input) 
 {
     DefaultPSInput output;

@@ -107,7 +107,7 @@ void RenderApp::Render(float deltaTime) {
     Graphics::stencliMaskPSO.SetPipelineState(m_context);
     mirror->Render(m_context);
     
-    //// Draw mirror if pass Stencil
+    //// Draw mirror 
     Graphics::reflectedSolidPSO.SetPipelineState(m_context);
     m_context->ClearDepthStencilView(m_DSV.Get(), D3D11_CLEAR_DEPTH, 1.f, 0);
     BaseApp::SetGlobalConsts(m_reflectGlobalConstsGPU);
@@ -118,8 +118,8 @@ void RenderApp::Render(float deltaTime) {
     skybox->Render(m_context);
     
     // blending
-
     Graphics::blendPSO.SetPipelineState(m_context);
+
 
     m_context->ResolveSubresource(m_resolvedBuffer.Get(), 0,
                                   m_floatBuffer.Get(), 0,
