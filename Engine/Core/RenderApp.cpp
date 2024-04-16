@@ -66,6 +66,8 @@ void RenderApp::Update(float deltaTime) {
                                               mirrorTranslation);
     BaseApp::UpdateGlobalConsts(eyeWorld, viewRow, projRow, textureLOD,
                                 mirrorMat);
+
+    // Update Model Constants
     for (const auto &model : models) {
         model->m_meshConstantsCPU.world =  Matrix();
         model->m_meshConstantsCPU.worldIT =
@@ -76,10 +78,13 @@ void RenderApp::Update(float deltaTime) {
         Utils::UpdateConstantBuffer(model->m_meshConstantsCPU,
                                     model->m_meshConstantsGPU, m_context);
     }
-    // Update Bloom Strength
+    // Update Combile Filter Constants
     m_postProcess.Update(SPSconstant, m_context);
 }
 void RenderApp::UpdateGUI(float deltaTime) {
+    ImGui::SliderFloat("Expose", &SPSconstant.expose, 0.f, 10.f);
+    ImGui::SliderFloat("Gamma", &SPSconstant.gamma, 0.f, 10.f);
+
     ImGui::SliderFloat("TextureLOD", &textureLOD, 0.f, 10.f);
     ImGui::SliderFloat("HeightScale", &heightScale, 0.f, 1.f);
     ImGui::SliderFloat("bloomStrength", &SPSconstant.bloomStrength, 0.f, 1.f);
@@ -87,7 +92,9 @@ void RenderApp::UpdateGUI(float deltaTime) {
 
 void RenderApp::Render(float deltaTime) {
     FLOAT color[4]{80.f / 255.f, 80.f / 255.f, 80.f / 255.f, 1.f};
-    m_context->OMSetRenderTargets(1, m_floatRTV.GetAddressOf(), m_DSV.Get());
+    std::vector<ID3D11RenderTargetView*> rtvs{m_floatRTV.Get()};
+    m_context->OMSetRenderTargets(rtvs.size(), rtvs.data(),
+                                  m_DSV.Get());
     m_context->ClearRenderTargetView(m_floatRTV.Get(), color);
     m_context->ClearDepthStencilView(
         m_DSV.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.f, 0);

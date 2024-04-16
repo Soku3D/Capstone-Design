@@ -92,19 +92,24 @@ void PostProcess::Render(Microsoft::WRL::ComPtr<ID3D11DeviceContext> &context) {
     for (int i = 0; i < downFilters.size(); i++) {
         downFilters[i].Render(context);
         context->DrawIndexed(m_meshes->m_indexCount, 0, 0);
+        Utils::ResetSRV(context);
     }
     Graphics::upSamplingPSO.SetPipelineState(context);
     for (int i = 0; i < upFilters.size(); i++) {
         upFilters[i].Render(context);
         context->DrawIndexed(m_meshes->m_indexCount, 0, 0);
+        Utils::ResetSRV(context);
     }
     Graphics::combinePSO.SetPipelineState(context);
     combineFilter.Render(context);
     context->DrawIndexed(m_meshes->m_indexCount, 0, 0);
+    Utils::ResetSRV(context);
 }
 void PostProcess::Update(const SamplingPSConstants &constant,
                          Microsoft::WRL::ComPtr<ID3D11DeviceContext> &context) {
     combineFilter.samplingConstantCPU.bloomStrength = constant.bloomStrength;
+    combineFilter.samplingConstantCPU.expose = constant.expose;
+    combineFilter.samplingConstantCPU.gamma = constant.gamma;
     Utils::UpdateConstantBuffer(combineFilter.samplingConstantCPU,
                                 combineFilter.samplingConstantGPU, context);
 }

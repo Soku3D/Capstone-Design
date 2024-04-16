@@ -23,8 +23,8 @@ struct MaterialConstants {
 struct SamplingPSConstants {
     float dx;
     float dy;
-    float expose;
-    float gamma;
+    float expose = 1.f;
+    float gamma = 2.2f;
     float bloomStrength;
     Vector3 dummy1;
 };
