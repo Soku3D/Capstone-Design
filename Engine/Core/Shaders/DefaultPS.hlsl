@@ -3,6 +3,7 @@
 Texture2D albedoTex : register(t0);
 Texture2D aoTex : register(t1);
 Texture2D normalTex : register(t2);
+Texture2D roughnessTex: register(t3);
 SamplerState g_sampler : register(s0);
 
 cbuffer MaterialConstants : register(b0)

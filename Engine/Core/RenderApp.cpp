@@ -82,6 +82,10 @@ void RenderApp::Update(float deltaTime) {
     m_postProcess.Update(SPSconstant, m_context);
 }
 void RenderApp::UpdateGUI(float deltaTime) {
+    if(ImGui::RadioButton("Env", useEnv==1)) 
+    { 
+        useEnv = 1;
+    }
     ImGui::SliderFloat("Expose", &SPSconstant.expose, 0.f, 10.f);
     ImGui::SliderFloat("Gamma", &SPSconstant.gamma, 0.f, 10.f);
 
@@ -100,7 +104,7 @@ void RenderApp::Render(float deltaTime) {
         m_DSV.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.f, 0);
 
     BaseApp::SetGlobalConsts(m_globalConstsGPU);
-    m_context->PSSetShaderResources(10, 1, m_envSRV.GetAddressOf());
+    
     Graphics::defaultSolidPSO.SetPipelineState(m_context);
     for (const auto &model : models) {
         model->Render(m_context);

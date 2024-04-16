@@ -6,6 +6,8 @@ cbuffer GlobalConsts : register(b1)
     matrix proj;
     float3 eyePos;
     float lod;
+    
+    int useEnv;
 }
 cbuffer ReflectedGlobalConsts : register(b2)
 {
@@ -14,11 +16,13 @@ cbuffer ReflectedGlobalConsts : register(b2)
     matrix r_proj;
     float3 r_eyePos;
     float r_lod;
+    
+    int r_useEnv;
 }
 TextureCube envIBL : register(t10);
-//TextureCube IrradianceIBL : register(t11);
-//TextureCube SpecularIBL : register(t12);
-//Texture2D brdf : register(t13);
+TextureCube IrradianceIBL : register(t11);
+TextureCube SpecularIBL : register(t12);
+Texture2D brdf : register(t13);
 
 struct DefaultVSInput
 {

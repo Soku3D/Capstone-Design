@@ -7,6 +7,9 @@ struct GlobalConstants {
     Matrix proj;
     Vector3 eyePos;
     float lod;
+
+    int useEnv = 1;
+    Vector3 dummy;
 };
 struct MeshConstants {
     Matrix world;

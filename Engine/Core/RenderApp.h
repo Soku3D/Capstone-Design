@@ -26,5 +26,6 @@ class RenderApp : public BaseApp {
     
     SamplingPSConstants SPSconstant;
     Matrix mirrorMat;
+    int useEnv = 1;
 };
 } // namespace soku

@@ -34,11 +34,20 @@ bool BaseApp::Initialize() {
 void BaseApp::InitCubemaps(const std::wstring &basePath,
                            const std::wstring &filename) {
     std::wstring brdfPath = basePath + filename + L"Brdf.dds";
-    std::wstring diffusePath = basePath + filename + L"DiffuseHDR.dds";
+    std::wstring irradiancePath = basePath + filename + L"DiffuseHDR.dds";
     std::wstring envPath = basePath + filename + L"EnvHDR.dds";
     std::wstring specularPath = basePath + filename + L"SpecularHDR.dds";
 
     Utils::CreateDDSTexture(envPath, m_envSRV, m_device, true);
+    Utils::CreateDDSTexture(irradiancePath, m_irradianceSRV, m_device, true);
+    Utils::CreateDDSTexture(specularPath, m_specularSRV, m_device, true);
+    Utils::CreateDDSTexture(brdfPath, m_brdfSRV, m_device, false);
+
+    std::vector<ID3D11ShaderResourceView *> srvs = {
+        m_envSRV.Get(), m_irradianceSRV.Get(), 
+        m_specularSRV.Get(),  m_brdfSRV.Get()};
+    m_context->PSSetShaderResources((UINT)10, (UINT)srvs.size(), 
+        srvs.data());
 }
 void BaseApp::CreateConsts() {
     Utils::CreateConstantBuffer(m_globalConstsCPU, m_globalConstsGPU, m_device);
@@ -47,13 +56,14 @@ void BaseApp::CreateConsts() {
 }
 void BaseApp::UpdateGlobalConsts(const Vector3 &eyeWorld, const Matrix &viewRow,
                                  const Matrix &projRow, const float &lod,
-                                 const Matrix &refl) {
+                                 const Matrix &refl, const int &useEnv) {
     m_globalConstsCPU.eyePos = eyeWorld;
     m_globalConstsCPU.view = viewRow.Transpose();
     m_globalConstsCPU.proj = projRow.Transpose();
     m_globalConstsCPU.viewProj = viewRow * projRow;
     m_globalConstsCPU.viewProj = m_globalConstsCPU.viewProj.Transpose();
     m_globalConstsCPU.lod = lod;
+    m_globalConstsCPU.useEnv = useEnv;
 
     m_reflectGlobalConstsCPU = m_globalConstsCPU;
     m_reflectGlobalConstsCPU.view = refl * viewRow;
