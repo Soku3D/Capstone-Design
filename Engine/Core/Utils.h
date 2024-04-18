@@ -16,8 +16,8 @@ class Utils {
         }
     }
     static void ResetSRV(Microsoft::WRL::ComPtr<ID3D11DeviceContext> &context) {
-        ID3D11ShaderResourceView *pSRV = NULL;
-        context->PSSetShaderResources(0, 1, &pSRV);
+        std::vector<ID3D11ShaderResourceView *> pSRV{nullptr};
+        context->PSSetShaderResources(0, pSRV.size(), pSRV.data());
     }
     static std::vector<uint8_t> CreateTextureImage(const std::wstring &filePath,
                                                    int &width, int &height);

@@ -4,6 +4,7 @@ namespace soku {
 
 class GeometryGenerator {
   public:
+    static MeshData MakeDot();
     static MeshData MakeSquare(const float &l = 1.f);
     static MeshData MakeCubeMapBox(float l = 1.f);
     static MeshData MakeBox(float l = 1.f, const std::string &texturePath = "");

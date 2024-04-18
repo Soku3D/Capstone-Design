@@ -32,5 +32,7 @@ extern GraphicsPSO downSamplingPSO;
 extern GraphicsPSO stencliMaskPSO;
 extern GraphicsPSO mirrorPSO;
 extern GraphicsPSO blendPSO;
+extern GraphicsPSO graphPSO;
+extern GraphicsPSO billboardPSO;
 } // namespace Graphics
 } // namespace soku

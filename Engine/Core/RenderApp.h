@@ -19,6 +19,8 @@ class RenderApp : public BaseApp {
     std::vector<std::shared_ptr<Model>> models;
     std::shared_ptr<Model> skybox;
     std::shared_ptr<Model> mirror;
+    std::shared_ptr<Model> dotModel;
+    std::shared_ptr<Model> screen;
     //GlobalCosntants
     float textureLOD;
     //MeshConstants

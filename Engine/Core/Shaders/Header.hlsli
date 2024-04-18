@@ -9,16 +9,6 @@ cbuffer GlobalConsts : register(b1)
     
     int useEnv;
 }
-cbuffer ReflectedGlobalConsts : register(b2)
-{
-    matrix r_viewProj;
-    matrix r_view;
-    matrix r_proj;
-    float3 r_eyePos;
-    float r_lod;
-    
-    int r_useEnv;
-}
 TextureCube envIBL : register(t10);
 TextureCube IrradianceIBL : register(t11);
 TextureCube SpecularIBL : register(t12);

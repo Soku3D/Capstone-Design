@@ -4,6 +4,18 @@
 
 
 namespace soku {
+MeshData GeometryGenerator::MakeDot() { 
+    std::vector<Vertex> vertices;
+    std::vector<uint32_t> indices;
+    Vertex v;
+    v.position = Vector3(0.f);
+    v.normal = Vector3(0.f, 0.f, -1.f);
+    v.uv = Vector2(0.f);
+    vertices.push_back(v);
+    indices.push_back(0);
+
+    return MeshData(vertices, indices);
+}
 MeshData GeometryGenerator::MakeSquare(const float &l) {
     MeshData meshData;
     std::vector<uint32_t> indices;

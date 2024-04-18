@@ -9,6 +9,8 @@
 #include "CompiledShaders/CombinePS.h"
 #include "CompiledShaders/UpSamplingPS.h"
 #include "CompiledShaders/DownSamplingPS.h"
+#include "CompiledShaders/GraphVS.h"
+#include "CompiledShaders/GraphPS.h"
 
 namespace soku {
 namespace Graphics {
@@ -39,6 +41,9 @@ GraphicsPSO downSamplingPSO;
 GraphicsPSO stencliMaskPSO;
 GraphicsPSO mirrorPSO;
 GraphicsPSO blendPSO;
+GraphicsPSO graphPSO;
+GraphicsPSO billboardPSO;
+
 void InitCommonStates(Microsoft::WRL::ComPtr<ID3D11Device> &device) {
     // Create SamplerState
     D3D11_SAMPLER_DESC samplerDesc;
@@ -163,6 +168,14 @@ void InitCommonStates(Microsoft::WRL::ComPtr<ID3D11Device> &device) {
     skyboxPSO.SetVertexShader(g_pSkyboxVS, sizeof(g_pSkyboxVS), device);
     skyboxPSO.SetPixelShader(g_pSkyboxPS, sizeof(g_pSkyboxPS), device);
     skyboxPSO.SetRasterizerState(skyboxRS);
+
+    graphPSO = defaultSolidPSO;
+    graphPSO.SetVertexShader(g_pGraphVS, sizeof(g_pGraphVS), device);
+    graphPSO.SetPixelShader(g_pGraphPS, sizeof(g_pGraphPS), device);
+
+    /*billboardPSO = defaultSolidPSO;
+    billboardPSO.SetPixelShader(g_pGraphPS, sizeof(g_pSkyboxPS), device);
+    billboardPSO.SetgeometryShader(g_pGraphPS, sizeof(g_pSkyboxPS), device);*/
 
     reflectedSkyboxPSO = skyboxPSO;
     reflectedSkyboxPSO.SetRasterizerState(reflectedSkyboxRS);

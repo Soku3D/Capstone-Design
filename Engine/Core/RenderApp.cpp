@@ -16,6 +16,7 @@ bool RenderApp::Initialize() {
     auto box = GeometryGenerator::MakeBox(40.f);
     skybox = std::make_shared<Model>(m_device, m_context, std::vector{box});
     
+    // Create SphereModel
     auto sphere = GeometryGenerator::MakeSphere(100, 100);
     //sphere.SetTexturePath(L"greyRock");
     sphere.SetTexturePath(L"globe");
@@ -24,11 +25,19 @@ bool RenderApp::Initialize() {
     sphereModel->m_materialConstantsCPU.useAlbedo = true;
     Utils::UpdateConstantBuffer(sphereModel->m_materialConstantsCPU,
                                 sphereModel->m_materialConstantsGPU, m_context);
-    models.push_back(sphereModel);
+    //models.push_back(sphereModel);
     
+    // Create Mirror
     auto square = GeometryGenerator::MakeSquare(3.f);
     mirror = std::make_shared<Model>(m_device, m_context, std::vector{square});
-       
+   
+    auto square2 = GeometryGenerator::MakeSquare(1.f);
+    screen = std::make_shared<Model>(m_device, m_context, std::vector{square2});
+    
+    MeshData dot = GeometryGenerator::MakeDot();
+    dotModel =
+        std::make_shared<Model>(m_device, m_context, std::vector{dot});
+
     return true;
 }
 void RenderApp::Update(float deltaTime) {
@@ -78,6 +87,15 @@ void RenderApp::Update(float deltaTime) {
         Utils::UpdateConstantBuffer(model->m_meshConstantsCPU,
                                     model->m_meshConstantsGPU, m_context);
     }
+
+    // Update Screen Model
+    /*screen->m_meshConstantsCPU.world = Matrix();
+    screen->m_meshConstantsCPU.world =
+        mirror->m_meshConstantsCPU.world.Transpose();
+   
+    Utils::UpdateConstantBuffer(screen->m_meshConstantsCPU,
+                                screen->m_meshConstantsGPU, m_context);*/
+    
     // Update Combile Filter Constants
     m_postProcess.Update(SPSconstant, m_context);
 }
@@ -105,14 +123,20 @@ void RenderApp::Render(float deltaTime) {
 
     BaseApp::SetGlobalConsts(m_globalConstsGPU);
     
-    Graphics::defaultSolidPSO.SetPipelineState(m_context);
-    for (const auto &model : models) {
+   Graphics::defaultSolidPSO.SetPipelineState(m_context);
+   for (const auto &model : models) {
         model->Render(m_context);
     }
-   
+  
     Graphics::skyboxPSO.SetPipelineState(m_context);
     skybox->Render(m_context);
+    
+    Graphics::graphPSO.SetPipelineState(m_context);
+    screen->Render(m_context);
 
+    //Graphics::billboardPSO.SetPipelineState(m_context);
+    //dotModel->Render(m_context);
+    
     // Mirror
     // Stencil Buffer Masking
     Graphics::stencliMaskPSO.SetPipelineState(m_context);
