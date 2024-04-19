@@ -33,6 +33,9 @@ class GraphicsPSO {
                          Microsoft::WRL::ComPtr<ID3D11Device> &device);
     void SetPixelShader(const void *Binary, size_t Size,
                         Microsoft::WRL::ComPtr<ID3D11Device> &device);
+
+    void SetGeometryShader(const void *Binary, size_t Size,
+                           Microsoft::WRL::ComPtr<ID3D11Device> &device);
    
 
   private:

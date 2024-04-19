@@ -6,6 +6,7 @@ Texture2D normalTex : register(t2);
 Texture2D roughnessTex: register(t3);
 SamplerState g_sampler : register(s0);
 
+// Model.h
 cbuffer MaterialConstants : register(b0)
 {
     int useAlbedo;

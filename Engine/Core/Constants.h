@@ -9,7 +9,8 @@ struct GlobalConstants {
     float lod;
 
     int useEnv = 1;
-    Vector3 dummy;
+    float time = 0.f;
+    Vector2 dummy;
 };
 struct MeshConstants {
     Matrix world;

@@ -8,6 +8,7 @@ cbuffer GlobalConsts : register(b1)
     float lod;
     
     int useEnv;
+    float time;
 }
 TextureCube envIBL : register(t10);
 TextureCube IrradianceIBL : register(t11);

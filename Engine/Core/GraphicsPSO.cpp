@@ -56,4 +56,9 @@ void GraphicsPSO::SetPixelShader(const void *Binary, size_t Size,
     ThrowIfFailed(device->CreatePixelShader(
         Binary, Size, nullptr, m_PSODesc.m_pixelShader.GetAddressOf()));
 }
+void GraphicsPSO::SetGeometryShader(const void *Binary, size_t Size,
+                                 Microsoft::WRL::ComPtr<ID3D11Device> &device) {
+    ThrowIfFailed(device->CreateGeometryShader(
+        Binary, Size, nullptr, m_PSODesc.m_geometryShader.GetAddressOf()));
+}
 } // namespace soku

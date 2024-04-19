@@ -25,7 +25,7 @@ class BaseApp {
     void UpdateGlobalConsts(const Vector3 &eyeWorld, const Matrix &viewRow,
                             const Matrix &projRow, const float &lod = 0.f,
                             const Matrix &refl = Matrix(),
-                            const int &useEnv = 1);
+                            const int &useEnv = 1, const float &delTime = 0.f);
     void SetGlobalConsts(Microsoft::WRL::ComPtr<ID3D11Buffer> &globalConstsGPU);
 
   protected:
