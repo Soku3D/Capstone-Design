@@ -19,7 +19,7 @@ bool RenderApp::Initialize() {
     // Create SphereModel
     auto sphere = GeometryGenerator::MakeSphere(100, 100);
     // sphere.SetTexturePath(L"greyRock");
-    sphere.SetTexturePath(L"globe");
+    //sphere.SetTexturePath(L"globe");
     auto sphereModel =
         std::make_shared<Model>(m_device, m_context, std::vector{sphere});
     sphereModel->m_materialConstantsCPU.useAlbedo = true;
@@ -121,7 +121,7 @@ void RenderApp::Render(float deltaTime) {
     m_context->ClearDepthStencilView(
         m_DSV.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.f, 0);
 
-    BaseApp::SetGlobalConsts(m_globalConstsGPU);
+  /*  BaseApp::SetGlobalConsts(m_globalConstsGPU);
 
     Graphics::defaultSolidPSO.SetPipelineState(m_context);
     for (const auto &model : models) {
@@ -132,7 +132,7 @@ void RenderApp::Render(float deltaTime) {
     skybox->Render(m_context);
 
     Graphics::graphPSO.SetPipelineState(m_context);
-    screen->Render(m_context);
+    screen->Render(m_context);*/
 
     // Graphics::billboardPSO.SetPipelineState(m_context);
     // dotModel->Render(m_context);
@@ -153,12 +153,18 @@ void RenderApp::Render(float deltaTime) {
     // skybox->Render(m_context);
     //
     //  blending
-    Graphics::blendPSO.SetPipelineState(m_context);
+    //Graphics::blendPSO.SetPipelineState(m_context);
 
     m_context->ResolveSubresource(m_resolvedBuffer.Get(), 0,
                                   m_floatBuffer.Get(), 0,
                                   DXGI_FORMAT_R16G16B16A16_FLOAT);
 
+    Graphics::bloomPSO.SetPipelineState(m_context);
+    m_context->CSSetUnorderedAccessViews(0, 1, m_resolvedUAV.GetAddressOf(),
+                                         NULL);
+    m_context->Dispatch(UINT(std::ceil(m_width/32.f)),UINT(std::ceil(m_height/32.f)), 1);
+    Utils::ComputeShaderBarrier(m_context);
+   
     m_postProcess.Render(m_context);
-}
+} 
 } // namespace soku

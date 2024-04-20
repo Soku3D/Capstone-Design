@@ -15,9 +15,21 @@ class Utils {
             }
         }
     }
-    static void ResetSRV(Microsoft::WRL::ComPtr<ID3D11DeviceContext> &context) {
-        std::vector<ID3D11ShaderResourceView *> pSRV{nullptr};
-        context->PSSetShaderResources(0, pSRV.size(), pSRV.data());
+    static void SRVBarrier(Microsoft::WRL::ComPtr<ID3D11DeviceContext> &context) {
+        ID3D11ShaderResourceView *nullSRVs[6] = {
+            0,
+        };
+        context->PSSetShaderResources(0, 6, nullSRVs);
+    }
+    static void ComputeShaderBarrier(Microsoft::WRL::ComPtr<ID3D11DeviceContext> &context) {
+        ID3D11ShaderResourceView *nullSRVs[6] = {
+            0,
+        };
+        context->CSSetShaderResources(0, 6, nullSRVs);
+        ID3D11UnorderedAccessView *nullUAVs[6] = {
+            0,
+        };
+        context->CSSetUnorderedAccessViews(0,6,nullUAVs,NULL);
     }
     static std::vector<uint8_t> CreateTextureImage(const std::wstring &filePath,
                                                    int &width, int &height);

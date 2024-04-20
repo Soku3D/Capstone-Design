@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "GraphicsCommon.h"
 #include "Utils.h"
+
 #include "CompiledShaders/SkyboxVS.h"
 #include "CompiledShaders/SkyboxPS.h"
 #include "CompiledShaders/DefaultVS.h"
@@ -11,6 +12,8 @@
 #include "CompiledShaders/DownSamplingPS.h"
 #include "CompiledShaders/GraphVS.h"
 #include "CompiledShaders/GraphPS.h"
+
+#include "CompiledShaders/ApplyBloomCS.h"
 
 namespace soku {
 namespace Graphics {
@@ -43,6 +46,8 @@ GraphicsPSO mirrorPSO;
 GraphicsPSO blendPSO;
 GraphicsPSO graphPSO;
 GraphicsPSO billboardPSO;
+
+ComputePSO bloomPSO;
 
 void InitCommonStates(Microsoft::WRL::ComPtr<ID3D11Device> &device) {
     // Create SamplerState
@@ -146,6 +151,7 @@ void InitCommonStates(Microsoft::WRL::ComPtr<ID3D11Device> &device) {
     blendDesc.RenderTarget[0].RenderTargetWriteMask =  D3D11_COLOR_WRITE_ENABLE_ALL;
     ThrowIfFailed(device->CreateBlendState(&blendDesc, basicBS.GetAddressOf()));
 
+    // Set Graphics PSO
     defaultSolidPSO.SetVertexShader(g_pDefaultVS, sizeof(g_pDefaultVS), device);
     defaultSolidPSO.SetPixelShader(g_pDefaultPS, sizeof(g_pDefaultPS), device);
     defaultSolidPSO.SetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -196,6 +202,10 @@ void InitCommonStates(Microsoft::WRL::ComPtr<ID3D11Device> &device) {
 
     blendPSO = defaultSolidPSO;
     blendPSO.SetBlendState(basicBS);
+
+    // Set Compute PSO
+    bloomPSO.SetComputeShader(g_pApplyBloomCS, sizeof(g_pApplyBloomCS), device);
+
 }
 } // namespace Graphics
 } // namespace soku

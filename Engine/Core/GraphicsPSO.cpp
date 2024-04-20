@@ -61,4 +61,23 @@ void GraphicsPSO::SetGeometryShader(const void *Binary, size_t Size,
     ThrowIfFailed(device->CreateGeometryShader(
         Binary, Size, nullptr, m_PSODesc.m_geometryShader.GetAddressOf()));
 }
+void ComputePSO::operator=(const ComputePSO &pso) {
+    this->m_PSODesc = pso.m_PSODesc;
+}
+void ComputePSO::SetPipelineState(
+    Microsoft::WRL::ComPtr<ID3D11DeviceContext> &context) {
+    
+    context->VSSetShader(NULL, NULL, 0);
+    context->PSSetShader(NULL, NULL, 0);
+    context->DSSetShader(NULL, NULL, 0);
+    context->HSSetShader(NULL, NULL, 0);
+    context->GSSetShader(NULL, NULL, 0);
+    context->CSSetShader(m_PSODesc.m_computeShader.Get(), NULL, 0);
+}
+void ComputePSO::SetComputeShader(
+    const void *Binary, size_t Size,
+    Microsoft::WRL::ComPtr<ID3D11Device> &device) {
+    ThrowIfFailed(device->CreateComputeShader(
+        Binary, Size, nullptr, m_PSODesc.m_computeShader.GetAddressOf()));
+}
 } // namespace soku

@@ -15,12 +15,14 @@ struct D3D11_GRAPHICS_PIPELINE_STATE_DESC {
 
     D3D11_PRIMITIVE_TOPOLOGY m_topology;
 };
+struct D3D11_COMPUTE_PIPELINE_STATE_DESC {
+    Microsoft::WRL::ComPtr<ID3D11ComputeShader> m_computeShader;
+};
 class GraphicsPSO {
   public:
     void operator=(const GraphicsPSO &pso);
     void SetPipelineState(Microsoft::WRL::ComPtr<ID3D11DeviceContext> &context);
-    void
-    SetSamplerState(Microsoft::WRL::ComPtr<ID3D11SamplerState> &samplerState);
+    void SetSamplerState(Microsoft::WRL::ComPtr<ID3D11SamplerState> &samplerState);
     void SetRasterizerState(
         Microsoft::WRL::ComPtr<ID3D11RasterizerState> &rasterizerState);
     void SetInputLayout(Microsoft::WRL::ComPtr<ID3D11InputLayout> &inputLayout);
@@ -33,12 +35,21 @@ class GraphicsPSO {
                          Microsoft::WRL::ComPtr<ID3D11Device> &device);
     void SetPixelShader(const void *Binary, size_t Size,
                         Microsoft::WRL::ComPtr<ID3D11Device> &device);
-
     void SetGeometryShader(const void *Binary, size_t Size,
                            Microsoft::WRL::ComPtr<ID3D11Device> &device);
    
 
   private:
     D3D11_GRAPHICS_PIPELINE_STATE_DESC m_PSODesc;
+};
+class ComputePSO {
+  public:
+    void operator=(const ComputePSO &pso);
+    void SetPipelineState(Microsoft::WRL::ComPtr<ID3D11DeviceContext> &context);
+    void SetComputeShader(const void *Binary, size_t Size,
+                         Microsoft::WRL::ComPtr<ID3D11Device> &device);
+
+  private:
+    D3D11_COMPUTE_PIPELINE_STATE_DESC m_PSODesc;
 };
 } // namespace soku

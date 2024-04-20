@@ -17,7 +17,7 @@ std::vector<uint8_t> Utils::CreateTextureImage(const std::wstring &filePath,
     intptr_t handle;
     struct _finddata_t fd;
     if ((handle = _findfirst(path.c_str(), &fd)) == -1L) {
-        std::cout << path << " file in directory!" << std::endl;
+        std::cout << path << " file not in directory!" << std::endl;
         return {};
     } else {
         unsigned char *img =

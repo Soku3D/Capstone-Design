@@ -34,5 +34,7 @@ extern GraphicsPSO mirrorPSO;
 extern GraphicsPSO blendPSO;
 extern GraphicsPSO graphPSO;
 extern GraphicsPSO billboardPSO;
+
+extern ComputePSO bloomPSO;
 } // namespace Graphics
 } // namespace soku

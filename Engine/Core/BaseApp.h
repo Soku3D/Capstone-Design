@@ -67,6 +67,7 @@ class BaseApp {
     Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_floatRTV;
     // Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_resolvedRTV;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_resolvedSRV;
+    Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> m_resolvedUAV;
 
   protected:
     Timer m_timer;
@@ -74,7 +75,7 @@ class BaseApp {
     std::shared_ptr<Camera> m_camera;
     bool keyDownState[256];
     bool m_captureFlag = false;
-
+    bool m_cameraMove = false;
     void CapturePNG();
     void OnMouseMove(int delX, int delY);
 
