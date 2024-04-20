@@ -159,11 +159,26 @@ void RenderApp::Render(float deltaTime) {
                                   m_floatBuffer.Get(), 0,
                                   DXGI_FORMAT_R16G16B16A16_FLOAT);
 
-    Graphics::bloomPSO.SetPipelineState(m_context);
+    Graphics::InitPSO.SetPipelineState(m_context);
     m_context->CSSetUnorderedAccessViews(0, 1, m_resolvedUAV.GetAddressOf(),
                                          NULL);
     m_context->Dispatch(UINT(std::ceil(m_width/32.f)),UINT(std::ceil(m_height/32.f)), 1);
     Utils::ComputeShaderBarrier(m_context);
+
+    Graphics::bloomPSO.SetPipelineState(m_context);
+    m_context->CSSetUnorderedAccessViews(0, 1, m_resolvedUAV.GetAddressOf(),
+                                         NULL);
+    m_context->Dispatch(UINT(std::ceil(m_width / 32.f)),
+                        UINT(std::ceil(m_height / 32.f)), 1);
+    Utils::ComputeShaderBarrier(m_context);
+    for (int i = 0; i < 100; i++) {
+        m_context->CSSetUnorderedAccessViews(0, 1, m_resolvedUAV.GetAddressOf(),
+                                             NULL);
+        m_context->Dispatch(UINT(std::ceil(m_width / 32.f)),
+                            UINT(std::ceil(m_height / 32.f)), 1);
+        Utils::ComputeShaderBarrier(m_context);
+    }
+
    
     m_postProcess.Render(m_context);
 } 

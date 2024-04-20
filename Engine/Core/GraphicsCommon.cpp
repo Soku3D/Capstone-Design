@@ -14,6 +14,7 @@
 #include "CompiledShaders/GraphPS.h"
 
 #include "CompiledShaders/ApplyBloomCS.h"
+#include "CompiledShaders/InitCS.h"
 
 namespace soku {
 namespace Graphics {
@@ -47,6 +48,7 @@ GraphicsPSO blendPSO;
 GraphicsPSO graphPSO;
 GraphicsPSO billboardPSO;
 
+ComputePSO InitPSO;
 ComputePSO bloomPSO;
 
 void InitCommonStates(Microsoft::WRL::ComPtr<ID3D11Device> &device) {
@@ -204,6 +206,8 @@ void InitCommonStates(Microsoft::WRL::ComPtr<ID3D11Device> &device) {
     blendPSO.SetBlendState(basicBS);
 
     // Set Compute PSO
+    InitPSO.SetComputeShader(g_pInitCS, sizeof(g_pInitCS), device);
+    
     bloomPSO.SetComputeShader(g_pApplyBloomCS, sizeof(g_pApplyBloomCS), device);
 
 }
