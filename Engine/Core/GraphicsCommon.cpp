@@ -209,7 +209,7 @@ void InitCommonStates(Microsoft::WRL::ComPtr<ID3D11Device> &device) {
     InitPSO.SetComputeShader(g_pInitCS, sizeof(g_pInitCS), device);
     
     bloomPSO.SetComputeShader(g_pApplyBloomCS, sizeof(g_pApplyBloomCS), device);
-
+    defaultSolidPSO.SetSamplerState(linearClampSS);
 }
 } // namespace Graphics
 } // namespace soku

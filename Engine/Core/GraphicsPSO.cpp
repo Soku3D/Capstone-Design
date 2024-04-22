@@ -19,8 +19,11 @@ void GraphicsPSO::SetPipelineState(
 
     context->RSSetState(m_PSODesc.m_rasterizerState.Get());
     context->OMSetDepthStencilState(m_PSODesc.m_depthStencilState.Get(), 1.f);
+    
+    // 각 shader당 두 개의 sampler 를 갖도록 수정 필요 (wrap 과 clamp)
     context->VSSetSamplers(0, 1, m_PSODesc.m_samplerState.GetAddressOf());
     context->PSSetSamplers(0, 1, m_PSODesc.m_samplerState.GetAddressOf());
+    context->CSSetSamplers(0, 1, m_PSODesc.m_samplerState.GetAddressOf());
 }
 void GraphicsPSO::SetSamplerState(
     Microsoft::WRL::ComPtr<ID3D11SamplerState> &samplerState) {
@@ -79,5 +82,9 @@ void ComputePSO::SetComputeShader(
     Microsoft::WRL::ComPtr<ID3D11Device> &device) {
     ThrowIfFailed(device->CreateComputeShader(
         Binary, Size, nullptr, m_PSODesc.m_computeShader.GetAddressOf()));
+}
+void ComputePSO::SetSamplerState(
+    Microsoft::WRL::ComPtr<ID3D11SamplerState> &samplerState) {
+    m_PSODesc.m_samplerState = samplerState;
 }
 } // namespace soku

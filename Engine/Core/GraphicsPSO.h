@@ -17,6 +17,7 @@ struct D3D11_GRAPHICS_PIPELINE_STATE_DESC {
 };
 struct D3D11_COMPUTE_PIPELINE_STATE_DESC {
     Microsoft::WRL::ComPtr<ID3D11ComputeShader> m_computeShader;
+    Microsoft::WRL::ComPtr<ID3D11SamplerState> m_samplerState;
 };
 class GraphicsPSO {
   public:
@@ -46,9 +47,9 @@ class ComputePSO {
   public:
     void operator=(const ComputePSO &pso);
     void SetPipelineState(Microsoft::WRL::ComPtr<ID3D11DeviceContext> &context);
+    void SetSamplerState(Microsoft::WRL::ComPtr<ID3D11SamplerState> &samplerState);
     void SetComputeShader(const void *Binary, size_t Size,
-                         Microsoft::WRL::ComPtr<ID3D11Device> &device);
-
+                          Microsoft::WRL::ComPtr<ID3D11Device> &device);
   private:
     D3D11_COMPUTE_PIPELINE_STATE_DESC m_PSODesc;
 };
