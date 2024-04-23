@@ -212,23 +212,6 @@ void BaseApp::CreateBuffers() {
     ThrowIfFailed(m_device->CreateShaderResourceView(
         m_resolvedBuffer.Get(), NULL, m_resolvedSRV.GetAddressOf()));
 
-    D3D11_UNORDERED_ACCESS_VIEW_DESC uaDesc;
-    ZeroMemory(&uaDesc, sizeof(uaDesc));
-    uaDesc.Format = texDesc.Format;
-    uaDesc.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE2D;
-    uaDesc.Texture2D.MipSlice = 0;
-    ThrowIfFailed(m_device->CreateUnorderedAccessView(
-        m_resolvedBuffer.Get(), &uaDesc, m_resolvedUAV.GetAddressOf()));
-    // m_device->CreateRenderTargetView(m_resolvedBuffer.Get(), NULL,
-    // m_resolvedRTV.GetAddressOf());
-    ThrowIfFailed(m_device->CreateTexture2D(&texDesc, NULL,
-                                            m_tempBuffer.GetAddressOf()));
-    ThrowIfFailed(m_device->CreateShaderResourceView(
-        m_tempBuffer.Get(), NULL, m_tempSRV.GetAddressOf()));
-
-    ThrowIfFailed(m_device->CreateUnorderedAccessView(
-        m_tempBuffer.Get(), &uaDesc, m_tempUAV.GetAddressOf()));
-
     texDesc.SampleDesc.Count = (m_sampleQulity > 0) ? 4 : 1;
     texDesc.SampleDesc.Quality = (m_sampleQulity > 0) ? m_sampleQulity - 1 : 0;
     texDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
@@ -237,6 +220,8 @@ void BaseApp::CreateBuffers() {
                                      m_floatRTV.GetAddressOf());
 
     CreateDepthBuffer();
+
+
 
     m_postProcess.Initialize(m_device, m_context, {m_resolvedSRV},
                              {m_backBufferRTV}, m_width, m_height);
