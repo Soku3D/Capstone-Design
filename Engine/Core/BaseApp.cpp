@@ -137,7 +137,7 @@ bool BaseApp::InitDirect3D() {
     scDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
     scDesc.OutputWindow = m_hWnd;
     scDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
-    scDesc.Windowed = true;
+    scDesc.Windowed = false;
 
     HRESULT hr = D3D11CreateDeviceAndSwapChain(
         nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, createDeviceFlag,
@@ -221,8 +221,31 @@ void BaseApp::CreateBuffers() {
 
     CreateDepthBuffer();
 
+    backBuffer->GetDesc(&texDesc);
+    texDesc.Format = DXGI_FORMAT_R16G16B16A16_FLOAT;
+    texDesc.Usage = D3D11_USAGE_DEFAULT;
+    texDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE |
+                        D3D11_BIND_UNORDERED_ACCESS;
 
+    D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc;
+    ZeroMemory(&uavDesc, sizeof(uavDesc));
+    uavDesc.Format = texDesc.Format;
+    uavDesc.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE2D;
+    uavDesc.Texture2D.MipSlice = 0;
 
+    ThrowIfFailed(
+        m_device->CreateTexture2D(&texDesc, NULL, m_texA.GetAddressOf()));
+    ThrowIfFailed(m_device->CreateShaderResourceView(m_texA.Get(), NULL,
+                                                     m_srvA.GetAddressOf()));
+    ThrowIfFailed(m_device->CreateUnorderedAccessView(m_texA.Get(), NULL,
+                                                      m_uavA.GetAddressOf()));
+
+    ThrowIfFailed(
+        m_device->CreateTexture2D(&texDesc, NULL, m_texB.GetAddressOf()));
+    ThrowIfFailed(m_device->CreateShaderResourceView(m_texB.Get(), NULL,
+                                                     m_srvB.GetAddressOf()));
+    ThrowIfFailed(m_device->CreateUnorderedAccessView(m_texB.Get(), NULL,
+                                                      m_uavB.GetAddressOf()));
     m_postProcess.Initialize(m_device, m_context, {m_resolvedSRV},
                              {m_backBufferRTV}, m_width, m_height);
 }

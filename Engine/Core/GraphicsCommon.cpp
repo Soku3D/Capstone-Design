@@ -15,6 +15,8 @@
 
 #include "CompiledShaders/ApplyBloomCS.h"
 #include "CompiledShaders/InitCS.h"
+#include "CompiledShaders/BlurXCS.h"
+#include "CompiledShaders/BlurYCS.h"
 
 namespace soku {
 namespace Graphics {
@@ -51,7 +53,8 @@ GraphicsPSO billboardPSO;
 
 ComputePSO InitPSO;
 ComputePSO bloomPSO;
-
+ComputePSO blurXPSO;
+ComputePSO blurYPSO;
 void InitCommonStates(Microsoft::WRL::ComPtr<ID3D11Device> &device) {
     // Create SamplerState
     D3D11_SAMPLER_DESC samplerDesc;
@@ -213,6 +216,12 @@ void InitCommonStates(Microsoft::WRL::ComPtr<ID3D11Device> &device) {
     
     bloomPSO.SetComputeShader(g_pApplyBloomCS, sizeof(g_pApplyBloomCS), device);
     bloomPSO.SetSamplerState(pointClampSS);
+
+    blurXPSO.SetComputeShader(g_cBlurXCS, sizeof(g_cBlurXCS), device);
+    blurXPSO.SetSamplerState(pointClampSS);
+    
+    blurYPSO.SetComputeShader(g_cBlurYCS, sizeof(g_cBlurYCS), device);
+    blurYPSO.SetSamplerState(pointClampSS);
 }
 } // namespace Graphics
 } // namespace soku

@@ -38,5 +38,7 @@ extern GraphicsPSO billboardPSO;
 
 extern ComputePSO InitPSO;
 extern ComputePSO bloomPSO;
+extern ComputePSO blurXPSO;
+extern ComputePSO blurYPSO;
 } // namespace Graphics
 } // namespace soku
