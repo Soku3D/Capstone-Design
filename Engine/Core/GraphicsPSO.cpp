@@ -76,6 +76,7 @@ void ComputePSO::SetPipelineState(
     context->HSSetShader(NULL, NULL, 0);
     context->GSSetShader(NULL, NULL, 0);
     context->CSSetShader(m_PSODesc.m_computeShader.Get(), NULL, 0);
+    //context->CSSetSamplers(0, 1, m_PSODesc.m_samplerState.GetAddressOf());
 }
 void ComputePSO::SetComputeShader(
     const void *Binary, size_t Size,

@@ -63,12 +63,19 @@ class BaseApp {
     Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_backBufferRTV;
     Microsoft::WRL::ComPtr<ID3D11DepthStencilView> m_DSV;
     Microsoft::WRL::ComPtr<ID3D11Texture2D> m_floatBuffer;
-    Microsoft::WRL::ComPtr<ID3D11Texture2D> m_resolvedBuffer;
     Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_floatRTV;
+    Microsoft::WRL::ComPtr<ID3D11Texture2D> m_resolvedBuffer;
     // Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_resolvedRTV;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_resolvedSRV;
-    Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> m_resolvedUAV;
+    
+    Microsoft::WRL::ComPtr<ID3D11Texture2D> m_texA;
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_srvA;
+    Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> m_uavA;
+    Microsoft::WRL::ComPtr<ID3D11Texture2D> m_texB;
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_srvB;
+    Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> m_uavB;
 
+    
   protected:
     Timer m_timer;
     std::unique_ptr<DirectX::Mouse> mouse;

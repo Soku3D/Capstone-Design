@@ -20,6 +20,7 @@ namespace soku {
 namespace Graphics {
 Microsoft::WRL::ComPtr<ID3D11SamplerState> linearWrapSS;
 Microsoft::WRL::ComPtr<ID3D11SamplerState> linearClampSS;
+Microsoft::WRL::ComPtr<ID3D11SamplerState> pointClampSS;
 
 Microsoft::WRL::ComPtr<ID3D11RasterizerState> solidRS;
 Microsoft::WRL::ComPtr<ID3D11RasterizerState> skyboxRS;
@@ -69,6 +70,8 @@ void InitCommonStates(Microsoft::WRL::ComPtr<ID3D11Device> &device) {
     samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
     device->CreateSamplerState(&samplerDesc, linearClampSS.GetAddressOf());
 
+    samplerDesc.Filter = D3D11_FILTER_COMPARISON_MIN_MAG_MIP_POINT;
+    device->CreateSamplerState(&samplerDesc, pointClampSS.GetAddressOf());
     // Create RasterizerState;
     D3D11_RASTERIZER_DESC rasterDesc;
     ZeroMemory(&rasterDesc, sizeof(D3D11_RASTERIZER_DESC));
@@ -209,7 +212,7 @@ void InitCommonStates(Microsoft::WRL::ComPtr<ID3D11Device> &device) {
     InitPSO.SetComputeShader(g_pInitCS, sizeof(g_pInitCS), device);
     
     bloomPSO.SetComputeShader(g_pApplyBloomCS, sizeof(g_pApplyBloomCS), device);
-    defaultSolidPSO.SetSamplerState(linearClampSS);
+    bloomPSO.SetSamplerState(pointClampSS);
 }
 } // namespace Graphics
 } // namespace soku

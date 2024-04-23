@@ -7,6 +7,7 @@ void InitCommonStates(Microsoft::WRL::ComPtr<ID3D11Device> &device);
 
 extern Microsoft::WRL::ComPtr<ID3D11SamplerState> linearWrapSS;
 extern Microsoft::WRL::ComPtr<ID3D11SamplerState> linearClampSS;
+extern Microsoft::WRL::ComPtr<ID3D11SamplerState> pointClampSS;
 
 extern Microsoft::WRL::ComPtr<ID3D11RasterizerState> solidRS;
 extern Microsoft::WRL::ComPtr<ID3D11RasterizerState> skyboxRS;

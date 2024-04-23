@@ -13,29 +13,18 @@ static const int blurRadius = 5;
 void main(int3 gID : SV_GroupID, int3 gtID : SV_GroupThreadID,
           uint3 dtID : SV_DispatchThreadID)
 {
-    //uint width, height;
-    //outputTex.GetDimensions(width, height);
-    //float2 dx = float2(1.0 / width, 1.0 / height);
-    
-    float dx = 1.0 / 1280;
-    float dy = 1.0 / 768;
-    // ¶Ç´Â float2 dx = float2(1.0 / 1280, 1.0 / 768)
+       
+    float dx = 1.0 / 1920;
+    float dy = 1.0 / 1080;
     
     float2 uv = float2((dtID.x + 0.5) * dx, (dtID.y + 0.5) * dy);
-    // float2 uv = float2((dtID.x + 0.5) * dx.x, (dtID.y + 0.5) * dx.y);
-
     float3 blurColor = float3(0, 0, 0);
 
     [unroll]
     for (int i = -blurRadius; i <= blurRadius; ++i)
     {
-        //uint clamped = uint(clamp(i + int(dtID.x), 0, int(width) - 1));
-        //float3 color = inputTex[uint2(clamped, dtID.y)].xyz;
-        
-        float3 color = g_input.SampleLevel(g_sampler, uv + float2(float(i) * dx, 0.0), 0.0).rgb;
-
+        float3 color = g_input.SampleLevel(g_sampler, uv + float2(float(i) * dx, 0.0),0.0).rgb;
         blurColor += weights[i + blurRadius] * color;
     }
-
     g_output[dtID.xy] = float4(blurColor, 1);
 }

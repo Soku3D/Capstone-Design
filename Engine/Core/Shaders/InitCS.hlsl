@@ -7,7 +7,7 @@ void main(uint3 gtID : SV_GroupThreadID, uint3 gID : SV_GroupID,
     float4 red = float4(5000.f, 0.f, 0.f, 1.f);
     float4 green = float4(0.f, 5000.f, 0.f, 1.f);
     float4 blue = float4(0.f, 0.f, 5000.f, 1.f);
-    float4 black = float4(0.f, 0.f, 0.f, 0.f);
+    float4 black = float4(0.f, 0.f, 0.f, 1.f);
     if (dtID.x == 480 && dtID.y == 540)
     {
         g_output[dtID.xy] = red;

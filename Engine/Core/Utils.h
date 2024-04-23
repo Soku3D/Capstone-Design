@@ -22,14 +22,14 @@ class Utils {
         context->PSSetShaderResources(0, 6, nullSRVs);
     }
     static void ComputeShaderBarrier(Microsoft::WRL::ComPtr<ID3D11DeviceContext> &context) {
-        ID3D11ShaderResourceView *nullSRVs[6] = {
+        ID3D11ShaderResourceView *nullSRV[6] = {
             0,
         };
-        context->CSSetShaderResources(0, 6, nullSRVs);
-        ID3D11UnorderedAccessView *nullUAVs[6] = {
+        context->CSSetShaderResources(0, 6, nullSRV);
+        ID3D11UnorderedAccessView *nullUAV[6] = {
             0,
         };
-        context->CSSetUnorderedAccessViews(0,6,nullUAVs,NULL);
+        context->CSSetUnorderedAccessViews(0, 6, nullUAV, NULL);
     }
     static std::vector<uint8_t> CreateTextureImage(const std::wstring &filePath,
                                                    int &width, int &height);
