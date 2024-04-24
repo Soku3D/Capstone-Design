@@ -166,10 +166,8 @@ void RenderApp::Render(float deltaTime) {
     m_context->Dispatch(m_width, m_height,
                         1);
     Utils::ComputeShaderBarrier(m_context);
-
-    
-    
-    for (int i = 0; i < 2; i++) {
+   
+    for (int i = 0; i < 1000; i++) {
         Graphics::blurXPSO.SetPipelineState(m_context);
         m_context->CSSetSamplers(0, 1, Graphics::pointClampSS.GetAddressOf());
         
@@ -186,6 +184,8 @@ void RenderApp::Render(float deltaTime) {
                             (UINT)std::ceil(m_height / 32.f), 1);
         Utils::ComputeShaderBarrier(m_context);
     }
+    
+    //exit(-1);
 
     m_context->CopyResource(m_resolvedBuffer.Get(), m_texA.Get());
 

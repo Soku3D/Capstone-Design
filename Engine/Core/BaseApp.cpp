@@ -86,17 +86,34 @@ void BaseApp::SetGlobalConsts(
 }
 bool BaseApp::InitWindow() {
     // Create WindowClass
-    WNDCLASSEXW wc = {
-        sizeof(wc), CS_CLASSDC, MainProc, 0, 0,        GetModuleHandle(NULL),
-        0,          0,          0,        0, L"class", 0};
-    RegisterClassExW(&wc);
+    WNDCLASSEX wc = {sizeof(WNDCLASSEX),
+                     CS_CLASSDC,
+                     MainProc,
+                     0L,
+                     0L,
+                     GetModuleHandle(NULL),
+                     NULL,
+                     NULL,
+                     NULL,
+                     NULL,
+                     L"HongLabGraphics", // lpszClassName, L-string
+                     NULL};
+
+    if (!RegisterClassEx(&wc)) {
+        std::cout << "RegisterClassEx() failed." << std::endl;
+        return false;
+    }
     RECT rect = {(LONG)0, (LONG)0, (LONG)m_width, (LONG)m_height};
     AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, false);
 
     // Create Window
-    m_hWnd = CreateWindowW(L"class", L"wnd", WS_OVERLAPPEDWINDOW, 10, 10,
-                           rect.right - rect.left, rect.bottom - rect.top, NULL,
-                           NULL, wc.hInstance, NULL);
+    m_hWnd = CreateWindow(wc.lpszClassName, L"Rendering Engine",
+                          WS_OVERLAPPEDWINDOW,
+                          100, 
+                          100, 
+                          rect.right - rect.left, 
+                          rect.bottom - rect.top, 
+                          NULL, NULL, wc.hInstance, NULL);
     if (!m_hWnd) {
         return false;
     }
@@ -137,7 +154,7 @@ bool BaseApp::InitDirect3D() {
     scDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
     scDesc.OutputWindow = m_hWnd;
     scDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
-    scDesc.Windowed = false;
+    scDesc.Windowed = true;
 
     HRESULT hr = D3D11CreateDeviceAndSwapChain(
         nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, createDeviceFlag,
@@ -273,7 +290,9 @@ int BaseApp::Run() {
             ImGui::NewFrame();
 
             ImGui::Begin("Hello, world!");
-
+            ImGui::Text("Average %.3f ms/frame (%.1f FPS)",
+                        1000.0f / ImGui::GetIO().Framerate,
+                        ImGui::GetIO().Framerate);
             UpdateGUI(0.f);
             // ImGui::SetWindowPos({ 0.f,0.f });
             // m_guiWidth = (UINT)ImGui::GetWindowSize().x;
