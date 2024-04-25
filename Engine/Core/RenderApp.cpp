@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "RenderApp.h"
 #include "GeometryGenerator.h"
-#include "GraphicsCommon.h" 
+#include "GraphicsCommon.h"
 namespace soku {
 using DirectX::SimpleMath::Matrix;
 RenderApp::RenderApp(const int width, const int height)
@@ -158,34 +158,31 @@ void RenderApp::Render(float deltaTime) {
     /*m_context->ResolveSubresource(m_resolvedBuffer.Get(), 0,
                                   m_floatBuffer.Get(), 0,
                                   DXGI_FORMAT_R16G16B16A16_FLOAT);*/
-    
+
     // Compute Shader
     Graphics::InitPSO.SetPipelineState(m_context);
-    //m_context->CSSetShaderResources(0, 1, m_srvB.GetAddressOf());
+    // m_context->CSSetShaderResources(0, 1, m_srvB.GetAddressOf());
     m_context->CSSetUnorderedAccessViews(0, 1, m_uavA.GetAddressOf(), NULL);
-    m_context->Dispatch(m_width, m_height,
-                        1);
+    m_context->Dispatch(m_width, m_height, 1);
     Utils::ComputeShaderBarrier(m_context);
-   
+
     for (int i = 0; i < 1000; i++) {
-        Graphics::blurXPSO.SetPipelineState(m_context);
         m_context->CSSetSamplers(0, 1, Graphics::pointClampSS.GetAddressOf());
-        
+        Graphics::blurXGroupCachePSO.SetPipelineState(m_context);
+
         m_context->CSSetShaderResources(0, 1, m_srvA.GetAddressOf());
         m_context->CSSetUnorderedAccessViews(0, 1, m_uavB.GetAddressOf(), NULL);
-        m_context->Dispatch((UINT)std::ceil(m_width/32.f),
-                            (UINT)std::ceil(m_height/32.f),1);
+        m_context->Dispatch((UINT)std::ceil(m_width / 256.f), m_height, 1);
         Utils::ComputeShaderBarrier(m_context);
-        
-        Graphics::blurYPSO.SetPipelineState(m_context);
+
+        Graphics::blurYGroupCachePSO.SetPipelineState(m_context);
         m_context->CSSetShaderResources(0, 1, m_srvB.GetAddressOf());
         m_context->CSSetUnorderedAccessViews(0, 1, m_uavA.GetAddressOf(), NULL);
-        m_context->Dispatch((UINT)std::ceil(m_width / 32.f),
-                            (UINT)std::ceil(m_height / 32.f), 1);
+        m_context->Dispatch(m_width, (UINT)std::ceil(m_height / 256.f), 1);
         Utils::ComputeShaderBarrier(m_context);
     }
-    
-    //exit(-1);
+
+    // exit(-1);
 
     m_context->CopyResource(m_resolvedBuffer.Get(), m_texA.Get());
 

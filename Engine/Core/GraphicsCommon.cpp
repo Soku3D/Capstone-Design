@@ -17,7 +17,8 @@
 #include "CompiledShaders/InitCS.h"
 #include "CompiledShaders/BlurXCS.h"
 #include "CompiledShaders/BlurYCS.h"
-
+#include "CompiledShaders/BlurXGroupCacheCS.h"
+#include "CompiledShaders/BlurYGroupCacheCS.h"
 namespace soku {
 namespace Graphics {
 Microsoft::WRL::ComPtr<ID3D11SamplerState> linearWrapSS;
@@ -55,6 +56,8 @@ ComputePSO InitPSO;
 ComputePSO bloomPSO;
 ComputePSO blurXPSO;
 ComputePSO blurYPSO;
+ComputePSO blurXGroupCachePSO;
+ComputePSO blurYGroupCachePSO;
 void InitCommonStates(Microsoft::WRL::ComPtr<ID3D11Device> &device) {
     // Create SamplerState
     D3D11_SAMPLER_DESC samplerDesc;
@@ -86,8 +89,8 @@ void InitCommonStates(Microsoft::WRL::ComPtr<ID3D11Device> &device) {
     rasterDesc.MultisampleEnable = true;
     ThrowIfFailed(
         device->CreateRasterizerState(&rasterDesc, solidRS.GetAddressOf()));
-    ThrowIfFailed(device->CreateRasterizerState(&rasterDesc,
-                                   reflectedSkyboxRS.GetAddressOf()));
+    ThrowIfFailed(device->CreateRasterizerState(
+        &rasterDesc, reflectedSkyboxRS.GetAddressOf()));
     rasterDesc.FrontCounterClockwise = true;
     device->CreateRasterizerState(&rasterDesc, skyboxRS.GetAddressOf());
     device->CreateRasterizerState(&rasterDesc, reflectedRS.GetAddressOf());
@@ -138,15 +141,15 @@ void InitCommonStates(Microsoft::WRL::ComPtr<ID3D11Device> &device) {
         {"TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 32,
          D3D11_INPUT_PER_VERTEX_DATA, 0},
     };
-    ThrowIfFailed(device->CreateInputLayout(basicIEs.data(), (UINT)basicIEs.size(),
-                               g_pDefaultVS, sizeof(g_pDefaultVS),
-                               basicIL.GetAddressOf()));
+    ThrowIfFailed(device->CreateInputLayout(
+        basicIEs.data(), (UINT)basicIEs.size(), g_pDefaultVS,
+        sizeof(g_pDefaultVS), basicIL.GetAddressOf()));
 
     D3D11_BLEND_DESC blendDesc;
     ZeroMemory(&blendDesc, sizeof(blendDesc));
     blendDesc.AlphaToCoverageEnable = true;
     blendDesc.IndependentBlendEnable = true;
-    
+
     blendDesc.RenderTarget[0].BlendEnable = true;
 
     blendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
@@ -156,7 +159,8 @@ void InitCommonStates(Microsoft::WRL::ComPtr<ID3D11Device> &device) {
     blendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
     blendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND::D3D11_BLEND_ONE;
     blendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND::D3D11_BLEND_ONE;
-    blendDesc.RenderTarget[0].RenderTargetWriteMask =  D3D11_COLOR_WRITE_ENABLE_ALL;
+    blendDesc.RenderTarget[0].RenderTargetWriteMask =
+        D3D11_COLOR_WRITE_ENABLE_ALL;
     ThrowIfFailed(device->CreateBlendState(&blendDesc, basicBS.GetAddressOf()));
 
     // Set Graphics PSO
@@ -213,15 +217,21 @@ void InitCommonStates(Microsoft::WRL::ComPtr<ID3D11Device> &device) {
 
     // Set Compute PSO
     InitPSO.SetComputeShader(g_pInitCS, sizeof(g_pInitCS), device);
-    
+
     bloomPSO.SetComputeShader(g_pApplyBloomCS, sizeof(g_pApplyBloomCS), device);
     bloomPSO.SetSamplerState(pointClampSS);
 
     blurXPSO.SetComputeShader(g_cBlurXCS, sizeof(g_cBlurXCS), device);
     blurXPSO.SetSamplerState(pointClampSS);
-    
     blurYPSO.SetComputeShader(g_cBlurYCS, sizeof(g_cBlurYCS), device);
     blurYPSO.SetSamplerState(pointClampSS);
+
+    blurXGroupCachePSO.SetComputeShader(g_cBlurXGroupCacheCS,
+                                        sizeof(g_cBlurXGroupCacheCS), device);
+    blurXGroupCachePSO.SetSamplerState(pointClampSS);
+    blurYGroupCachePSO.SetComputeShader(g_cBlurYGroupCacheCS,
+                                        sizeof(g_cBlurYGroupCacheCS), device);
+    blurYGroupCachePSO.SetSamplerState(pointClampSS);
 }
 } // namespace Graphics
 } // namespace soku

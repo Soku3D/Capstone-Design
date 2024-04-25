@@ -40,5 +40,7 @@ extern ComputePSO InitPSO;
 extern ComputePSO bloomPSO;
 extern ComputePSO blurXPSO;
 extern ComputePSO blurYPSO;
+extern ComputePSO blurXGroupCachePSO;
+extern ComputePSO blurYGroupCachePSO;
 } // namespace Graphics
 } // namespace soku
