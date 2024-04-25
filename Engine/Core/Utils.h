@@ -15,13 +15,15 @@ class Utils {
             }
         }
     }
-    static void SRVBarrier(Microsoft::WRL::ComPtr<ID3D11DeviceContext> &context) {
+    static void
+    SRVBarrier(Microsoft::WRL::ComPtr<ID3D11DeviceContext> &context) {
         ID3D11ShaderResourceView *nullSRVs[6] = {
             0,
         };
         context->PSSetShaderResources(0, 6, nullSRVs);
     }
-    static void ComputeShaderBarrier(Microsoft::WRL::ComPtr<ID3D11DeviceContext> &context) {
+    static void
+    ComputeShaderBarrier(Microsoft::WRL::ComPtr<ID3D11DeviceContext> &context) {
         ID3D11ShaderResourceView *nullSRV[6] = {
             0,
         };
@@ -124,11 +126,13 @@ class Utils {
         const std::wstring &filePath,
         Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> &shaderResourceView,
         Microsoft::WRL::ComPtr<ID3D11Device> &device, bool isCubeMap);
-    static void CreateTexture(
-        const std::wstring &filePath, Microsoft::WRL::ComPtr<ID3D11Texture2D> &tex,
-        Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> &srv,
-        Microsoft::WRL::ComPtr<ID3D11Device> &device,
-        Microsoft::WRL::ComPtr<ID3D11DeviceContext> &context, bool useSRGB);
+    static void
+    CreateTexture(const std::wstring &filePath,
+                  Microsoft::WRL::ComPtr<ID3D11Texture2D> &tex,
+                  Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> &srv,
+                  Microsoft::WRL::ComPtr<ID3D11Device> &device,
+                  Microsoft::WRL::ComPtr<ID3D11DeviceContext> &context,
+                  bool useSRGB);
     static void
     CreateStagingTexture(const int &width, const int &height,
                          const std::vector<uint8_t> &image,
@@ -140,5 +144,41 @@ class Utils {
     static void CreateTextureArray();
     static Matrix CreateReflectedMatrix(const Vector3 &normal,
                                         const Vector3 &point);
+    template <typename T>
+    static void CreateStructuredBuffer(
+        Microsoft::WRL::ComPtr<ID3D11Device> &device, std::vector<T> &cpu,
+        Microsoft::WRL::ComPtr<ID3D11Buffer> &gpu,
+        Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> &srv,
+        Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> &uav) {
+
+        D3D11_BUFFER_DESC bufferDesc;
+        ZeroMemory(&bufferDesc, sizeof(bufferDesc));
+        bufferDesc.ByteWidth = sizeof(T) * cpu.size();
+        bufferDesc.Usage = D3D11_USAGE_DEFAULT;
+        bufferDesc.BindFlags =
+            D3D11_BIND_UNORDERED_ACCESS | D3D11_BIND_SHADER_RESOURCE;
+        bufferDesc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
+        bufferDesc.StructureByteStride = sizeof(T);
+
+        D3D11_SUBRESOURCE_DATA subData;
+        ZeroMemory(&subData, sizeof(subData));
+        subData.pSysMem = cpu.data();
+        // subData.SysMemPitch = sizeof(T) * cpu.size();
+        device->CreateBuffer(&bufferDesc, &subData, gpu.GetAddressOf());
+
+        D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc;
+        ZeroMemory(&uavDesc, sizeof(uavDesc));
+        uavDesc.Format = DXGI_FORMAT_UNKNOWN;
+        uavDesc.ViewDimension = D3D11_UAV_DIMENSION_BUFFER;
+        uavDesc.Buffer.NumElements = cpu.size();
+        ThrowIfFailed(device->CreateUnorderedAccessView(gpu.Get(), &uavDesc,
+                                                        uav.GetAddressOf()));
+        D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
+        ZeroMemory(&srvDesc, sizeof(srvDesc));
+        srvDesc.Format = DXGI_FORMAT_UNKNOWN;
+        srvDesc.ViewDimension = D3D10_1_SRV_DIMENSION_BUFFER;
+        srvDesc.BufferEx.NumElements = cpu.size();
+        ThrowIfFailed(device->CreateShaderResourceView(gpu.Get(), &srvDesc, srv.GetAddressOf()));
+    }
 };
 } // namespace soku

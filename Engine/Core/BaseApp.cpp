@@ -154,7 +154,7 @@ bool BaseApp::InitDirect3D() {
     scDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
     scDesc.OutputWindow = m_hWnd;
     scDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
-    scDesc.Windowed = false;
+    scDesc.Windowed = true;
 
     HRESULT hr = D3D11CreateDeviceAndSwapChain(
         nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, createDeviceFlag,
@@ -266,6 +266,7 @@ void BaseApp::CreateBuffers() {
     m_postProcess.Initialize(m_device, m_context, {m_resolvedSRV},
                              {m_backBufferRTV}, m_width, m_height);
 }
+
 bool BaseApp::InitGUI() {
     ImGui::CreateContext();
     ImGuiIO &io = ImGui::GetIO();
@@ -408,5 +409,53 @@ LRESULT BaseApp::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
         break;
     }
     return ::DefWindowProc(hWnd, msg, wParam, lParam);
+}
+void BaseApp::RenderDotBlur() {
+    // Compute Shader
+    Graphics::InitPSO.SetPipelineState(m_context);
+    // m_context->CSSetShaderResources(0, 1, m_srvB.GetAddressOf());
+    m_context->CSSetUnorderedAccessViews(0, 1, m_uavA.GetAddressOf(), NULL);
+    m_context->Dispatch(m_width, m_height, 1);
+    Utils::ComputeShaderBarrier(m_context);
+
+    for (int i = 0; i < 1000; i++) {
+        m_context->CSSetSamplers(0, 1, Graphics::pointClampSS.GetAddressOf());
+        Graphics::blurXGroupCachePSO.SetPipelineState(m_context);
+
+        m_context->CSSetShaderResources(0, 1, m_srvA.GetAddressOf());
+        m_context->CSSetUnorderedAccessViews(0, 1, m_uavB.GetAddressOf(), NULL);
+        m_context->Dispatch((UINT)std::ceil(m_width / 256.f), m_height, 1);
+        Utils::ComputeShaderBarrier(m_context);
+
+        Graphics::blurYGroupCachePSO.SetPipelineState(m_context);
+        m_context->CSSetShaderResources(0, 1, m_srvB.GetAddressOf());
+        m_context->CSSetUnorderedAccessViews(0, 1, m_uavA.GetAddressOf(), NULL);
+        m_context->Dispatch(m_width, (UINT)std::ceil(m_height / 256.f), 1);
+        Utils::ComputeShaderBarrier(m_context);
+    }
+
+    // exit(-1);
+
+    m_context->CopyResource(m_resolvedBuffer.Get(), m_texA.Get());
+}
+void BaseApp::MakeParticles() { 
+    particles.m_cpu.resize(2560); 
+    
+    std::mt19937 gen(0);
+    std::uniform_real_distribution<float> urdp(-1.f, 1.f);
+    std::uniform_real_distribution<float> urdc(0.f, 1.f);
+    for (auto &p : particles.m_cpu) {
+        p.m_position = Vector3(urdp(gen),urdp(gen), 0.f);
+        p.m_color = Vector3(urdc(gen), urdc(gen), urdc(gen));
+    }
+    
+    particles.Initialize(m_device);
+}
+void BaseApp::UpdateParticles() {
+    Graphics::updateParticlePSO.SetPipelineState(m_context);
+    m_context->CSSetUnorderedAccessViews(0,1, particles.m_uav.GetAddressOf(),
+                                         NULL);
+    m_context->Dispatch((UINT)std::ceil(particles.m_cpu.size()/256.f), 1, 1);
+    Utils::ComputeShaderBarrier(m_context);
 }
 } // namespace soku

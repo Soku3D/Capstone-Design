@@ -12,6 +12,8 @@
 #include "CompiledShaders/DownSamplingPS.h"
 #include "CompiledShaders/GraphVS.h"
 #include "CompiledShaders/GraphPS.h"
+#include "CompiledShaders/DrawingParticlesVS.h"
+#include "CompiledShaders/DrawingParticlesPS.h"
 
 #include "CompiledShaders/ApplyBloomCS.h"
 #include "CompiledShaders/InitCS.h"
@@ -19,6 +21,9 @@
 #include "CompiledShaders/BlurYCS.h"
 #include "CompiledShaders/BlurXGroupCacheCS.h"
 #include "CompiledShaders/BlurYGroupCacheCS.h"
+#include "CompiledShaders/UpdateParticlesCS.h"
+
+
 namespace soku {
 namespace Graphics {
 Microsoft::WRL::ComPtr<ID3D11SamplerState> linearWrapSS;
@@ -34,6 +39,7 @@ Microsoft::WRL::ComPtr<ID3D11DepthStencilState> drawDSS;
 Microsoft::WRL::ComPtr<ID3D11DepthStencilState> maskingDSS;
 Microsoft::WRL::ComPtr<ID3D11DepthStencilState> maskedDrawDSS;
 
+Microsoft::WRL::ComPtr<ID3D11InputLayout> dummyIL;
 Microsoft::WRL::ComPtr<ID3D11InputLayout> basicIL;
 Microsoft::WRL::ComPtr<ID3D11InputLayout> combineIL;
 
@@ -51,6 +57,7 @@ GraphicsPSO mirrorPSO;
 GraphicsPSO blendPSO;
 GraphicsPSO graphPSO;
 GraphicsPSO billboardPSO;
+GraphicsPSO drawingParticlesPSO;
 
 ComputePSO InitPSO;
 ComputePSO bloomPSO;
@@ -58,6 +65,8 @@ ComputePSO blurXPSO;
 ComputePSO blurYPSO;
 ComputePSO blurXGroupCachePSO;
 ComputePSO blurYGroupCachePSO;
+ComputePSO updateParticlePSO;
+
 void InitCommonStates(Microsoft::WRL::ComPtr<ID3D11Device> &device) {
     // Create SamplerState
     D3D11_SAMPLER_DESC samplerDesc;
@@ -123,7 +132,10 @@ void InitCommonStates(Microsoft::WRL::ComPtr<ID3D11Device> &device) {
     dsDesc.FrontFace.StencilFunc = D3D11_COMPARISON_EQUAL;
     ThrowIfFailed(
         device->CreateDepthStencilState(&dsDesc, maskedDrawDSS.GetAddressOf()));
-
+    std::vector<D3D11_INPUT_ELEMENT_DESC> dummyIEs = {
+        {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0,
+         D3D11_INPUT_PER_VERTEX_DATA, 0}
+    };
     std::vector<D3D11_INPUT_ELEMENT_DESC> basicIEs = {
         {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0,
          D3D11_INPUT_PER_VERTEX_DATA, 0},
@@ -144,6 +156,9 @@ void InitCommonStates(Microsoft::WRL::ComPtr<ID3D11Device> &device) {
     ThrowIfFailed(device->CreateInputLayout(
         basicIEs.data(), (UINT)basicIEs.size(), g_pDefaultVS,
         sizeof(g_pDefaultVS), basicIL.GetAddressOf()));
+    ThrowIfFailed(device->CreateInputLayout(
+        dummyIEs.data(), (UINT)dummyIEs.size(), g_vDrawingParticlesVS,
+        sizeof(g_vDrawingParticlesVS), dummyIL.GetAddressOf()));
 
     D3D11_BLEND_DESC blendDesc;
     ZeroMemory(&blendDesc, sizeof(blendDesc));
@@ -215,6 +230,16 @@ void InitCommonStates(Microsoft::WRL::ComPtr<ID3D11Device> &device) {
     blendPSO = defaultSolidPSO;
     blendPSO.SetBlendState(basicBS);
 
+    drawingParticlesPSO = defaultSolidPSO;
+    drawingParticlesPSO.SetVertexShader(g_vDrawingParticlesVS,
+                                        sizeof(g_vDrawingParticlesVS),
+                                        device); 
+    drawingParticlesPSO.SetPixelShader(g_pDrawingParticlesPS,
+                                       sizeof(g_pDrawingParticlesPS),
+                                        device); 
+    drawingParticlesPSO.SetPrimitiveTopology(
+        D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
+
     // Set Compute PSO
     InitPSO.SetComputeShader(g_pInitCS, sizeof(g_pInitCS), device);
 
@@ -232,6 +257,10 @@ void InitCommonStates(Microsoft::WRL::ComPtr<ID3D11Device> &device) {
     blurYGroupCachePSO.SetComputeShader(g_cBlurYGroupCacheCS,
                                         sizeof(g_cBlurYGroupCacheCS), device);
     blurYGroupCachePSO.SetSamplerState(pointClampSS);
+
+    updateParticlePSO.SetSamplerState(pointClampSS);
+    updateParticlePSO.SetComputeShader(g_cUpdateParticlesCS,
+                                       sizeof(g_cUpdateParticlesCS), device);
 }
 } // namespace Graphics
 } // namespace soku

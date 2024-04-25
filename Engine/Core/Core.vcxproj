@@ -33,6 +33,7 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="PostProcess.h" />
     <ClInclude Include="RenderApp.h" />
+    <ClInclude Include="StructuredBuffer.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="Utils.h" />
     <ClInclude Include="Vertex.h" />
@@ -52,6 +53,7 @@
     <ClCompile Include="pch.cpp" />
     <ClCompile Include="PostProcess.cpp" />
     <ClCompile Include="RenderApp.cpp" />
+    <ClCompile Include="StructuredBuffer.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="Utils.cpp" />
     <ClCompile Include="Vertex.cpp" />
@@ -105,6 +107,13 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
+    <FxCompile Include="Shaders\DrawingParticlesPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="Shaders\DrawingParticlesVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">g_v%(Filename)</VariableName>
+    </FxCompile>
     <FxCompile Include="Shaders\GraphPS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
@@ -126,6 +135,10 @@
     <FxCompile Include="Shaders\SkyboxVS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
+    <FxCompile Include="Shaders\UpdateParticlesCS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compute</ShaderType>
+      <VariableName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">g_c%(Filename)</VariableName>
     </FxCompile>
     <FxCompile Include="Shaders\UpSamplingPS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>

@@ -18,6 +18,7 @@ extern Microsoft::WRL::ComPtr<ID3D11DepthStencilState> drawDSS;
 extern Microsoft::WRL::ComPtr<ID3D11DepthStencilState> maskingDSS;
 extern Microsoft::WRL::ComPtr<ID3D11DepthStencilState> maskedDrawDSS;
 
+extern Microsoft::WRL::ComPtr<ID3D11InputLayout> dummyIL;
 extern Microsoft::WRL::ComPtr<ID3D11InputLayout> basicIL;
 extern Microsoft::WRL::ComPtr<ID3D11InputLayout> combineIL;
 
@@ -35,6 +36,7 @@ extern GraphicsPSO mirrorPSO;
 extern GraphicsPSO blendPSO;
 extern GraphicsPSO graphPSO;
 extern GraphicsPSO billboardPSO;
+extern GraphicsPSO drawingParticlesPSO;
 
 extern ComputePSO InitPSO;
 extern ComputePSO bloomPSO;
@@ -42,5 +44,6 @@ extern ComputePSO blurXPSO;
 extern ComputePSO blurYPSO;
 extern ComputePSO blurXGroupCachePSO;
 extern ComputePSO blurYGroupCachePSO;
+extern ComputePSO updateParticlePSO;
 } // namespace Graphics
 } // namespace soku

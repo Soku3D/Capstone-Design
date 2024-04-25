@@ -16,6 +16,7 @@ void GraphicsPSO::SetPipelineState(
     context->DSSetShader(m_PSODesc.m_domainShader.Get(), NULL, 0);
     context->HSSetShader(m_PSODesc.m_hullShader.Get(), NULL, 0);
     context->GSSetShader(m_PSODesc.m_geometryShader.Get(), NULL, 0);
+    context->CSSetShader(NULL, 0, 0);
 
     context->RSSetState(m_PSODesc.m_rasterizerState.Get());
     context->OMSetDepthStencilState(m_PSODesc.m_depthStencilState.Get(), 1.f);

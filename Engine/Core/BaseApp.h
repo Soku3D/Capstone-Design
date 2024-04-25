@@ -6,8 +6,12 @@
 #include "PostProcess.h"
 #include "Timer.h"
 #include "Utils.h"
-
+#include "StructuredBuffer.h"
 namespace soku {
+struct Particle {
+    Vector3 m_position;
+    Vector3 m_color;
+};
 class BaseApp {
   public:
     BaseApp(int width, int height);
@@ -40,6 +44,11 @@ class BaseApp {
     virtual void Update(float deltaTime) = 0;
     virtual void UpdateGUI(float deltaTime) = 0;
 
+  protected:
+    void RenderDotBlur();
+    void MakeParticles();
+    void UpdateParticles();
+    //void RenderParticles();
   private:
     DXGI_FORMAT swapChainFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
     UINT m_sampleCount;
@@ -67,7 +76,7 @@ class BaseApp {
     Microsoft::WRL::ComPtr<ID3D11Texture2D> m_resolvedBuffer;
     // Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_resolvedRTV;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_resolvedSRV;
-    
+
     Microsoft::WRL::ComPtr<ID3D11Texture2D> m_texA;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_srvA;
     Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> m_uavA;
@@ -75,7 +84,6 @@ class BaseApp {
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_srvB;
     Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> m_uavB;
 
-    
   protected:
     Timer m_timer;
     std::unique_ptr<DirectX::Mouse> mouse;
@@ -101,5 +109,9 @@ class BaseApp {
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_irradianceSRV;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_specularSRV;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_brdfSRV;
+
+    protected:
+    StructuredBuffer<Particle> particles;
+
 };
 } // namespace soku

@@ -23,6 +23,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <random>
 
 using DirectX::SimpleMath::Matrix;
 using DirectX::SimpleMath::Vector2;
