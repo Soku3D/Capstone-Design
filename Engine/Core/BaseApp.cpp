@@ -81,6 +81,7 @@ void BaseApp::UpdateGlobalConsts(const Vector3 &eyeWorld, const Matrix &viewRow,
 void BaseApp::SetGlobalConsts(
     Microsoft::WRL::ComPtr<ID3D11Buffer> &globalConstsGPU) {
     m_context->VSSetConstantBuffers(1, 1, globalConstsGPU.GetAddressOf());
+    m_context->CSSetConstantBuffers(1, 1, globalConstsGPU.GetAddressOf());
     m_context->PSSetConstantBuffers(1, 1, globalConstsGPU.GetAddressOf());
     m_context->GSSetConstantBuffers(1, 1, globalConstsGPU.GetAddressOf());
 }
@@ -192,14 +193,14 @@ bool BaseApp::CreateDepthBuffer() {
     depthDesc.BindFlags = D3D11_BIND_FLAG::D3D11_BIND_DEPTH_STENCIL;
 
     HRESULT hr = m_device->CreateTexture2D(&depthDesc, nullptr,
-                                           depthBuffer.GetAddressOf());
+                                           depthBuffer.ReleaseAndGetAddressOf());
 
     if (FAILED(hr)) {
         std::cout << "CreateDepthBuffer Failed" << '\n';
         return false;
     }
     hr = m_device->CreateDepthStencilView(depthBuffer.Get(), 0,
-                                          m_DSV.GetAddressOf());
+                                          m_DSV.ReleaseAndGetAddressOf());
     if (FAILED(hr)) {
         std::cout << "CreateDepthStencilView Failed" << '\n';
         return false;
@@ -211,7 +212,7 @@ void BaseApp::CreateBuffers() {
     m_swapChain->GetBuffer(0, IID_PPV_ARGS(backBuffer.GetAddressOf()));
 
     ThrowIfFailed(m_device->CreateRenderTargetView(
-        backBuffer.Get(), nullptr, m_backBufferRTV.GetAddressOf()));
+        backBuffer.Get(), nullptr, m_backBufferRTV.ReleaseAndGetAddressOf()));
 
     D3D11_TEXTURE2D_DESC texDesc;
     backBuffer->GetDesc(&texDesc);
@@ -224,17 +225,17 @@ void BaseApp::CreateBuffers() {
     texDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE |
                         D3D11_BIND_UNORDERED_ACCESS;
 
-    ThrowIfFailed(m_device->CreateTexture2D(&texDesc, NULL,
-                                            m_resolvedBuffer.GetAddressOf()));
+    ThrowIfFailed(m_device->CreateTexture2D(&texDesc, NULL, m_resolvedBuffer.ReleaseAndGetAddressOf()));
     ThrowIfFailed(m_device->CreateShaderResourceView(
-        m_resolvedBuffer.Get(), NULL, m_resolvedSRV.GetAddressOf()));
+        m_resolvedBuffer.Get(), NULL, m_resolvedSRV.ReleaseAndGetAddressOf()));
 
     texDesc.SampleDesc.Count = (m_sampleQulity > 0) ? 4 : 1;
     texDesc.SampleDesc.Quality = (m_sampleQulity > 0) ? m_sampleQulity - 1 : 0;
     texDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
-    m_device->CreateTexture2D(&texDesc, NULL, m_floatBuffer.GetAddressOf());
+    m_device->CreateTexture2D(&texDesc, NULL,
+                              m_floatBuffer.ReleaseAndGetAddressOf());
     m_device->CreateRenderTargetView(m_floatBuffer.Get(), NULL,
-                                     m_floatRTV.GetAddressOf());
+                                     m_floatRTV.ReleaseAndGetAddressOf());
 
     CreateDepthBuffer();
 
@@ -250,19 +251,15 @@ void BaseApp::CreateBuffers() {
     uavDesc.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE2D;
     uavDesc.Texture2D.MipSlice = 0;
 
-    ThrowIfFailed(
-        m_device->CreateTexture2D(&texDesc, NULL, m_texA.GetAddressOf()));
-    ThrowIfFailed(m_device->CreateShaderResourceView(m_texA.Get(), NULL,
-                                                     m_srvA.GetAddressOf()));
-    ThrowIfFailed(m_device->CreateUnorderedAccessView(m_texA.Get(), NULL,
-                                                      m_uavA.GetAddressOf()));
+    ThrowIfFailed(m_device->CreateTexture2D(&texDesc, NULL,
+                                            m_texA.ReleaseAndGetAddressOf()));
+    ThrowIfFailed(m_device->CreateShaderResourceView(m_texA.Get(), NULL, m_srvA.ReleaseAndGetAddressOf()));
+    ThrowIfFailed(m_device->CreateUnorderedAccessView(m_texA.Get(), NULL, m_uavA.ReleaseAndGetAddressOf()));
 
-    ThrowIfFailed(
-        m_device->CreateTexture2D(&texDesc, NULL, m_texB.GetAddressOf()));
-    ThrowIfFailed(m_device->CreateShaderResourceView(m_texB.Get(), NULL,
-                                                     m_srvB.GetAddressOf()));
-    ThrowIfFailed(m_device->CreateUnorderedAccessView(m_texB.Get(), NULL,
-                                                      m_uavB.GetAddressOf()));
+    ThrowIfFailed(m_device->CreateTexture2D(&texDesc, NULL,
+                                            m_texB.ReleaseAndGetAddressOf()));
+    ThrowIfFailed(m_device->CreateShaderResourceView(m_texB.Get(), NULL, m_srvB.ReleaseAndGetAddressOf()));
+    ThrowIfFailed(m_device->CreateUnorderedAccessView(m_texB.Get(), NULL, m_uavB.ReleaseAndGetAddressOf()));
     m_postProcess.Initialize(m_device, m_context, {m_resolvedSRV},
                              {m_backBufferRTV}, m_width, m_height);
 }
@@ -348,6 +345,7 @@ LRESULT BaseApp::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 
             // 화면 해상도가 바뀌면 카메라의 aspect ratio도 변경
             m_camera->SetAspectRatio(this->GetAspectRatio());
+            std::cout << m_width << " " << m_height << '\n';
         }
         break;
     case WM_DESTROY:

@@ -13,7 +13,9 @@ void PostProcess::Initialize(
     const int &height,
     const int & bloomLevel) {
       
-    
+    downFilters.clear();
+    upFilters.clear();
+
     // Create Filter Mesh
     auto screen = GeometryGenerator::MakeSquare();
     m_meshes = std::make_shared<Mesh>();
@@ -74,10 +76,9 @@ void PostProcess::CreateBuffer(
     Microsoft::WRL::ComPtr<ID3D11Texture2D> buff;
     device->CreateTexture2D(&texDesc, NULL, buff.GetAddressOf());
 
-    ThrowIfFailed(device->CreateRenderTargetView(buff.Get(), NULL,
-                                                 outputRTV.GetAddressOf()));
+    ThrowIfFailed(device->CreateRenderTargetView(buff.Get(), NULL, outputRTV.ReleaseAndGetAddressOf()));
     ThrowIfFailed(device->CreateShaderResourceView(buff.Get(), NULL,
-                                                 outputSRV.GetAddressOf()));
+                                                   outputSRV.ReleaseAndGetAddressOf()));
 }
 void PostProcess::Render(Microsoft::WRL::ComPtr<ID3D11DeviceContext> &context) {
     

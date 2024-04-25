@@ -6,9 +6,11 @@ struct Particle
     float3 color;
 };
 RWStructuredBuffer<Particle> particles : register(u0);
-
+static const float dt = 1.f / 60.f;
 [numthreads(256,1,1)]
 void main(uint dtID: SV_DispatchThreadID, uint3 gID : SV_GroupID)
 {
-    particles[dtID.x] = particles[dtID.x];
+    float2 dir = float2(-particles[dtID].pos.y, particles[dtID].pos.x);
+    float velocity = 1.f;
+    particles[dtID.x].pos.xy += dir*velocity * dt;
 }

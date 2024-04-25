@@ -55,7 +55,8 @@ class Utils {
         };
         subData.pSysMem = vertices.data();
 
-        device->CreateBuffer(&bufferDesc, &subData, buffer.GetAddressOf());
+        device->CreateBuffer(&bufferDesc, &subData,
+                             buffer.ReleaseAndGetAddressOf());
     }
     template <typename INDEX>
     static void
@@ -75,7 +76,8 @@ class Utils {
         };
         subData.pSysMem = indices.data();
 
-        device->CreateBuffer(&bufferDesc, &subData, buffer.GetAddressOf());
+        device->CreateBuffer(&bufferDesc, &subData,
+                             buffer.ReleaseAndGetAddressOf());
     }
     template <typename CONSTANT>
     static void
@@ -95,8 +97,8 @@ class Utils {
         };
         subData.pSysMem = &constantData;
 
-        HRESULT hr =
-            device->CreateBuffer(&bufferDesc, &subData, buffer.GetAddressOf());
+        HRESULT hr = device->CreateBuffer(&bufferDesc, &subData,
+                                          buffer.ReleaseAndGetAddressOf());
         if (FAILED(hr)) {
             std::cout << "Create ConstantBuffer  Failed\n";
         }
@@ -176,7 +178,7 @@ class Utils {
         D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
         ZeroMemory(&srvDesc, sizeof(srvDesc));
         srvDesc.Format = DXGI_FORMAT_UNKNOWN;
-        srvDesc.ViewDimension = D3D10_1_SRV_DIMENSION_BUFFER;
+        srvDesc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
         srvDesc.BufferEx.NumElements = cpu.size();
         ThrowIfFailed(device->CreateShaderResourceView(gpu.Get(), &srvDesc, srv.GetAddressOf()));
     }
