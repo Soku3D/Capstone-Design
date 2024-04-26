@@ -17,7 +17,8 @@ void GraphicsPSO::SetPipelineState(
     context->HSSetShader(m_PSODesc.m_hullShader.Get(), NULL, 0);
     context->GSSetShader(m_PSODesc.m_geometryShader.Get(), NULL, 0);
     context->CSSetShader(NULL, 0, 0);
-
+    context->OMSetBlendState(m_PSODesc.m_blendState.Get(), m_PSODesc.m_blendfactor,
+                             0xffffffff);
     context->RSSetState(m_PSODesc.m_rasterizerState.Get());
     context->OMSetDepthStencilState(m_PSODesc.m_depthStencilState.Get(), 1.f);
     
@@ -46,7 +47,11 @@ void GraphicsPSO::SetBlendState(
     Microsoft::WRL::ComPtr<ID3D11BlendState> &blendState) {
     m_PSODesc.m_blendState = blendState;
 }
-void GraphicsPSO::SetPrimitiveTopology(
+void GraphicsPSO::SetBlendFactor(const float factor[4]) {
+    memcpy(m_PSODesc.m_blendfactor, factor, sizeof(float) * 4);
+}
+void GraphicsPSO::
+    SetPrimitiveTopology(
     const D3D11_PRIMITIVE_TOPOLOGY &topology) {
     m_PSODesc.m_topology = topology;
 }

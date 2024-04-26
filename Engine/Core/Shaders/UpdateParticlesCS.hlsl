@@ -11,6 +11,6 @@ static const float dt = 1.f / 144.f;
 void main(uint dtID: SV_DispatchThreadID, uint3 gID : SV_GroupID)
 {
     float2 dir = float2(-particles[dtID].pos.y, particles[dtID].pos.x);
-    float velocity = 1.f;
+    float velocity = 0.2f;
     particles[dtID.x].pos.xy += dir*velocity * dt;
 }

@@ -37,6 +37,7 @@ extern GraphicsPSO blendPSO;
 extern GraphicsPSO graphPSO;
 extern GraphicsPSO billboardPSO;
 extern GraphicsPSO drawingParticlesPSO;
+extern GraphicsPSO drawingParticlesBlendPSO;
 
 extern ComputePSO InitPSO;
 extern ComputePSO bloomPSO;

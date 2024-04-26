@@ -155,7 +155,7 @@ void RenderApp::Render(float deltaTime) {
     //Graphics::reflectedSkyboxPSO.SetPipelineState(m_context);
     //skybox->Render(m_context);
 
-    //Graphics::blendPSO.SetPipelineState(m_context);
+   
 
     //m_context->ResolveSubresource(m_resolvedBuffer.Get(), 0,
     //                              m_floatBuffer.Get(), 0,
@@ -168,6 +168,21 @@ void RenderApp::Render(float deltaTime) {
      m_context->VSSetShaderResources(20, 1, particles.m_srv.GetAddressOf());
      m_context->Draw(particles.m_cpu.size(), 0);
 
+     BaseApp::UpdateParticles();
+     Graphics::drawingParticlesBlendPSO.SetPipelineState(m_context);
+     m_context->VSSetShaderResources(20, 1, particles.m_srv.GetAddressOf());
+     m_context->Draw(particles.m_cpu.size(), 0);
+     
+     BaseApp::UpdateParticles();
+     Graphics::drawingParticlesBlendPSO.SetPipelineState(m_context);
+     m_context->VSSetShaderResources(20, 1, particles.m_srv.GetAddressOf());
+     m_context->Draw(particles.m_cpu.size(), 0);
+     BaseApp::UpdateParticles();
+     Graphics::drawingParticlesBlendPSO.SetPipelineState(m_context);
+     m_context->VSSetShaderResources(20, 1, particles.m_srv.GetAddressOf());
+     m_context->Draw(particles.m_cpu.size(), 0);
+
+     
      m_context->ResolveSubresource(m_resolvedBuffer.Get(), 0,
                                    m_floatBuffer.Get(), 0,
                                    DXGI_FORMAT_R16G16B16A16_FLOAT);

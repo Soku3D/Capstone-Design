@@ -11,6 +11,8 @@ struct D3D11_GRAPHICS_PIPELINE_STATE_DESC {
     Microsoft::WRL::ComPtr<ID3D11RasterizerState> m_rasterizerState;
     Microsoft::WRL::ComPtr<ID3D11InputLayout> m_inputLayout;
     Microsoft::WRL::ComPtr<ID3D11DepthStencilState> m_depthStencilState;
+
+    FLOAT m_blendfactor[4];
     Microsoft::WRL::ComPtr<ID3D11BlendState> m_blendState;
 
     D3D11_PRIMITIVE_TOPOLOGY m_topology;
@@ -30,6 +32,7 @@ class GraphicsPSO {
     void SetDepthStencilState(
         Microsoft::WRL::ComPtr<ID3D11DepthStencilState> &depthStencilState);
     void SetBlendState(Microsoft::WRL::ComPtr<ID3D11BlendState> &blendState);
+    void SetBlendFactor(const float factor[4]);
     void SetPrimitiveTopology(const D3D11_PRIMITIVE_TOPOLOGY &m_topology);
 
     void SetVertexShader(const void *Binary, size_t Size,

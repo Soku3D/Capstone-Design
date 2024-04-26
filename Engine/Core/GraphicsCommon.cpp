@@ -59,6 +59,7 @@ GraphicsPSO blendPSO;
 GraphicsPSO graphPSO;
 GraphicsPSO billboardPSO;
 GraphicsPSO drawingParticlesPSO;
+GraphicsPSO drawingParticlesBlendPSO;
 
 ComputePSO InitPSO;
 ComputePSO bloomPSO;
@@ -229,6 +230,8 @@ void InitCommonStates(Microsoft::WRL::ComPtr<ID3D11Device> &device) {
                                    device);
 
     blendPSO = defaultSolidPSO;
+    float blendFactor[4]{0.2f, 0.2f, 0.2f, 1.f};
+    blendPSO.SetBlendFactor(blendFactor);
     blendPSO.SetBlendState(basicBS);
 
     drawingParticlesPSO = defaultSolidPSO;
@@ -241,6 +244,10 @@ void InitCommonStates(Microsoft::WRL::ComPtr<ID3D11Device> &device) {
                                        sizeof(g_gDrawingParticlesGS), device);
     drawingParticlesPSO.SetPrimitiveTopology(
         D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
+
+    drawingParticlesBlendPSO = drawingParticlesPSO;
+    drawingParticlesBlendPSO.SetBlendFactor(blendFactor);
+    drawingParticlesBlendPSO.SetBlendState(basicBS);
 
     // Set Compute PSO
     InitPSO.SetComputeShader(g_pInitCS, sizeof(g_pInitCS), device);
