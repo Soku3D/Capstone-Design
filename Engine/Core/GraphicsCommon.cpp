@@ -13,6 +13,7 @@
 #include "CompiledShaders/GraphVS.h"
 #include "CompiledShaders/GraphPS.h"
 #include "CompiledShaders/DrawingParticlesVS.h"
+#include "CompiledShaders/DrawingParticlesGS.h"
 #include "CompiledShaders/DrawingParticlesPS.h"
 
 #include "CompiledShaders/ApplyBloomCS.h"
@@ -235,8 +236,9 @@ void InitCommonStates(Microsoft::WRL::ComPtr<ID3D11Device> &device) {
                                         sizeof(g_vDrawingParticlesVS),
                                         device); 
     drawingParticlesPSO.SetPixelShader(g_pDrawingParticlesPS,
-                                       sizeof(g_pDrawingParticlesPS),
-                                        device); 
+                                       sizeof(g_pDrawingParticlesPS), device);
+    drawingParticlesPSO.SetGeometryShader(g_gDrawingParticlesGS,
+                                       sizeof(g_gDrawingParticlesGS), device);
     drawingParticlesPSO.SetPrimitiveTopology(
         D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
 

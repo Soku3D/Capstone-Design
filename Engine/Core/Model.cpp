@@ -78,7 +78,6 @@ void Model::Render(Microsoft::WRL::ComPtr<ID3D11DeviceContext> &context) {
         context->PSSetShaderResources(0, (UINT)srvs.size(), srvs.data());
         
         context->DrawIndexed(mesh->m_indexCount, 0, 0);
-        context->Draw(mesh->m_indexCount, 0);
     }
 }
 } // namespace soku

@@ -46,7 +46,7 @@ class BaseApp {
 
   protected:
     void RenderDotBlur();
-    void MakeParticles();
+    void MakeParticles(const int& particleCount = 2560);
     void UpdateParticles();
     //void RenderParticles();
   private:

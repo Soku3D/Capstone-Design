@@ -287,7 +287,7 @@ int BaseApp::Run() {
             ImGui_ImplWin32_NewFrame();
             ImGui::NewFrame();
 
-            ImGui::Begin("Hello, world!");
+            ImGui::Begin("GUI");
             ImGui::Text("Average %.3f ms/frame (%.1f FPS)",
                         1000.0f / ImGui::GetIO().Framerate,
                         ImGui::GetIO().Framerate);
@@ -436,8 +436,8 @@ void BaseApp::RenderDotBlur() {
 
     m_context->CopyResource(m_resolvedBuffer.Get(), m_texA.Get());
 }
-void BaseApp::MakeParticles() { 
-    particles.m_cpu.resize(2560); 
+void BaseApp::MakeParticles(const int &particleCount) { 
+    particles.m_cpu.resize(particleCount); 
     
     std::mt19937 gen(0);
     std::uniform_real_distribution<float> urdp(-1.f, 1.f);

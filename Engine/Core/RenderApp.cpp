@@ -10,7 +10,7 @@ bool RenderApp::Initialize() {
     if (!BaseApp::Initialize()) {
         return false;
     }
-    BaseApp::MakeParticles();
+    BaseApp::MakeParticles(256);
 
     BaseApp::InitCubemaps(L"Assets/Textures/Skybox/Sample/", L"Sample");
 
@@ -117,60 +117,60 @@ void RenderApp::UpdateGUI(float deltaTime) {
 
 void RenderApp::Render(float deltaTime) {
     FLOAT grey[4]{80.f / 255.f, 80.f / 255.f, 80.f / 255.f, 1.f};
-    FLOAT black[4]{0.f,0.f,0.f, 1.f};
+    FLOAT black[4]{0.f, 0.f, 0.f, 1.f};
     std::vector<ID3D11RenderTargetView *> rtvs{m_floatRTV.Get()};
     m_context->OMSetRenderTargets(rtvs.size(), rtvs.data(), m_DSV.Get());
-    m_context->ClearRenderTargetView(m_floatRTV.Get(), black);
+   // m_context->ClearRenderTargetView(m_floatRTV.Get(), black);
     m_context->ClearDepthStencilView(
         m_DSV.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.f, 0);
-    
-     BaseApp::SetGlobalConsts(m_globalConstsGPU);
 
-      Graphics::defaultSolidPSO.SetPipelineState(m_context);
-      for (const auto &model : models) {
-          model->Render(m_context);
-      }
+    //BaseApp::SetGlobalConsts(m_globalConstsGPU);
 
-      Graphics::skyboxPSO.SetPipelineState(m_context);
-      skybox->Render(m_context);
+    //Graphics::defaultSolidPSO.SetPipelineState(m_context);
+    //for (const auto &model : models) {
+    //    model->Render(m_context);
+    //}
 
-      Graphics::graphPSO.SetPipelineState(m_context);
-      screen->Render(m_context);
+    //Graphics::skyboxPSO.SetPipelineState(m_context);
+    //skybox->Render(m_context);
 
-     Graphics::billboardPSO.SetPipelineState(m_context);
-     dotModel->Render(m_context);
+    //Graphics::graphPSO.SetPipelineState(m_context);
+    //screen->Render(m_context);
 
-    // Mirror
-    // Stencil Buffer Masking
-     Graphics::stencliMaskPSO.SetPipelineState(m_context);
-     mirror->Render(m_context);
-    
-    //// Draw mirror
-     Graphics::reflectedSolidPSO.SetPipelineState(m_context);
-     m_context->ClearDepthStencilView(m_DSV.Get(), D3D11_CLEAR_DEPTH, 1.f, 0);
-     BaseApp::SetGlobalConsts(m_reflectGlobalConstsGPU);
-     for (const auto &model : models) {
-         model->Render(m_context);
-     }
-     Graphics::reflectedSkyboxPSO.SetPipelineState(m_context);
-     skybox->Render(m_context);
-    
-     Graphics::blendPSO.SetPipelineState(m_context);
+    ////Graphics::billboardPSO.SetPipelineState(m_context);
+    ////dotModel->Render(m_context);
 
-    m_context->ResolveSubresource(m_resolvedBuffer.Get(), 0,
-                                  m_floatBuffer.Get(), 0,
-                                  DXGI_FORMAT_R16G16B16A16_FLOAT);
+    //// Mirror
+    //// Stencil Buffer Masking
+    //Graphics::stencliMaskPSO.SetPipelineState(m_context);
+    //mirror->Render(m_context);
 
-    //BaseApp::MakeDotBlur();
-   /* BaseApp::UpdateParticles();
+    ////// Draw mirror
+    //Graphics::reflectedSolidPSO.SetPipelineState(m_context);
+    //m_context->ClearDepthStencilView(m_DSV.Get(), D3D11_CLEAR_DEPTH, 1.f, 0);
+    //BaseApp::SetGlobalConsts(m_reflectGlobalConstsGPU);
+    //for (const auto &model : models) {
+    //    model->Render(m_context);
+    //}
+    //Graphics::reflectedSkyboxPSO.SetPipelineState(m_context);
+    //skybox->Render(m_context);
 
-    Graphics::drawingParticlesPSO.SetPipelineState(m_context);
-    m_context->VSSetShaderResources(20, 1, particles.m_srv.GetAddressOf());
-    m_context->Draw(particles.m_cpu.size(), 0);
+    //Graphics::blendPSO.SetPipelineState(m_context);
 
-    m_context->ResolveSubresource(m_resolvedBuffer.Get(), 0,
-                                  m_floatBuffer.Get(), 0,
-                                  DXGI_FORMAT_R16G16B16A16_FLOAT);*/
+    //m_context->ResolveSubresource(m_resolvedBuffer.Get(), 0,
+    //                              m_floatBuffer.Get(), 0,
+    //                              DXGI_FORMAT_R16G16B16A16_FLOAT);
+
+    // BaseApp::MakeDotBlur();
+     BaseApp::UpdateParticles();
+
+     Graphics::drawingParticlesPSO.SetPipelineState(m_context);
+     m_context->VSSetShaderResources(20, 1, particles.m_srv.GetAddressOf());
+     m_context->Draw(particles.m_cpu.size(), 0);
+
+     m_context->ResolveSubresource(m_resolvedBuffer.Get(), 0,
+                                   m_floatBuffer.Get(), 0,
+                                   DXGI_FORMAT_R16G16B16A16_FLOAT);
     m_postProcess.Render(m_context);
 }
 

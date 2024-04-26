@@ -1,8 +1,8 @@
 #include "Header.hlsli"
-struct PSInput
+struct GSInput
 {
-    float4 posProj : SV_Position;
-    float3 color : color;
+    float4 pos : Position;
+    float3 color : Color;
 };
 struct Particle
 {
@@ -11,12 +11,11 @@ struct Particle
 };
 StructuredBuffer<Particle> particles : register(t20);
 
-PSInput main(uint idx : SV_VertexID)
+GSInput main(uint idx : SV_VertexID)
 {
     Particle p = particles[idx];
-    PSInput output;
-    output.posProj = float4(p.pos, 1.0);
+    GSInput output;
+    output.pos = float4(p.pos, 1.0);
     output.color = p.color;
-
     return output;
 }
