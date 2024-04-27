@@ -23,6 +23,15 @@ class Utils {
         context->PSSetShaderResources(0, 6, nullSRVs);
     }
     static void
+    IABufferClear(Microsoft::WRL::ComPtr<ID3D11DeviceContext> &context) {
+        ID3D11Buffer *nullBuffers[1] = {
+            0,
+        };
+        UINT offset = 0;
+        UINT stride = 0;
+        context->IASetVertexBuffers(0, 1, nullBuffers, &stride, &offset);
+    }
+    static void
     ComputeShaderBarrier(Microsoft::WRL::ComPtr<ID3D11DeviceContext> &context) {
         ID3D11ShaderResourceView *nullSRV[6] = {
             0,

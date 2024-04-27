@@ -23,6 +23,7 @@ extern Microsoft::WRL::ComPtr<ID3D11InputLayout> basicIL;
 extern Microsoft::WRL::ComPtr<ID3D11InputLayout> combineIL;
 
 extern Microsoft::WRL::ComPtr<ID3D11BlendState> basicBS;
+extern Microsoft::WRL::ComPtr<ID3D11BlendState> addBS;
 
 extern GraphicsPSO defaultSolidPSO;
 extern GraphicsPSO reflectedSolidPSO;

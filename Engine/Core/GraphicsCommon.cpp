@@ -45,6 +45,7 @@ Microsoft::WRL::ComPtr<ID3D11InputLayout> basicIL;
 Microsoft::WRL::ComPtr<ID3D11InputLayout> combineIL;
 
 Microsoft::WRL::ComPtr<ID3D11BlendState> basicBS;
+Microsoft::WRL::ComPtr<ID3D11BlendState> addBS;
 
 GraphicsPSO defaultSolidPSO;
 GraphicsPSO reflectedSolidPSO;
@@ -158,6 +159,7 @@ void InitCommonStates(Microsoft::WRL::ComPtr<ID3D11Device> &device) {
     ThrowIfFailed(device->CreateInputLayout(
         basicIEs.data(), (UINT)basicIEs.size(), g_pDefaultVS,
         sizeof(g_pDefaultVS), basicIL.GetAddressOf()));
+
     ThrowIfFailed(device->CreateInputLayout(
         dummyIEs.data(), (UINT)dummyIEs.size(), g_vDrawingParticlesVS,
         sizeof(g_vDrawingParticlesVS), dummyIL.GetAddressOf()));
@@ -179,6 +181,12 @@ void InitCommonStates(Microsoft::WRL::ComPtr<ID3D11Device> &device) {
     blendDesc.RenderTarget[0].RenderTargetWriteMask =
         D3D11_COLOR_WRITE_ENABLE_ALL;
     ThrowIfFailed(device->CreateBlendState(&blendDesc, basicBS.GetAddressOf()));
+        
+    blendDesc.AlphaToCoverageEnable = true;
+    blendDesc.IndependentBlendEnable = false;
+    blendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_BLEND_FACTOR; 
+    ThrowIfFailed(device->CreateBlendState(&blendDesc, addBS.GetAddressOf()));
+    
 
     // Set Graphics PSO
     defaultSolidPSO.SetVertexShader(g_pDefaultVS, sizeof(g_pDefaultVS), device);
@@ -230,7 +238,7 @@ void InitCommonStates(Microsoft::WRL::ComPtr<ID3D11Device> &device) {
                                    device);
 
     blendPSO = defaultSolidPSO;
-    float blendFactor[4]{0.2f, 0.2f, 0.2f, 1.f};
+    float blendFactor[4] = {1.f, 1.f,1.f,1.f};
     blendPSO.SetBlendFactor(blendFactor);
     blendPSO.SetBlendState(basicBS);
 
@@ -244,11 +252,12 @@ void InitCommonStates(Microsoft::WRL::ComPtr<ID3D11Device> &device) {
                                        sizeof(g_gDrawingParticlesGS), device);
     drawingParticlesPSO.SetPrimitiveTopology(
         D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
+    drawingParticlesPSO.SetInputLayout(dummyIL);
 
     drawingParticlesBlendPSO = drawingParticlesPSO;
     drawingParticlesBlendPSO.SetBlendFactor(blendFactor);
-    drawingParticlesBlendPSO.SetBlendState(basicBS);
-
+    drawingParticlesBlendPSO.SetBlendState(addBS);
+    
     // Set Compute PSO
     InitPSO.SetComputeShader(g_pInitCS, sizeof(g_pInitCS), device);
 

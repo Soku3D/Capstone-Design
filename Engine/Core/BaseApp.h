@@ -50,7 +50,7 @@ class BaseApp {
     void UpdateParticles();
     //void RenderParticles();
   private:
-    DXGI_FORMAT swapChainFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
+    DXGI_FORMAT m_backBufferFormat = DXGI_FORMAT_R16G16B16A16_FLOAT;
     UINT m_sampleCount;
     UINT m_sampleQulity;
     bool useMSAA = true;
@@ -69,6 +69,8 @@ class BaseApp {
 
     Microsoft::WRL::ComPtr<IDXGISwapChain> m_swapChain;
 
+    
+    bool usebackBufferMSAA = true;
     Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_backBufferRTV;
     Microsoft::WRL::ComPtr<ID3D11DepthStencilView> m_DSV;
     Microsoft::WRL::ComPtr<ID3D11Texture2D> m_floatBuffer;

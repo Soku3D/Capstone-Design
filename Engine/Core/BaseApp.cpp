@@ -145,7 +145,7 @@ bool BaseApp::InitDirect3D() {
     ZeroMemory(&scDesc, sizeof(scDesc));
     scDesc.BufferDesc.Width = m_width;
     scDesc.BufferDesc.Height = m_height;
-    scDesc.BufferDesc.Format = swapChainFormat;
+    scDesc.BufferDesc.Format = m_backBufferFormat;
     scDesc.BufferDesc.RefreshRate.Numerator = 60;
     scDesc.BufferDesc.RefreshRate.Denominator = 1;
     scDesc.SampleDesc.Count = 1;

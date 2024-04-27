@@ -105,6 +105,7 @@ void PostProcess::Render(Microsoft::WRL::ComPtr<ID3D11DeviceContext> &context) {
     combineFilter.Render(context);
     context->DrawIndexed(m_meshes->m_indexCount, 0, 0);
     Utils::SRVBarrier(context);
+    Utils::IABufferClear(context);
 }
 void PostProcess::Update(const SamplingPSConstants &constant,
                          Microsoft::WRL::ComPtr<ID3D11DeviceContext> &context) {
@@ -113,5 +114,6 @@ void PostProcess::Update(const SamplingPSConstants &constant,
     combineFilter.samplingConstantCPU.gamma = constant.gamma;
     Utils::UpdateConstantBuffer(combineFilter.samplingConstantCPU,
                                 combineFilter.samplingConstantGPU, context);
+    
 }
 } // namespace soku
