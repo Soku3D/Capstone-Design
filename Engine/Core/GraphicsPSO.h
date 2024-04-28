@@ -43,7 +43,7 @@ class GraphicsPSO {
                            Microsoft::WRL::ComPtr<ID3D11Device> &device);
    
 
-  private:
+  public:
     D3D11_GRAPHICS_PIPELINE_STATE_DESC m_PSODesc;
 };
 class ComputePSO {

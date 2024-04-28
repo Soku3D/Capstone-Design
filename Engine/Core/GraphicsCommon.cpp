@@ -184,7 +184,7 @@ void InitCommonStates(Microsoft::WRL::ComPtr<ID3D11Device> &device) {
         
     blendDesc.AlphaToCoverageEnable = true;
     blendDesc.IndependentBlendEnable = false;
-    blendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_BLEND_FACTOR; 
+    blendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_BLEND_FACTOR; 
     ThrowIfFailed(device->CreateBlendState(&blendDesc, addBS.GetAddressOf()));
     
 

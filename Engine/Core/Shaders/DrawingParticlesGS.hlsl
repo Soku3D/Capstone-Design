@@ -1,46 +1,52 @@
-struct GSInput
+struct GeometryShaderInput
 {
-    float4 pos : Position;
-    float3 color : Color;
-};
-struct PSInput
-{
-    float4 pos : SV_Position;
+    float4 pos : SV_POSITION;
     float3 color : COLOR;
-    float2 uv : TEXCOORD;
+};
+
+struct PixelShaderInput
+{
+    float4 pos : SV_POSITION;
+    float2 texCoord : TEXCOORD;
+    float3 color : COLOR;
     uint primID : SV_PrimitiveID;
 };
 
 [maxvertexcount(4)]
-void main(point GSInput input[1], uint primID : SV_PrimitiveID,
-    inout TriangleStream<PSInput> outputStream)
+void main(point GeometryShaderInput input[1], uint primID : SV_PrimitiveID,
+                              inout TriangleStream<PixelShaderInput> outputStream)
 {
-    float4 x = float4(1, 0, 0, 0);
-    float4 y = float4(0, 1, 0, 0);
-    float w = 0.03f;
+    float w = 0.3;
+    float3 up = float3(0, 1, 0);
+    float3 right = float3(1, 0, 0);
     
-    PSInput output;
-    output.primID = primID;
+    PixelShaderInput output;
+    output.pos.w = 1;
     output.color = input[0].color;
     
-    output.pos = input[0].pos - (x + y) * w;
-    output.uv = float2(0, 1);
+    output.pos.xyz = input[0].pos.xyz - w * right - w * up;
+    output.texCoord = float2(0.0, 1.0);
+    output.primID = primID;
+    
+    outputStream.Append(output);
+
+    output.pos.xyz = input[0].pos.xyz - w * right + w * up;
+    output.texCoord = float2(0.0, 0.0);
+    output.primID = primID;
+    
     outputStream.Append(output);
     
-    output.pos = input[0].pos - (x - y) * w;
-    output.uv = float2(0, 0);
+    output.pos.xyz = input[0].pos.xyz + w * right - w * up;
+    output.texCoord = float2(1.0, 1.0);
+    output.primID = primID;
+    
     outputStream.Append(output);
     
-    output.pos = input[0].pos - (-x + y) * w;
-    output.uv = float2(1, 1);
+    output.pos.xyz = input[0].pos.xyz + w * right + w * up;
+    output.texCoord = float2(1.0, 0.0);
+    output.primID = primID;
+
     outputStream.Append(output);
-    
-    output.pos = input[0].pos - (-x - y) * w;
-    output.uv = float2(1, 0);
-    outputStream.Append(output);
-    
-    
-    
-    outputStream.RestartStrip();
-    
+
+    outputStream.RestartStrip(); 
 }

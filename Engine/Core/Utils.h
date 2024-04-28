@@ -175,7 +175,8 @@ class Utils {
         ZeroMemory(&subData, sizeof(subData));
         subData.pSysMem = cpu.data();
         // subData.SysMemPitch = sizeof(T) * cpu.size();
-        device->CreateBuffer(&bufferDesc, &subData, gpu.GetAddressOf());
+        ThrowIfFailed(
+            device->CreateBuffer(&bufferDesc, &subData, gpu.GetAddressOf()));
 
         D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc;
         ZeroMemory(&uavDesc, sizeof(uavDesc));

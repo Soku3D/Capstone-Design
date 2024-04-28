@@ -1,21 +1,27 @@
-#include "Header.hlsli"
-struct GSInput
+struct PSInput // GS가 있다면 GSInput으로 사용됨
 {
-    float4 pos : Position;
-    float3 color : Color;
+    float4 position : SV_POSITION;
+    float3 color : COLOR;
 };
+
 struct Particle
 {
-    float3 pos;
+    float3 position;
     float3 color;
 };
-StructuredBuffer<Particle> particles : register(t20);
 
-GSInput main(uint idx : SV_VertexID)
+StructuredBuffer<Particle> particles : register(t0);
+
+// VSInput이 없이 vertexID만 사용
+PSInput main(uint vertexID : SV_VertexID)
 {
-    Particle p = particles[idx];
-    GSInput output;
-    output.pos = float4(p.pos, 1.0);
+    Particle p = particles[vertexID];
+    
+    PSInput output;
+    
+    output.position = float4(p.position.xyz, 1.0);
+    
     output.color = p.color;
+
     return output;
 }
