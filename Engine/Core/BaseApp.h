@@ -48,6 +48,7 @@ class BaseApp {
     virtual void UpdateGUI(float deltaTime) = 0;
 
   protected:
+    StructuredBuffer<Particle> m_particles;
     void RenderDotBlur();
     void InitParticles(const int& count);
     void RenderParticles();

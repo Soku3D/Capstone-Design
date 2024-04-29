@@ -14,7 +14,7 @@ bool RenderApp::Initialize() {
     return true;
 }
 void RenderApp::Update(float deltaTime) {
-    std::cout << mouse->GetState().x << ' ' << mouse->GetState().y << '\n';
+    //std::cout << mouse->GetState().x << ' ' << mouse->GetState().y << '\n';
 }
 void RenderApp::UpdateGUI(float deltaTime) {
     ImGui::RadioButton("test", m_captureFlag);

@@ -152,6 +152,21 @@ class Utils {
                          Microsoft::WRL::ComPtr<ID3D11Device> &device,
                          Microsoft::WRL::ComPtr<ID3D11DeviceContext> &context,
                          const int &mipLevels = 1, const int &arraySize = 1);
+    template <typename T>
+    static void
+    CreateStagingBuffer(const std::vector<T> &cpu,
+                        Microsoft::WRL::ComPtr<ID3D11Buffer> &staging,
+                        Microsoft::WRL::ComPtr<ID3D11Device> &device) {
+        D3D11_BUFFER_DESC bufferDesc;
+        ZeroMemory(&bufferDesc, sizeof(bufferDesc));
+        bufferDesc.ByteWidth = sizeof(T) * cpu.size();
+        bufferDesc.Usage = D3D11_USAGE_STAGING;
+        bufferDesc.CPUAccessFlags =
+            D3D11_CPU_ACCESS_WRITE | D3D11_CPU_ACCESS_READ;
+        bufferDesc.StructureByteStride = sizeof(T);
+        ThrowIfFailed(
+            device->CreateBuffer(&bufferDesc, NULL, staging.GetAddressOf()));
+    }
     static void CreateTextureArray();
     static Matrix CreateReflectedMatrix(const Vector3 &normal,
                                         const Vector3 &point);
@@ -161,7 +176,7 @@ class Utils {
         Microsoft::WRL::ComPtr<ID3D11Buffer> &gpu,
         Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> &srv,
         Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> &uav,
-        Microsoft::WRL::ComPtr<ID3D11RenderTargetView> &rtv ) {
+        Microsoft::WRL::ComPtr<ID3D11RenderTargetView> &rtv) {
 
         D3D11_BUFFER_DESC bufferDesc;
         ZeroMemory(&bufferDesc, sizeof(bufferDesc));
@@ -190,7 +205,16 @@ class Utils {
         srvDesc.Format = DXGI_FORMAT_UNKNOWN;
         srvDesc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
         srvDesc.BufferEx.NumElements = cpu.size();
-        ThrowIfFailed(device->CreateShaderResourceView(gpu.Get(), &srvDesc, srv.GetAddressOf()));
+        ThrowIfFailed(device->CreateShaderResourceView(gpu.Get(), &srvDesc,
+                                                       srv.GetAddressOf()));
     }
+    static void
+    CreateUATexture(const int &width, const int &height,
+                    const DXGI_FORMAT &format,
+                    Microsoft::WRL::ComPtr<ID3D11Device> &device,
+                    Microsoft::WRL::ComPtr<ID3D11Texture2D> &tex,
+                    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> &srv,
+                    Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> &uav,
+                    Microsoft::WRL::ComPtr<ID3D11RenderTargetView> &rtv);
 };
 } // namespace soku

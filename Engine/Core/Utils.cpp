@@ -140,7 +140,6 @@ void Utils::CreateStagingTexture(
     texDesc.SampleDesc.Count = 1;
     texDesc.Usage = D3D11_USAGE_STAGING;
     texDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ | D3D11_CPU_ACCESS_WRITE;
-
     ThrowIfFailed(
         device->CreateTexture2D(&texDesc, NULL, stagingTex.GetAddressOf()));
 
@@ -161,5 +160,31 @@ Matrix Utils::CreateReflectedMatrix(const Vector3 &n, const Vector3 &p) {
                -2.f * n.x * n.z, -2.f * n.y * n.z, 1.f - 2.f * n.z * n.z, 0.f,
                -2.f * n.x * d, -2.f * n.y * d, -2.f * n.z * d, 1.f);
     return mat;
+}
+void Utils::CreateUATexture(
+    const int &width, const int &height, const DXGI_FORMAT &format,
+    Microsoft::WRL::ComPtr<ID3D11Device> &device,
+    Microsoft::WRL::ComPtr<ID3D11Texture2D> &tex,
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> &srv,
+    Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> &uav,
+    Microsoft::WRL::ComPtr<ID3D11RenderTargetView> &rtv ) {
+    D3D11_TEXTURE2D_DESC texDesc;
+    ZeroMemory(&texDesc, sizeof(texDesc));
+    texDesc.Width = width;
+    texDesc.Height = height;
+    texDesc.ArraySize = texDesc.MipLevels = 1;
+    texDesc.Format = format;
+    texDesc.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_UNORDERED_ACCESS |
+                        D3D11_BIND_SHADER_RESOURCE;
+    texDesc.SampleDesc.Count = 1;
+    texDesc.Usage = D3D11_USAGE_DEFAULT;
+    
+    ThrowIfFailed(device->CreateTexture2D(&texDesc, NULL, tex.GetAddressOf()));
+    ThrowIfFailed(
+        device->CreateShaderResourceView(tex.Get(), NULL, srv.GetAddressOf()));
+    ThrowIfFailed(
+        device->CreateRenderTargetView(tex.Get(), NULL, rtv.GetAddressOf()));
+    ThrowIfFailed(
+        device->CreateUnorderedAccessView(tex.Get(), NULL, uav.GetAddressOf()));
 }
 } // namespace soku

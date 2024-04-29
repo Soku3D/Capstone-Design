@@ -437,9 +437,23 @@ void BaseApp::RenderDotBlur() {
 }
 
 void BaseApp::InitParticles(const int &count) {
-    
-}
 
+    m_particles.m_cpu.resize(count);
+    
+    std::mt19937 gen(0);
+    std::uniform_real_distribution<float> urd_p(-1.f, 1.f);
+    std::uniform_real_distribution<float> urd_c(0.f, 1.f);
+    std::uniform_real_distribution<float> urd_r(0.1f, 0.3f);
+    std::uniform_real_distribution<float> urd_v(-0.1f, 0.1f);
+
+    for (auto &p : m_particles.m_cpu) {
+        p.m_position = Vector3(urd_p(gen), urd_p(gen), urd_p(gen));
+        p.m_color = Vector3(urd_c(gen), urd_c(gen), urd_c(gen));
+        p.m_radius = urd_r(gen);
+        p.m_velocity = Vector3(urd_v(gen), urd_v(gen), 0.f);
+    }
+
+}
 void BaseApp::RenderParticles() {}
 
 } // namespace soku
