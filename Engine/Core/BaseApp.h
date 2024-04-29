@@ -7,13 +7,13 @@
 #include "Timer.h"
 #include "Utils.h"
 #include "StructuredBuffer.h"
+#include "Texture2D.h"
 namespace soku {
 struct Particle {
     Vector3 m_position;
     Vector3 m_color;
     Vector3 m_velocity;
-    float m_time;
-    float m_radius;
+    float width;
 };
 class BaseApp {
   public:
@@ -48,12 +48,15 @@ class BaseApp {
     virtual void UpdateGUI(float deltaTime) = 0;
 
   protected:
+    Texture2D renderTex;
     StructuredBuffer<Particle> m_particles;
     void RenderDotBlur();
     void InitParticles(const int& count);
     void RenderParticles();
-    void AddParticle(const Vector2 &position);
-  private:
+    void UpdateParticles();
+    void DisspationParticles();
+   // void AddParticle(const Vector2 &position);
+  protected:
     DXGI_FORMAT m_backBufferFormat = DXGI_FORMAT_R16G16B16A16_FLOAT;
     UINT m_sampleCount;
     UINT m_sampleQulity;

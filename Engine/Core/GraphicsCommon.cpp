@@ -12,6 +12,9 @@
 #include "CompiledShaders/DownSamplingPS.h"
 #include "CompiledShaders/GraphVS.h"
 #include "CompiledShaders/GraphPS.h"
+#include "CompiledShaders/DrawingParticlesVS.h"
+#include "CompiledShaders/DrawingParticlesGS.h"
+#include "CompiledShaders/DrawingParticlesPS.h"
 
 #include "CompiledShaders/ApplyBloomCS.h"
 #include "CompiledShaders/InitCS.h"
@@ -19,6 +22,8 @@
 #include "CompiledShaders/BlurYCS.h"
 #include "CompiledShaders/BlurXGroupCacheCS.h"
 #include "CompiledShaders/BlurYGroupCacheCS.h"
+#include "CompiledShaders/UpdateParticlesCS.h"
+#include "CompiledShaders/DisspationParticlesCS.h"
 
 namespace soku {
 namespace Graphics {
@@ -64,6 +69,7 @@ ComputePSO blurYPSO;
 ComputePSO blurXGroupCachePSO;
 ComputePSO blurYGroupCachePSO;
 ComputePSO updateParticlePSO;
+ComputePSO disspateParticlePSO;
 
 void InitCommonStates(Microsoft::WRL::ComPtr<ID3D11Device> &device) {
     // Create SamplerState
@@ -233,7 +239,21 @@ void InitCommonStates(Microsoft::WRL::ComPtr<ID3D11Device> &device) {
     float blendFactor[4] = {1.f, 1.f,1.f,1.f};
     blendPSO.SetBlendFactor(blendFactor);
     blendPSO.SetBlendState(basicBS);
-  
+    
+    drawingParticlesPSO.SetInputLayout(dummyIL);
+    drawingParticlesPSO.SetVertexShader(g_vDrawingParticlesVS,
+                                        sizeof(g_vDrawingParticlesVS), device);
+    drawingParticlesPSO.SetPixelShader(g_pDrawingParticlesPS,
+                                        sizeof(g_pDrawingParticlesPS), device);
+    drawingParticlesPSO.SetGeometryShader(g_gDrawingParticlesGS,
+                                        sizeof(g_gDrawingParticlesGS), device);
+    drawingParticlesPSO.SetPrimitiveTopology(
+        D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
+    
+    drawingParticlesBlendPSO = drawingParticlesPSO;
+    drawingParticlesBlendPSO.SetBlendState(addBS);
+    drawingParticlesBlendPSO.SetBlendFactor(blendFactor);
+
     // Set Compute PSO
     InitPSO.SetComputeShader(g_pInitCS, sizeof(g_pInitCS), device);
 
@@ -252,6 +272,9 @@ void InitCommonStates(Microsoft::WRL::ComPtr<ID3D11Device> &device) {
                                         sizeof(g_cBlurYGroupCacheCS), device);
     blurYGroupCachePSO.SetSamplerState(pointClampSS);
 
+    updateParticlePSO.SetComputeShader(g_cUpdateParticlesCS,
+                                       sizeof(g_cUpdateParticlesCS), device);
+    disspateParticlePSO.SetComputeShader(g_cDisspationParticlesCS, sizeof(g_cDisspationParticlesCS), device);
 }
 } // namespace Graphics
 } // namespace soku

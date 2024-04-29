@@ -170,43 +170,50 @@ class Utils {
     static void CreateTextureArray();
     static Matrix CreateReflectedMatrix(const Vector3 &normal,
                                         const Vector3 &point);
-    template <typename T>
     static void CreateStructuredBuffer(
-        Microsoft::WRL::ComPtr<ID3D11Device> &device, std::vector<T> &cpu,
-        Microsoft::WRL::ComPtr<ID3D11Buffer> &gpu,
+        Microsoft::WRL::ComPtr<ID3D11Device> &device, const UINT numElements,
+        const UINT sizeElement, const void *initData,
+        Microsoft::WRL::ComPtr<ID3D11Buffer> &buffer,
         Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> &srv,
-        Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> &uav,
-        Microsoft::WRL::ComPtr<ID3D11RenderTargetView> &rtv) {
+        Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> &uav) {
 
         D3D11_BUFFER_DESC bufferDesc;
         ZeroMemory(&bufferDesc, sizeof(bufferDesc));
-        bufferDesc.ByteWidth = sizeof(T) * cpu.size();
         bufferDesc.Usage = D3D11_USAGE_DEFAULT;
-        bufferDesc.BindFlags =
-            D3D11_BIND_UNORDERED_ACCESS | D3D11_BIND_SHADER_RESOURCE;
+        bufferDesc.ByteWidth = numElements * sizeElement;
+        bufferDesc.BindFlags = D3D11_BIND_UNORDERED_ACCESS | 
+                               D3D11_BIND_SHADER_RESOURCE;  
+        bufferDesc.StructureByteStride = sizeElement;
         bufferDesc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
-        bufferDesc.StructureByteStride = sizeof(T);
 
-        D3D11_SUBRESOURCE_DATA subData;
-        ZeroMemory(&subData, sizeof(subData));
-        subData.pSysMem = cpu.data();
-        ThrowIfFailed(
-            device->CreateBuffer(&bufferDesc, &subData, gpu.GetAddressOf()));
+ 
+
+        if (initData) {
+            D3D11_SUBRESOURCE_DATA bufferData;
+            ZeroMemory(&bufferData, sizeof(bufferData));
+            bufferData.pSysMem = initData;
+            ThrowIfFailed(device->CreateBuffer(&bufferDesc, &bufferData,
+                                               buffer.GetAddressOf()));
+        } else {
+            ThrowIfFailed(
+                device->CreateBuffer(&bufferDesc, NULL, buffer.GetAddressOf()));
+        }
 
         D3D11_UNORDERED_ACCESS_VIEW_DESC uavDesc;
         ZeroMemory(&uavDesc, sizeof(uavDesc));
         uavDesc.Format = DXGI_FORMAT_UNKNOWN;
         uavDesc.ViewDimension = D3D11_UAV_DIMENSION_BUFFER;
-        uavDesc.Buffer.NumElements = cpu.size();
-        ThrowIfFailed(device->CreateUnorderedAccessView(gpu.Get(), &uavDesc,
-                                                        uav.GetAddressOf()));
+        uavDesc.Buffer.NumElements = numElements;
+        device->CreateUnorderedAccessView(buffer.Get(), &uavDesc,
+                                          uav.GetAddressOf());
+
         D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
         ZeroMemory(&srvDesc, sizeof(srvDesc));
         srvDesc.Format = DXGI_FORMAT_UNKNOWN;
         srvDesc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
-        srvDesc.BufferEx.NumElements = cpu.size();
-        ThrowIfFailed(device->CreateShaderResourceView(gpu.Get(), &srvDesc,
-                                                       srv.GetAddressOf()));
+        srvDesc.BufferEx.NumElements = numElements;
+        device->CreateShaderResourceView(buffer.Get(), &srvDesc,
+                                         srv.GetAddressOf());
     }
     static void
     CreateUATexture(const int &width, const int &height,

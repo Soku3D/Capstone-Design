@@ -5,10 +5,17 @@ namespace soku {
 template <typename T> class StructuredBuffer {
   public:
     void Initilaize(Microsoft::WRL::ComPtr<ID3D11Device> &device) {
-        Utils::CreateStructuredBuffer(device, m_cpu, m_gpu, m_srv, m_uav,
-                                      m_rtv);
+        Utils::CreateStructuredBuffer(device, UINT(m_cpu.size()),
+                                           sizeof(T), m_cpu.data(),
+                                           m_gpu, m_srv, m_uav);
         Utils::CreateStagingBuffer(m_cpu, m_staging, device);
     }
+    ID3D11ShaderResourceView **GetSrvAddressOf() {
+        return m_srv.GetAddressOf();
+    }
+    ID3D11UnorderedAccessView **GetUavAddressOf() {
+        return m_uav.GetAddressOf();
+        }
     std::vector<T> m_cpu;
   private:
     Microsoft::WRL::ComPtr<ID3D11Buffer> m_gpu;

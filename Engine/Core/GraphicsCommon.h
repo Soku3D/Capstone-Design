@@ -47,5 +47,6 @@ extern ComputePSO blurYPSO;
 extern ComputePSO blurXGroupCachePSO;
 extern ComputePSO blurYGroupCachePSO;
 extern ComputePSO updateParticlePSO;
+extern ComputePSO disspateParticlePSO;
 } // namespace Graphics
 } // namespace soku

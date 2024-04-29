@@ -7,6 +7,11 @@ class Texture2D {
                     const DXGI_FORMAT &format,
                     Microsoft::WRL::ComPtr<ID3D11Device> &device);
 
+    ID3D11Texture2D *GetTex() { return m_tex.Get(); }
+    ID3D11RenderTargetView **GetRtvAddressOf() { return m_rtv.GetAddressOf(); }
+    ID3D11ShaderResourceView **GetSrvAddressOf() { return m_srv.GetAddressOf(); }
+    ID3D11UnorderedAccessView **GetUavAddressOf() { return m_uav.GetAddressOf(); }
+
   private:
     Microsoft::WRL::ComPtr<ID3D11Texture2D> m_tex;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_srv;

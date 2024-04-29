@@ -447,13 +447,36 @@ void BaseApp::InitParticles(const int &count) {
     std::uniform_real_distribution<float> urd_v(-0.1f, 0.1f);
 
     for (auto &p : m_particles.m_cpu) {
-        p.m_position = Vector3(urd_p(gen), urd_p(gen), urd_p(gen));
+        p.m_position = Vector3(urd_p(gen), urd_p(gen), 0.f);
         p.m_color = Vector3(urd_c(gen), urd_c(gen), urd_c(gen));
-        p.m_radius = urd_r(gen);
-        p.m_velocity = Vector3(urd_v(gen), urd_v(gen), 0.f);
     }
 
+    m_particles.Initilaize(m_device);
 }
-void BaseApp::RenderParticles() {}
 
+void BaseApp::RenderParticles() {
+    Graphics::drawingParticlesBlendPSO.SetPipelineState(m_context);
+    m_context->CSSetShader(NULL, NULL, 0);
+    m_context->VSSetShaderResources(0, 1, m_particles.GetSrvAddressOf());
+    m_context->Draw(m_particles.m_cpu.size(), 0);
+    ID3D11ShaderResourceView *nullSRVs[1] = {0};
+    m_context->VSSetShaderResources(0, 1, nullSRVs);
+}
+void BaseApp::UpdateParticles() {
+    Graphics::updateParticlePSO.SetPipelineState(m_context);
+    m_context->CSSetUnorderedAccessViews(0, 1, m_particles.GetUavAddressOf(),NULL);
+    m_context->Dispatch((UINT)(std::ceil(m_particles.m_cpu.size() / 256.f)), 1.f, 1.f);
+    //m_context->CSSetShaderResources()
+    //m_context->CSSetConstantBuffers()
+    Utils::ComputeShaderBarrier(m_context);
+}
+void BaseApp::DisspationParticles() {
+    Graphics::disspateParticlePSO.SetPipelineState(m_context);
+    m_context->CSSetUnorderedAccessViews(0, 1,
+                                         renderTex.GetUavAddressOf(),
+                                         NULL);
+    m_context->Dispatch((UINT)(std::ceil(m_width)),
+                        (UINT)(std::ceil(m_height)),1.f);
+    Utils::ComputeShaderBarrier(m_context);
+}
 } // namespace soku
