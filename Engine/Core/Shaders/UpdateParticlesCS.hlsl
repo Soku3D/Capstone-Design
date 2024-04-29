@@ -4,6 +4,7 @@ struct Particle
     float3 color;
     float3 velocity;
     float width;
+    float time;
 };
 #define PI 3.141592
 RWStructuredBuffer<Particle> Particles : register(u0);

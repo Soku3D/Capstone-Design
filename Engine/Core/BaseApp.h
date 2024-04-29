@@ -14,6 +14,7 @@ struct Particle {
     Vector3 m_color;
     Vector3 m_velocity;
     float width;
+    float time;
 };
 class BaseApp {
   public:
@@ -96,6 +97,8 @@ class BaseApp {
     Timer m_timer;
     std::unique_ptr<DirectX::Mouse> mouse;
     std::shared_ptr<Camera> m_camera;
+    bool lButtonDrag = false;
+    bool lButtionDown = false;
     bool keyDownState[256];
     bool m_captureFlag = false;
     bool m_cameraMove = false;

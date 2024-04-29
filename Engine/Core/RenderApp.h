@@ -13,7 +13,7 @@ class RenderApp : public BaseApp {
     
   private:
     virtual void Render(float deltaTime) override;
-    void RenderSpinParticles();
+   
     virtual void Update(float deltaTime) override;
     virtual void UpdateGUI(float deltaTime) override;
 

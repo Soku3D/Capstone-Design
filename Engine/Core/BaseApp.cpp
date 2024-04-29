@@ -390,7 +390,14 @@ LRESULT BaseApp::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
             break;
         }
     case WM_LBUTTONDOWN:
+        if (lButtionDown)
+            lButtonDrag = true;
+        lButtionDown = true;
+        break;
     case WM_LBUTTONUP:
+        lButtonDrag = false;
+        lButtionDown = false;
+        break;
     case WM_ACTIVATE:
     case WM_ACTIVATEAPP:
     case WM_MOUSEMOVE:
@@ -443,12 +450,17 @@ void BaseApp::InitParticles(const int &count) {
     std::mt19937 gen(0);
     std::uniform_real_distribution<float> urd_p(-1.f, 1.f);
     std::uniform_real_distribution<float> urd_c(0.f, 1.f);
-    std::uniform_real_distribution<float> urd_r(0.1f, 0.3f);
-    std::uniform_real_distribution<float> urd_v(-0.1f, 0.1f);
+    std::uniform_real_distribution<float> urd_r(0.01f, 0.03f);
+    std::uniform_real_distribution<float> urd_v(-1.f, -0.05f);
+    std::uniform_real_distribution<float> urd_t(0.5f, 1.5f);
 
     for (auto &p : m_particles.m_cpu) {
-        p.m_position = Vector3(urd_p(gen), urd_p(gen), 0.f);
+        //p.m_position = Vector3(urd_p(gen), urd_p(gen), 0.f);
+        p.m_position = Vector3(0.f,0.f, 0.f);
         p.m_color = Vector3(urd_c(gen), urd_c(gen), urd_c(gen));
+        p.time = urd_t(gen);
+        p.width = urd_r(gen);
+        p.m_velocity = Vector3(urd_v(gen), 0.f, 0.f);
     }
 
     m_particles.Initilaize(m_device);

@@ -8,6 +8,7 @@ class Texture2D {
                     Microsoft::WRL::ComPtr<ID3D11Device> &device);
 
     ID3D11Texture2D *GetTex() { return m_tex.Get(); }
+    ID3D11RenderTargetView *GetRtv() { return m_rtv.Get(); }
     ID3D11RenderTargetView **GetRtvAddressOf() { return m_rtv.GetAddressOf(); }
     ID3D11ShaderResourceView **GetSrvAddressOf() { return m_srv.GetAddressOf(); }
     ID3D11UnorderedAccessView **GetUavAddressOf() { return m_uav.GetAddressOf(); }
