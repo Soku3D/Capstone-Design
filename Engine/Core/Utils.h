@@ -160,7 +160,8 @@ class Utils {
         Microsoft::WRL::ComPtr<ID3D11Device> &device, std::vector<T> &cpu,
         Microsoft::WRL::ComPtr<ID3D11Buffer> &gpu,
         Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> &srv,
-        Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> &uav) {
+        Microsoft::WRL::ComPtr<ID3D11UnorderedAccessView> &uav,
+        Microsoft::WRL::ComPtr<ID3D11RenderTargetView> &rtv ) {
 
         D3D11_BUFFER_DESC bufferDesc;
         ZeroMemory(&bufferDesc, sizeof(bufferDesc));
@@ -174,7 +175,6 @@ class Utils {
         D3D11_SUBRESOURCE_DATA subData;
         ZeroMemory(&subData, sizeof(subData));
         subData.pSysMem = cpu.data();
-        // subData.SysMemPitch = sizeof(T) * cpu.size();
         ThrowIfFailed(
             device->CreateBuffer(&bufferDesc, &subData, gpu.GetAddressOf()));
 

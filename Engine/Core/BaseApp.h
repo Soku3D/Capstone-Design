@@ -11,6 +11,9 @@ namespace soku {
 struct Particle {
     Vector3 m_position;
     Vector3 m_color;
+    Vector3 m_velocity;
+    float m_time;
+    float m_radius;
 };
 class BaseApp {
   public:
@@ -46,9 +49,9 @@ class BaseApp {
 
   protected:
     void RenderDotBlur();
-    void MakeParticles(const int& particleCount = 2560);
-    void UpdateParticles();
-    //void RenderParticles();
+    void InitParticles(const int& count);
+    void RenderParticles();
+    void AddParticle(const Vector2 &position);
   private:
     DXGI_FORMAT m_backBufferFormat = DXGI_FORMAT_R16G16B16A16_FLOAT;
     UINT m_sampleCount;
@@ -68,8 +71,7 @@ class BaseApp {
     Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_context;
 
     Microsoft::WRL::ComPtr<IDXGISwapChain> m_swapChain;
-
-    
+        
     bool usebackBufferMSAA = true;
     Microsoft::WRL::ComPtr<ID3D11RenderTargetView> m_backBufferRTV;
     Microsoft::WRL::ComPtr<ID3D11DepthStencilView> m_DSV;
@@ -111,9 +113,7 @@ class BaseApp {
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_irradianceSRV;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_specularSRV;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> m_brdfSRV;
-
     protected:
-    StructuredBuffer<Particle> particles;
 
 };
 } // namespace soku

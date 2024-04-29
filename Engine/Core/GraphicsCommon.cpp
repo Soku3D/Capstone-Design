@@ -12,9 +12,6 @@
 #include "CompiledShaders/DownSamplingPS.h"
 #include "CompiledShaders/GraphVS.h"
 #include "CompiledShaders/GraphPS.h"
-#include "CompiledShaders/DrawingParticlesVS.h"
-#include "CompiledShaders/DrawingParticlesGS.h"
-#include "CompiledShaders/DrawingParticlesPS.h"
 
 #include "CompiledShaders/ApplyBloomCS.h"
 #include "CompiledShaders/InitCS.h"
@@ -22,8 +19,6 @@
 #include "CompiledShaders/BlurYCS.h"
 #include "CompiledShaders/BlurXGroupCacheCS.h"
 #include "CompiledShaders/BlurYGroupCacheCS.h"
-#include "CompiledShaders/UpdateParticlesCS.h"
-
 
 namespace soku {
 namespace Graphics {
@@ -160,9 +155,6 @@ void InitCommonStates(Microsoft::WRL::ComPtr<ID3D11Device> &device) {
         basicIEs.data(), (UINT)basicIEs.size(), g_pDefaultVS,
         sizeof(g_pDefaultVS), basicIL.GetAddressOf()));
 
-    ThrowIfFailed(device->CreateInputLayout(
-        dummyIEs.data(), (UINT)dummyIEs.size(), g_vDrawingParticlesVS,
-        sizeof(g_vDrawingParticlesVS), dummyIL.GetAddressOf()));
 
     D3D11_BLEND_DESC blendDesc;
     ZeroMemory(&blendDesc, sizeof(blendDesc));
@@ -241,23 +233,7 @@ void InitCommonStates(Microsoft::WRL::ComPtr<ID3D11Device> &device) {
     float blendFactor[4] = {1.f, 1.f,1.f,1.f};
     blendPSO.SetBlendFactor(blendFactor);
     blendPSO.SetBlendState(basicBS);
-
-    drawingParticlesPSO = defaultSolidPSO;
-    drawingParticlesPSO.SetVertexShader(g_vDrawingParticlesVS,
-                                        sizeof(g_vDrawingParticlesVS),
-                                        device); 
-    drawingParticlesPSO.SetPixelShader(g_pDrawingParticlesPS,
-                                       sizeof(g_pDrawingParticlesPS), device);
-    drawingParticlesPSO.SetGeometryShader(g_gDrawingParticlesGS,
-                                       sizeof(g_gDrawingParticlesGS), device);
-    drawingParticlesPSO.SetPrimitiveTopology(
-        D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
-    drawingParticlesPSO.SetInputLayout(dummyIL);
-
-    drawingParticlesBlendPSO = drawingParticlesPSO;
-    drawingParticlesBlendPSO.SetBlendFactor(blendFactor);
-    drawingParticlesBlendPSO.SetBlendState(addBS);
-    
+  
     // Set Compute PSO
     InitPSO.SetComputeShader(g_pInitCS, sizeof(g_pInitCS), device);
 
@@ -276,9 +252,6 @@ void InitCommonStates(Microsoft::WRL::ComPtr<ID3D11Device> &device) {
                                         sizeof(g_cBlurYGroupCacheCS), device);
     blurYGroupCachePSO.SetSamplerState(pointClampSS);
 
-    updateParticlePSO.SetSamplerState(pointClampSS);
-    updateParticlePSO.SetComputeShader(g_cUpdateParticlesCS,
-                                       sizeof(g_cUpdateParticlesCS), device);
 }
 } // namespace Graphics
 } // namespace soku

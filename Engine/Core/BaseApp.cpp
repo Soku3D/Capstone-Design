@@ -390,8 +390,6 @@ LRESULT BaseApp::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
             break;
         }
     case WM_LBUTTONDOWN:
-        /*if (!mouse->GetState().leftButton)
-            m_dragStartFlag = true; */
     case WM_LBUTTONUP:
     case WM_ACTIVATE:
     case WM_ACTIVATEAPP:
@@ -437,24 +435,11 @@ void BaseApp::RenderDotBlur() {
 
     m_context->CopyResource(m_resolvedBuffer.Get(), m_texA.Get());
 }
-void BaseApp::MakeParticles(const int &particleCount) { 
-    particles.m_cpu.resize(particleCount); 
+
+void BaseApp::InitParticles(const int &count) {
     
-    std::mt19937 gen(0);
-    std::uniform_real_distribution<float> urdp(-1.f, 1.f);
-    std::uniform_real_distribution<float> urdc(0.f, 1.f);
-    for (auto &p : particles.m_cpu) {
-        p.m_position = Vector3(urdp(gen),urdp(gen), 0.f);
-        p.m_color = Vector3(urdc(gen), urdc(gen), urdc(gen));
-    }
-    
-    particles.Initialize(m_device);
 }
-void BaseApp::UpdateParticles() {
-    Graphics::updateParticlePSO.SetPipelineState(m_context);
-    m_context->CSSetUnorderedAccessViews(0,1, particles.m_uav.GetAddressOf(),
-                                         NULL);
-    m_context->Dispatch((UINT)std::ceil(particles.m_cpu.size()/256.f), 1, 1);
-    Utils::ComputeShaderBarrier(m_context);
-}
+
+void BaseApp::RenderParticles() {}
+
 } // namespace soku
