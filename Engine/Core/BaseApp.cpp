@@ -372,25 +372,24 @@ LRESULT BaseApp::wndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) {
             m_cameraMove = !m_cameraMove;
         }
         break;
+    //case WM_INPUT:
+    //    if (m_cameraMove) {
+    //        RAWINPUT raw;
+    //        UINT rawSize = sizeof(raw);
 
-    case WM_INPUT:
-        if (m_cameraMove) {
-            RAWINPUT raw;
-            UINT rawSize = sizeof(raw);
-
-            const UINT resultData =
-                GetRawInputData(reinterpret_cast<HRAWINPUT>(lParam), RID_INPUT,
-                                &raw, &rawSize, sizeof(RAWINPUTHEADER));
-            // if (raw.header.dwType == RIM_TYPEMOUSE && m_FPSMode) {
-            int deltaX = raw.data.mouse.lLastX;
-            int deltaY = raw.data.mouse.lLastY;
-            // std::cout << deltaX << " " << deltaY << '\n';
-            OnMouseMove(deltaX, deltaY);
-            DirectX::Mouse::ProcessMessage(msg, wParam, lParam);
-            break;
-        }
+    //        const UINT resultData =
+    //            GetRawInputData(reinterpret_cast<HRAWINPUT>(lParam), RID_INPUT,
+    //                            &raw, &rawSize, sizeof(RAWINPUTHEADER));
+    //        // if (raw.header.dwType == RIM_TYPEMOUSE && m_FPSMode) {
+    //        int deltaX = raw.data.mouse.lLastX;
+    //        int deltaY = raw.data.mouse.lLastY;
+    //        // std::cout << deltaX << " " << deltaY << '\n';
+    //        OnMouseMove(deltaX, deltaY);
+    //        DirectX::Mouse::ProcessMessage(msg, wParam, lParam);
+    //        break;
+    //    }
     case WM_LBUTTONDOWN:
-        if (lButtionDown)
+        if (!lButtionDown)
             lButtonDrag = true;
         lButtionDown = true;
         break;
@@ -458,7 +457,7 @@ void BaseApp::InitParticles(const int &count) {
         //p.m_position = Vector3(urd_p(gen), urd_p(gen), 0.f);
         p.m_position = Vector3(0.f,0.f, 0.f);
         p.m_color = Vector3(urd_c(gen), urd_c(gen), urd_c(gen));
-        p.time = urd_t(gen);
+        p.time = -1.f;
         p.width = urd_r(gen);
         p.m_velocity = Vector3(urd_v(gen), 0.f, 0.f);
     }

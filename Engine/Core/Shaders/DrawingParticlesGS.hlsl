@@ -2,7 +2,8 @@ struct GSInput
 {
     float4 pos : SV_Position;
     float3 color : Color;
-    float2 width : TEXCOORD;
+    float life : PSIZE0;
+    float size : PSIZE1;
 };
 struct PSInput
 {
@@ -15,7 +16,7 @@ struct PSInput
 void main(point GSInput input[1], uint primID : SV_PrimitiveID,
     inout TriangleStream<PSInput> outputStream)
 {
-    float w = 0.03f;
+    float w = input[0].size;
     PSInput output;
     output.primID = primID;
     output.color = input[0].color;
