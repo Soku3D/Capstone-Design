@@ -65,12 +65,10 @@ void RenderApp::Update(float dt) {
         float y = p.m_position.y;
 
         if (y < -0.8f) {
-            p.m_velocity.y *= -1.f;
-            p.m_velocity*=randomCoefficient(gen);
+            p.m_velocity.y *= -randomCoefficient(gen);
         }
         if (x < -0.8f) {
-            p.m_velocity.x *= -1.f;
-            p.m_velocity.x *= randomCoefficient(gen);
+            p.m_velocity.x *= -randomCoefficient(gen);
         }
     }
     D3D11_MAPPED_SUBRESOURCE ms;
