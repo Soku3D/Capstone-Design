@@ -7,6 +7,8 @@ struct Particle
     float width;
     float time;
     float mass;
+    float density;
+    float pressure;
 };
 
 struct GSInput

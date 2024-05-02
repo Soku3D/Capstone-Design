@@ -7,6 +7,8 @@ struct Particle
     float width;
     float time;
     float mass;
+    float density;
+    float pressure;
 };
 #define PI 3.141592
 static const float3 g = float3(0, -9.8f, 0.f);
