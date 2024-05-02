@@ -204,16 +204,16 @@ class Utils {
         uavDesc.Format = DXGI_FORMAT_UNKNOWN;
         uavDesc.ViewDimension = D3D11_UAV_DIMENSION_BUFFER;
         uavDesc.Buffer.NumElements = numElements;
-        device->CreateUnorderedAccessView(buffer.Get(), &uavDesc,
-                                          uav.GetAddressOf());
+       ThrowIfFailed( device->CreateUnorderedAccessView(buffer.Get(), &uavDesc,
+                                          uav.GetAddressOf()));
 
         D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
         ZeroMemory(&srvDesc, sizeof(srvDesc));
         srvDesc.Format = DXGI_FORMAT_UNKNOWN;
         srvDesc.ViewDimension = D3D11_SRV_DIMENSION_BUFFER;
         srvDesc.BufferEx.NumElements = numElements;
-        device->CreateShaderResourceView(buffer.Get(), &srvDesc,
-                                         srv.GetAddressOf());
+        ThrowIfFailed(device->CreateShaderResourceView(buffer.Get(), &srvDesc,
+                                         srv.GetAddressOf()));
     }
     static void
     CreateUATexture(const int &width, const int &height,

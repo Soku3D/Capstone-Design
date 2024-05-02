@@ -13,10 +13,8 @@ class RenderApp : public BaseApp {
     
   private:
     virtual void Render(float deltaTime) override;
-   
     virtual void Update(float deltaTime) override;
     virtual void UpdateGUI(float deltaTime) override;
-
   private:
     std::vector<std::shared_ptr<Model>> models;
     std::shared_ptr<Model> skybox;
@@ -31,5 +29,8 @@ class RenderApp : public BaseApp {
     SamplingPSConstants SPSconstant;
     Matrix mirrorMat;
     int useEnv = 1;
+
+  private:
+    std::shared_ptr<class Sph> m_sphSimulator;
 };
 } // namespace soku

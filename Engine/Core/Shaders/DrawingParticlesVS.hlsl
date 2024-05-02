@@ -3,8 +3,10 @@ struct Particle
     float3 position;
     float3 color;
     float3 velocity;
+    float3 acceleration;
     float width;
     float time;
+    float mass;
 };
 
 struct GSInput

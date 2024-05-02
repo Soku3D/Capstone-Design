@@ -1,7 +1,7 @@
 #include "RenderApp.h"
 
 int main() {
-    soku::RenderApp app(1080, 1000);
+    soku::RenderApp app(720, 720);
     if (app.Initialize()) {
         app.Run();
     }

@@ -3,21 +3,33 @@ struct Particle
     float3 position;
     float3 color;
     float3 velocity;
+    float3 acceleration;
     float width;
     float time;
+    float mass;
 };
 #define PI 3.141592
+static const float3 g = float3(0, -9.8f, 0.f);
+cbuffer CSConsts : register(b0)
+{
+    float dt;
+}
 RWStructuredBuffer<Particle> Particles : register(u0);
-static const float delTime = 1.f / 144;
 
 [numthreads(256,1,1)]
 void main(uint dtID : SV_DispatchThreadID)
 {
+    
     Particle p = Particles[dtID];
-    float w = 0.1f;
-    float dTheta= (2.f * PI) * delTime * w;
-    float2x2 rotMat = float2x2(cos(dTheta), sin(dTheta), -sin(dTheta), cos(dTheta));
-    p.position.xy = mul(p.position.xy, rotMat);
- 
+    if (p.time > 0.3)
+    {
+        p.velocity += g * dt;
+        p.position += p.velocity * dt;
+    }
+    else
+    {
+        
+    }
+    p.time += dt;
     Particles[dtID] = p;
 }
