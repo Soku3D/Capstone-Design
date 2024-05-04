@@ -179,12 +179,12 @@ void Utils::CreateUATexture(
     texDesc.SampleDesc.Count = 1;
     texDesc.Usage = D3D11_USAGE_DEFAULT;
     
-    ThrowIfFailed(device->CreateTexture2D(&texDesc, NULL, tex.GetAddressOf()));
-    ThrowIfFailed(
-        device->CreateShaderResourceView(tex.Get(), NULL, srv.GetAddressOf()));
-    ThrowIfFailed(
-        device->CreateRenderTargetView(tex.Get(), NULL, rtv.GetAddressOf()));
-    ThrowIfFailed(
-        device->CreateUnorderedAccessView(tex.Get(), NULL, uav.GetAddressOf()));
+    ThrowIfFailed(device->CreateTexture2D(&texDesc, NULL, tex.ReleaseAndGetAddressOf()));
+    ThrowIfFailed(device->CreateShaderResourceView(
+        tex.Get(), NULL, srv.ReleaseAndGetAddressOf()));
+    ThrowIfFailed(device->CreateRenderTargetView(tex.Get(), NULL,
+                                                 rtv.ReleaseAndGetAddressOf()));
+    ThrowIfFailed(device->CreateUnorderedAccessView(
+        tex.Get(), NULL, uav.ReleaseAndGetAddressOf()));
 }
 } // namespace soku

@@ -211,7 +211,9 @@ bool BaseApp::CreateDepthBuffer() {
 void BaseApp::CreateBuffers() {
     Microsoft::WRL::ComPtr<ID3D11Texture2D> backBuffer;
     m_swapChain->GetBuffer(0, IID_PPV_ARGS(backBuffer.GetAddressOf()));
-
+    
+    renderTex.Initialize(m_width, m_height, BaseApp::m_backBufferFormat,
+                         m_device);
     ThrowIfFailed(m_device->CreateRenderTargetView(
         backBuffer.Get(), nullptr, m_backBufferRTV.ReleaseAndGetAddressOf()));
 

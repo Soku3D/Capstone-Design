@@ -12,14 +12,13 @@ bool RenderApp::Initialize() {
     if (!BaseApp::Initialize()) {
         return false;
     };
-    renderTex.Initialize(m_width, m_height, BaseApp::m_backBufferFormat,
-                         m_device);
+    
     m_sphSimulator = std::make_shared<Sph>();
-    m_sphSimulator->Initialize(m_device, 2560);
+    m_sphSimulator->Initialize(m_device, 2048);
     return true;
 }
 void RenderApp::Update(float dt) { 
-    m_sphSimulator->Update(m_context, dt); 
+    m_sphSimulator->Update(m_context, dt, GetAspectRatio());
 }
 void RenderApp::UpdateGUI(float deltaTime) {
     ImGui::RadioButton("test", m_captureFlag);

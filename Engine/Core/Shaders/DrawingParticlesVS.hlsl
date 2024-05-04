@@ -25,7 +25,10 @@ GSInput main(uint vertexID : SV_VertexID)
     GSInput output;
     Particle p = particles[vertexID];
     output.pos = float4(p.position, 1.f);
-    output.color = p.color * saturate(p.time / 0.3f);
+    float v = length(p.velocity);
+    float cv = saturate(v / 5.f);;
+    output.color = p.color + float3(cv, cv, 0.f);
+    //output.color = float3(cv, cv,0.2f);
     output.size = p.width;
     output.life = p.time;
     return output;
