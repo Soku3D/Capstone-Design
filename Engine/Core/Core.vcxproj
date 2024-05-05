@@ -34,6 +34,7 @@
     <ClInclude Include="PostProcess.h" />
     <ClInclude Include="RenderApp.h" />
     <ClInclude Include="Sph.h" />
+    <ClInclude Include="StableFluids.h" />
     <ClInclude Include="StructuredBuffer.h" />
     <ClInclude Include="Texture2D.h" />
     <ClInclude Include="Timer.h" />
@@ -56,6 +57,7 @@
     <ClCompile Include="PostProcess.cpp" />
     <ClCompile Include="RenderApp.cpp" />
     <ClCompile Include="Sph.cpp" />
+    <ClCompile Include="StableFluids.cpp" />
     <ClCompile Include="StructuredBuffer.cpp" />
     <ClCompile Include="Texture2D.cpp" />
     <ClCompile Include="Timer.cpp" />
