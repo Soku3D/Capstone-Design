@@ -8,9 +8,9 @@ class StableFluids {
 
   public:
     void Update(float &dt, Microsoft::WRL::ComPtr<ID3D11DeviceContext> & context);
-    void Sourcing();
-    void Projection();
-    void Advection();
+    void Sourcing(Microsoft::WRL::ComPtr<ID3D11DeviceContext> &context);
+    void Projection(Microsoft::WRL::ComPtr<ID3D11DeviceContext> &context);
+    void Advection(Microsoft::WRL::ComPtr<ID3D11DeviceContext> &context);
     void Render(float &dt);
   private:
 };
